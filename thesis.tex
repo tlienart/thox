@@ -1,0 +1,41 @@
+\input{preamble.tex}
+
+\setlength\parindent{0pt} % no paragraph indentation
+
+\reversemarginpar
+\newcommand{\margnote}[1]{\marginpar{\hfill\fontsize{8}{0}{\idblue{(#1)}}}}
+
+%%%%%%%%%%%%%%%%
+\begin{document}
+
+%\input{parts/title.tex}
+
+\tableofcontents
+
+\part{} % part I 
+\chapter{Introduction}
+\section{Blah}
+\chapter{}
+
+\part{} % part II
+\chapter{Introduction}
+
+\newpage
+\chapter{Conclusion}
+
+%%%%%%%%%%%
+\appendix{}
+
+
+% BIBLIOGRAPHY
+% ------------
+\newpage
+\renewcommand{\bibname}{References}
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{myabbrvnat}
+\begin{footnotesize}
+\bibliography{../texReferences}
+\end{footnotesize}
+
+%%%%%%%%%%%%%%
+\end{document}

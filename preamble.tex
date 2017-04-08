@@ -1,0 +1,47 @@
+% DOC
+\documentclass[a4paper,12pt, twoside]{report}
+
+% FONT
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[default]{sourcesanspro}
+
+% COLORS
+\usepackage[usenames,dvipsnames,svgnames]{xcolor}
+
+\definecolor{TitleCol}{named}{NavyBlue} % sections, ...
+\definecolor{EnvCol}  {named}{NavyBlue} % theorem, ...
+\definecolor{CapCol}  {named}{NavyBlue} % fig, ...
+
+% CHAP STYLE
+\usepackage{titlesec}
+\makeatletter 			% section & subsection number in margin
+	\def\@seccntformat#1{
+		\protect\makebox[0pt][r]{
+			\csname the#1\endcsname\quad
+			}
+		}
+\makeatother
+%\titleformat*{\chapter}{
+%	\Huge\bfseries\selectfont\color{TitleCol}}
+\titleformat*{\section}{
+	\Large\bfseries\selectfont\color{TitleCol}}
+\titleformat*{\subsection}{
+    \large\bfseries\selectfont\color{TitleCol}}
+\titleformat*{\subsubsection}{
+    \small\bfseries\selectfont\color{TitleCol}}
+
+% BIBLIOGRAPHY
+\usepackage[authoryear,sort]{natbib}
+
+% TIKZ
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes}
+
+% MATHS
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+\numberwithin{equation}{chapter}
