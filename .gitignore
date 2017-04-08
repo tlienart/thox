@@ -1,5 +1,5 @@
 *.DS_Store
-examples/
+thesisexamples/
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
