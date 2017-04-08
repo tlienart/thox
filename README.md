@@ -55,8 +55,9 @@
         * Discussion
 * General Conclusion, perspectives
     * (discuss Bayesian ML in general, bring rant from bayesian comp)
+    * sampling vs message passing, pros cons and blah
 * Appendices
-
+* Bibliography (*single*)
 
 ## Todo
 
@@ -79,3 +80,7 @@
 * pass @ end to fix image placement ignore until publish time (add fig on individual pages)
 * if only very few propositions/theorems, maybe don't use
 * hunt for `(??)` in last pass.
+
+## Useful tex resources
+
+* citation with theorem: http://tex.stackexchange.com/questions/36918/how-can-one-cite-theorems-of-references
