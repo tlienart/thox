@@ -1,30 +1,82 @@
 \input{preamble.tex}
+\input{commands.tex}
 
 \setlength\parindent{0pt} % no paragraph indentation
 
 \reversemarginpar
 \newcommand{\margnote}[1]{\marginpar{\hfill\fontsize{8}{0}{\idblue{(#1)}}}}
 
+\titleformat{\chapter}[hang]{\Huge\bfseries\color{TitleCol}\raggedleft}{\thechapter\hspace{20pt}\textcolor{Gray}{$\mid$}\hspace{20pt}}{0pt}{\Huge\bfseries\color{TitleCol}}
+
 %%%%%%%%%%%%%%%%
 \begin{document}
 
-%\input{parts/title.tex}
+%%%% ABSTRACT SEPARATE
+% This is used to create the separate, one-page abstract that you are required to hand into the Exam
+% Schools.  You can comment it out to generate a PDF for printing or whatnot.
+%\begin{abstractseparate}
+%	\input{text/abstract} % Create an abstract.tex file in the 'text' folder for your abstract.
+%\end{abstractseparate}
 
+\input{parts/title}
+\clearpage
+\thispagestyle{empty}
+
+%%%% ACKNOWLEDGEMENTS
+%
+%%%% ABSTRACT
+% 
+%%%% TABLE OF CONTENTS
+
+\setcounter{tocdepth}{1}
 \tableofcontents
+\pagenumbering{roman}
+\setcounter{page}{1}
 
-\part{} % part I 
-\chapter{Introduction}
-\section{Blah}
-\chapter{}
+%%%% NOTATIONS / ABBREVIATIONS
 
-\part{} % part II
+% Official ``oxford-thesis'' style.
+\doublespacing
+\flushbottom
+
+%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
+\setcounter{page}{1}
+\pagenumbering{arabic}
+
+\input{parts/introduction}
+
+%%%%%%%
+\part{Sampling Algorithms} % part I 
+
+%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Background}
+
+\section{}
+
+%%%%%%%%%
+\chapter{Two Filter Smoothing}
+
+%%%%%%%%%
+\chapter{Local Bouncy Particle Sampler}
+
+
+\part{Message Passing Algorithms} % part II
+
+\chapter{Background}
+
+\section{}
+
 
 \newpage
 \chapter{Conclusion}
 
 %%%%%%%%%%%
+
 \appendix{}
+\addcontentsline{toc}{part}{Appendix}
+
+\chapter{blah}
 
 
 % BIBLIOGRAPHY
