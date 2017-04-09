@@ -10,21 +10,19 @@
 \newif\ifpbp
 \newif\ifsnep
 
-\tocfalse
+\toctrue
 \introtrue
 \bgstrue % background sampling
-\tfsfalse
-\lbpsfalse
+\tfstrue
+\lbpstrue
 \bgmtrue % background mess pass
-\pbpfalse
-\snepfalse
+\pbptrue
+\sneptrue
 
 \setlength\parindent{0pt} % no paragraph indentation
 
 \reversemarginpar
 \newcommand{\margnote}[1]{\marginpar{\hfill\fontsize{8}{0}{\idblue{(#1)}}}}
-
-\titleformat{\chapter}[hang]{\Huge\bfseries\sc\color{TitleCol}\raggedleft}{\thechapter\hspace{20pt}\textcolor{Gray}{$\mid$}\hspace{20pt}}{0pt}{\Huge\bfseries\color{TitleCol}\sc}
 
 \usepackage{xspace}
 \usepackage[backgroundcolor=Yellow!30,
@@ -56,16 +54,20 @@
 
 % ... 
 
+\titleformat{\chapter}[hang]{\Huge\bfseries\sc\color{TitleCol}\raggedleft}{\thechapter\hspace{20pt}\textcolor{Gray}{$\mid$}\hspace{20pt}}{0pt}{\Huge\bfseries\color{TitleCol}\sc}
+
+
 %%%% TABLE OF CONTENTS
 
 \setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{2}
 \iftoc\tableofcontents\fi
 \pagenumbering{roman}
 \setcounter{page}{1}
 
 %%%% NOTATIONS / ABBREVIATIONS
 
-% ...
+\input{parts/notations}
 
 % --------------------------------------
 % Now start the flushing + doublespacing
@@ -99,7 +101,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SECOND PART -------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\part{Message Passing Algorithms} % part II
+\part{Variational Inference} % part II
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Background}

@@ -9,7 +9,7 @@
 %%%%%%%%%%%
 \subsection{\label{subsection: mrf}Markov Random Fields}
 
-\dred{need to rephrase this entry}
+\add{need to rephrase this, add what conditional indep means, HC theorem}
 
 %
 A \margnote{MRF}\emph{Markov random field} (MRF) allows to represent specific conditional dependences between a set of random variables with a graph. 
@@ -24,7 +24,7 @@ Consequently, we will write
 % 
 respectively a potential function on a node $i\in \mathcal V$ and on an edge $(i,j)\in \mathcal E$. 
 %Note that, in principle, any MRF can be 
-Such a graph represents the factorisation structure of a class of probability density functions that can be written as
+Such a graph represents the factorisation structure of a class of probability density functions on the product space $\mathcal X := \prod\mathcal X_{i}$ that can be written as
 \eqa{		p(x) &\propto & \prod_{i\in\mathcal V}\psi_{i}(x_{i})\prod_{j\in\partial i}\psi_{ij}(x_{i},x_{j}),	}
 where $x=(x_{i})_{i\in \mathcal V}$ and $\partial i:=\{j\st (i,j)\!\in\,\!\mathcal E\}$ denotes the neighbourhood of the $i$th node. 
 A simple MRF is illustrated in \fig{fig:simple-MRF}.\\
@@ -141,7 +141,6 @@ where the $y_k$ are subsets of the entire observed data and $\pi_0$ is a prior o
 \subsubsection{Grid and loopy graphs}
 So far the examples we have considered do not exhibit cycles. An example of a structure with cycles which is encountered in image processing is the \emph{grid graph}\margnote{grid graph} illustrated in \fig{fig:grid1} \citep{blake11}.
 
-\newpage
 \begin{figure}[!h]
 	\center
 	\begin{tikzpicture}[-,minimum size=.7cm,scale=.1,node distance=1.3cm, thick]

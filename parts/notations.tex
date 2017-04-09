@@ -1,0 +1,79 @@
+% !TEX root = ../thesis.tex
+
+\chapter*{Notations}
+
+\todofr{
+    \begin{itemize}\itsep0
+    	\item see later if should be more formal like Jeremy, for now good to have a list of stuff
+    	\item pre-messages are actually confusing (notations $st$)
+    	\item a lot of notations are not self sufficient, think of text as in JH ($\rightarrow$ would probably be nice although maybe shorter)
+    	\item red highlights unclear or insufficient
+    \end{itemize}
+}
+
+\dred{note} 
+\add{explain notations for message, explain add comma for t-1,t}
+
+\setlength{\tabcolsep}{12pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\textbf{symbol} 		& \textbf{meaning}\\[.3cm]
+$\mathcal X$ 			& sample space\\
+$x,y,z \in \mathcal X$	& sampling points\\
+$X,Y,Z$ 				& random variables\\
+$x_{1:T}$ 				& collection $\{x_{t}\}_{t=1}^{T}$\\
+$X \sim q(\cdot)$ 		& random variable drawn from a distribution $q$\\
+$\mathcal N(\,\cdot\,; \mu, \Sigma)$ 
+						& Normal distribution with mean $\mu$ and covariance matrix $\Sigma$\\
+%$p(x_{1:T})$ & joint distribution over the collection $\{x_{t}\}_{t=1}^{T}$\\
+$p(x\st y)$ 				& conditional distribution at $x$ given that $y$ was observed\\
+$\text{supp}(p)$ 		& set of $x$ such that $p(x)>0$ where $p$ is a distribution\\
+$\delta_{a}(x)$ 		& Dirac-delta distribution with point mass at $x=a$\\
+$\hat p(x)$ 				& \dred{particle estimator of the distribution $p$}\\
+%$\pd_t(x_t)$ & \dred{(in HMM) predictive density $p(x_t\st y_{1:t-1})$}\\
+%$\bif_t(x_t)$ & \dred{(in HMM) backward information filter $p(y_{t:T}\st x_t)$}\\
+%$\tbif_t (x_t)$ & \dred{(in HMM) normalised backward information filter $\gamma_t(x_t)p(y_{t:T}\st x_t)$}\\
+$\psi_{u}$ 				& singleton potential on a node $u$\\
+$\psi_{uv}$ 				& pairwise potential on an edge between a node $u$ and a node $v$\\
+$\partial i$ 			& neighbourhood of node $i$ in a graph\\
+$m_{st}$ 				& message from node $s$ to node $t$\\
+$M_{st}$ 				& \dred{pre-message at $s$ going to $t$ in Belief Propagation}\\
+$\KL{p,q}$ 				& Kullback-Leibler divergence between two distributions $p$ and $q$\\
+$\mathcal F_\phi$ 		& exponential family with sufficient statistic $\phi$\\
+$q_\theta$ 				& distribution parametrised by $\theta$\\
+$A(\nu)$ 				& log-partition function of an $\mathcal F_{\phi}$ distribution parametrised by $\theta$\\
+$A^{\star}(\nu)$		& \dred{convex-conjugate of $A$}\\
+%$\theta[q]$ & natural parameter of distribution $q\in \mathcal F_{\phi}$\\
+%$\mu[q]$ & mean parameter of distribution $q\in \mathcal F_{\phi}$\\
+$\mathcal P_\phi[p]$ 	& Kullback-Leibler projection of a distribution $p$ on $\mathcal F_\phi$\\
+$\E_p[\phi]$ 			& expected value of $\phi(X)$ if $X\sim p(\cdot)$\\
+$\V_{p}[\phi]$ 			& \dred{variance of $\phi(X)$} if $X\sim p(\cdot)$  
+
+\end{tabular}
+\setlength{\tabcolsep}{6pt} % default
+
+\section*{Abbreviations}
+
+\setlength{\tabcolsep}{12pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\textbf{abbreviation} & \textbf{meaning}\\[.3cm]
+BIF 	& Backward Information Filter\\
+BP/LBP 	& (Loopy) Belief Propagation\\
+EP	 	& Expectation Propagation\\
+EPBP 	& Expectation Particle Belief Propagation\\
+ESS 	& Effective Sample Size\\
+FFBS 	& Forward Filtering Backward Smoothing \\
+IPP 	& Inhomogeneous Poisson Process\\
+HMM 	& Hidden Markov Model\\
+MCMC 	& Markov Chain Monte Carlo\\
+MRF 	& Markov Random Field\\
+NBP 	& Nonparametric Belief Propagation\\
+PBP 	& Particle Belief Propagation\\
+RMS(E) 	& Root Mean Squared (Error)\\
+SMC 	& Sequential Monte Carlo\\
+SMS 	& Sampling via Moment Sharing\\
+TFS 	& Two Filter Smoothing\\ 
+
+\end{tabular}
+\setlength{\tabcolsep}{6pt} % default

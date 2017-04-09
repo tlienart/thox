@@ -12,6 +12,21 @@
 % LINE SPACING
 \usepackage{setspace}
 
+% coloured frames
+\usepackage{mdframed}
+\mdfdefinestyle{todo}{
+				leftmargin=5pt,
+				linecolor=white,
+				backgroundcolor=Red!10!White}
+%
+\newcommand{\todofr}[1]{
+				\begin{mdframed}[style=todo]
+					\vspace*{-.3cm}
+					{\singlespacing\small#1}
+					\vspace*{.1cm}
+				\end{mdframed}}
+
+
 % HEADERS
 \usepackage{fancyhdr}
 \setlength{\headheight}{15pt}
