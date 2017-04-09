@@ -12,6 +12,8 @@
 * (List of Figures)
 * Notations (single)
 * General Intro (what is it about, bayesian inference, how is the document structured and why (explain software project at ATI))
+    * Objectives, bayesian inf, structure
+    * Markov Random Fields
 * **Part I** (sampling methods)
     * Intro
         * Basic MC estimators, importance sampling, validation (ESS, Computational effort)

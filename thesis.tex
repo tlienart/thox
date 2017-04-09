@@ -1,12 +1,38 @@
 \input{preamble.tex}
 \input{commands.tex}
 
+\newif\iftoc
+\newif\ifintro
+\newif\ifbgs
+\newif\iftfs
+\newif\iflbps
+\newif\ifbgm
+\newif\ifpbp
+\newif\ifsnep
+
+\tocfalse
+\introtrue
+\bgstrue % background sampling
+\tfsfalse
+\lbpsfalse
+\bgmtrue % background mess pass
+\pbpfalse
+\snepfalse
+
 \setlength\parindent{0pt} % no paragraph indentation
 
 \reversemarginpar
 \newcommand{\margnote}[1]{\marginpar{\hfill\fontsize{8}{0}{\idblue{(#1)}}}}
 
-\titleformat{\chapter}[hang]{\Huge\bfseries\color{TitleCol}\raggedleft}{\thechapter\hspace{20pt}\textcolor{Gray}{$\mid$}\hspace{20pt}}{0pt}{\Huge\bfseries\color{TitleCol}}
+\titleformat{\chapter}[hang]{\Huge\bfseries\sc\color{TitleCol}\raggedleft}{\thechapter\hspace{20pt}\textcolor{Gray}{$\mid$}\hspace{20pt}}{0pt}{\Huge\bfseries\color{TitleCol}\sc}
+
+\usepackage{xspace}
+\usepackage[backgroundcolor=Yellow!30,
+			textsize=tiny]{todonotes}
+\renewcommand{\check}[1]{\todo{\textbf{checked}: #1}\xspace}
+\newcommand{\add}[1]{\todo[backgroundcolor=red!20,linecolor=red]{\textbf{add}: #1}\xspace}
+
+\renewcommand\margnote[1]{\xspace}
 
 %%%%%%%%%%%%%%%%
 \begin{document}
@@ -23,60 +49,82 @@
 \thispagestyle{empty}
 
 %%%% ACKNOWLEDGEMENTS
-%
+
+% ...
+
 %%%% ABSTRACT
-% 
+
+% ... 
+
 %%%% TABLE OF CONTENTS
 
 \setcounter{tocdepth}{1}
-\tableofcontents
+\iftoc\tableofcontents\fi
 \pagenumbering{roman}
 \setcounter{page}{1}
 
 %%%% NOTATIONS / ABBREVIATIONS
 
-% Official ``oxford-thesis'' style.
+% ...
+
+% --------------------------------------
+% Now start the flushing + doublespacing
+
 \doublespacing
 \flushbottom
 
 %%%%%%%%%%%%%%%%%%%%%%
-\chapter{Introduction}
-\setcounter{page}{1}
-\pagenumbering{arabic}
+\chapter{Introduction}\setcounter{page}{1}\pagenumbering{arabic}
 
-\input{parts/introduction}
+\ifintro\input{parts/introduction}\fi
 
-%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{Sampling Algorithms} % part I 
 
-%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
 
-\section{}
+\ifbgs\input{parts/bg_sampling}\fi
 
-%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Two Filter Smoothing}
 
-%%%%%%%%%
+\iftfs\input{parts/twofilter}\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Local Bouncy Particle Sampler}
 
+\iflbps\input{parts/lbps}\fi
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECOND PART -------------------
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \part{Message Passing Algorithms} % part II
 
+%%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
 
-\section{}
+\ifbgm\input{parts/bg_messpass}\fi
 
+\chapter{Particle Belief Propagation}
 
-\newpage
+\ifpbp\input{parts/pbp}\fi
+
+\chapter{Distributed Bayesian Inference}
+
+\ifsnep\input{parts/snep}\fi
+
+%%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
+
+\input{parts/conclusion}
 
 %%%%%%%%%%%
 
 \appendix{}
 \addcontentsline{toc}{part}{Appendix}
 
-\chapter{blah}
+\input{parts/appendix}
 
 
 % BIBLIOGRAPHY
@@ -86,7 +134,7 @@
 \addcontentsline{toc}{chapter}{References}
 \bibliographystyle{myabbrvnat}
 \begin{footnotesize}
-\bibliography{../texReferences}
+\bibliography{texReferences}
 \end{footnotesize}
 
 %%%%%%%%%%%%%%
