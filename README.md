@@ -30,59 +30,59 @@
 
 # STRUCTURE
 
-* [] (cover page with compressed abstract)
-* [] Title page with logo and co (no supervisors)
-* [] Acknowledgements (*single space*)
-* [] Abstract (*single space*)
-* [] TOC (*single*)
-* [] (List of Figures)
-* [] Notations (single)
-* [] General Intro (what is it about, bayesian inference, how is the document structured and why (explain software project at ATI))
-    * [] Objectives, bayesian inf, structure
-    * [] Markov Random Fields
+* [ ] (cover page with compressed abstract)
+* [ ] Title page with logo and co (no supervisors)
+* [ ] Acknowledgements (*single space*)
+* [ ] Abstract (*single space*)
+* [ ] TOC (*single*)
+* [ ] (List of Figures)
+* [ ] Notations (single)
+* [ ] General Intro (what is it about, bayesian inference, how is the document structured and why (explain software project at ATI))
+    * [ ] Objectives, bayesian inf, structure
+    * [ ] Markov Random Fields
 * **Part I** (sampling methods)
     * Intro
-        * [] Basic MC estimators, importance sampling, validation (ESS, Computational effort)
-        * [] Intro to SMC-sampling and filtering
-        * [] Intro to PDMP-sampling (global one)
-        * [] Discussion
+        * [ ] Basic MC estimators, importance sampling, validation (ESS, Computational effort)
+        * [ ] Intro to SMC-sampling and filtering
+        * [ ] Intro to PDMP-sampling (global one)
+        * [ ] Discussion
     * TFS
-        * [] The smoothing problem + litt review
-            * [] FFBS and TFS + difference
-        * [] The Backward Information smoother
-            * [] GTFS and BIS, subsampling
-            * [] (variance, log partition function?)
-            * [] experiments
-        * [] Discussion
+        * [ ] The smoothing problem + litt review
+            * [ ] FFBS and TFS + difference
+        * [ ] The Backward Information smoother
+            * [ ] GTFS and BIS, subsampling
+            * [ ] (variance, log partition function?)
+            * [ ] experiments
+        * [ ] Discussion
     * LBPS and applications
-        * [] The local BPS
-            * [] (comparison with HMC on a chain)
-            * [] (comparison with TFS on HMM?)
-        * [] Application of the local BPS (PMF)
-        * [] Discussion
+        * [ ] The local BPS
+            * [ ] (comparison with HMC on a chain)
+            * [ ] (comparison with TFS on HMM?)
+        * [ ] Application of the local BPS (PMF)
+        * [ ] Discussion
 * **Part II** (message passing algorithms)
     * Intro
-        * [] Belief Propagation / message passing
-            * [] BP, BP on a tree, notion of message, link with Kalman
-            * [] LBP, problems advantages
-        * [] Variational inference
-            * [] VB with mean field style assumption
-            * [] VI in the exponential family (basic form): ADF
-            * [] EP, EP fixed point, EP energy (not in details)
-        * [] Discussion
+        * [ ] Belief Propagation / message passing
+            * [ ] BP, BP on a tree, notion of message, link with Kalman
+            * [ ] LBP, problems advantages
+        * [ ] Variational inference
+            * [ ] VB with mean field style assumption
+            * [ ] VI in the exponential family (basic form): ADF
+            * [ ] EP, EP fixed point, EP energy (not in details)
+        * [ ] Discussion
     * EPBP
-        * [] PBP and the problem
-        * [] EPBP: method and properties
-        * [] Experiments
-        * [] (Generalisation)
-        * [] Discussion
+        * [ ] PBP and the problem
+        * [ ] EPBP: method and properties
+        * [ ] Experiments
+        * [ ] (Generalisation)
+        * [ ] Discussion
     * SNEP
-        * [] EP mixing with MCMC, SMS
-        * [] Updates in the mean parameter space and SNEP
-        * [] Experiments
-        * [] Discussion
-* [] General Conclusion, perspectives
-    * [] (discuss Bayesian ML in general, bring rant from bayesian comp)
-    * [] sampling vs message passing, pros cons and blah
-* [] Appendices
-* [] Bibliography (*single*)
+        * [ ] EP mixing with MCMC, SMS
+        * [ ] Updates in the mean parameter space and SNEP
+        * [ ] Experiments
+        * [ ] Discussion
+* [ ] General Conclusion, perspectives
+    * [ ] (discuss Bayesian ML in general, bring rant from bayesian comp)
+    * [ ] sampling vs message passing, pros cons and blah
+* [ ] Appendices
+* [ ] Bibliography (*single*)
