@@ -31,12 +31,14 @@
 # STRUCTURE
 
 * [ ] (cover page with compressed abstract)
-* [ ] Title page with logo and co (no supervisors)
+* [x] Title page with logo and co (no supervisors)
 * [ ] Acknowledgements (*single space*)
 * [ ] Abstract (*single space*)
-* [ ] TOC (*single*)
+* [x] TOC (*single*)
 * [ ] (List of Figures)
 * [ ] Notations (single)
+    * [ ] Notations / symbols / conventions
+    * [ ] Abbreviations
 * [ ] General Intro (what is it about, bayesian inference, how is the document structured and why (explain software project at ATI))
     * [ ] Objectives, bayesian inf, structure
     * [ ] Markov Random Fields
