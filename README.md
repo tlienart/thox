@@ -24,6 +24,7 @@
 * if only very few propositions/theorems, maybe don't use
 * hunt for `(??)` in last pass.
 * hessian -> Hessian
+* check for irregular spaces after `\subsubsections`
 
 ## Useful tex resources
 
@@ -65,13 +66,15 @@
         * [ ] Discussion
 * **Part II** (message passing algorithms)
     * Intro
+        * [ ] Variational Inference
+            * [ ] General form (discuss alpha div, KL, KStein, Wasserstein)
+            * [ ] VB, mean field, ELBO, Guarantees (and lack thereof)
         * [ ] Belief Propagation / message passing
             * [ ] BP, BP on a tree, notion of message, link with Kalman
             * [ ] LBP, problems advantages
-        * [ ] Variational inference
-            * [ ] VB with mean field style assumption
-            * [ ] VI in the exponential family (basic form): ADF
-            * [ ] EP, EP fixed point, EP energy (not in details)
+        * [ ] Expectation propagation
+            * [x] Exponential family and convexity
+            * [ ] ADF and EP (not in details)
         * [ ] Discussion
     * EPBP
         * [ ] PBP and the problem

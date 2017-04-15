@@ -1,20 +1,27 @@
 % !TEX root = ../thesis.tex
 
-\subsubsection{Definition and elementary properties}
-Following \dred{WJ08} we define the \emph{exponential family} $\mathcal F_\phi$ associated with a sufficient statistic $\phi:\mathcal X\to\R^{d}$ as the collection of probability distribution functions of the form\add{review notations, stick to theta}
+\todofr{
+\begin{itemize}
+	\item General reference, say that aim is to be self contained rather than completely general, suggest Brown and Rockafellar for the details.
+\end{itemize}
+}
+
+\subsubsection*{Log partition function and natural parameter space
+}
+Following \dred{WJ08} we define the \emph{exponential family} $\mathcal F_\phi$ associated with a sufficient statistic $\phi:\mathcal X\to\R^{d}$ on a set $\mathcal X\subseteq \R^{n}$ as the collection of probability distribution functions indexed by a parameter $\theta\in\R^{d}$ and of the form\add{review notations, stick to theta}
 %
 \eqa{
 	p_\theta(x)&=& \exp\pat{\scal{\theta,\phi(x)}-A(\theta)}
 }
 %
-with respect to a base measure $\nu$ on $\mathcal X$. $A$ is the \emph{log-partition} function with
+with respect to a base measure $\nu$ on $\mathcal X$. The \emph{log partition} function $A$ is defined such as to normalise $p_{\theta}$:
 %
 \eqa{
 	A(\theta) &=& \log \int_{\mathcal X} \exp\scal{\theta,\phi(x)}\nudx
 .
 }
 %
-The set of \emph{natural parameters} $\Omega \subseteq \mathbb R^{d}$ is defined as the set of parameters $\theta$ such that $A(\theta)$ is bounded (and, therefore, $p_\theta$ is a distribution):\add{stuff drawn not from WJ but reference in comment above (spring10)}
+The set of \emph{natural parameters} $\Omega \subseteq \mathbb R^{d}$ is defined as the set of parameters $\theta$ such that $A(\theta)$ is bounded (and, therefore, $p_\theta$ is a proper distribution):\add{stuff drawn not from WJ but reference in comment above (spring10)}
 \eqa{	\Omega &:=& \{\theta\in\R^{d}\mid A(\theta) \,<\,\infty\}.\label{def:natural} 	}
 %
 An exponential family is said to be \emph{regular}\margnote{regular fam.} when the corresponding set $\Omega$ is nonempty and open. Additionally, an exponential family is said to be \emph{minimal}\margnote{minimal fam.} provided there does not exist a nonzero vector $a\in\mathbb R^{d}$ such that $\scal{a,\phi(x)}$ is constant $\nu$-almost everywhere. A distribution in a minimal exponential family is therefore one-to-one with its parameter $\theta\in\Omega$. In the rest of this document, we will assume that we are working with a regular and minimal exponential family unless otherwise mentioned.\add{is this ever the case?}
@@ -26,7 +33,7 @@ The log-partition function $A$ is convex on $\Omega$. Indeed, let $\theta_1,\the
 }
 Taking the logarithm of that inequality shows that $A$ is convex on $\Omega$ and therefore that $\Omega$ itself is convex.\todo{Actually $\Omega$ is the \emph{effective domain} of $A$, Rockafellar p.23}
 
-\subsubsection{Gradient and convex-conjugate of $A$}
+\subsubsection*{Gradient and convex-conjugate of $A$}
 In a regular exponential family, it is well known (see e.g.\ \citet[theorem 2.2]{brown86}) that the log-partition function is infinitely continuously differentiable and that its gradient and hessian are related to the first two moments of the sufficient statistic:\add{make sure the notations are clarified somewhere}
 %
 \eqa{
