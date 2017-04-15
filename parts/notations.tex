@@ -78,3 +78,10 @@ TFS 	& Two Filter Smoothing\\
 
 \end{tabular}
 \setlength{\tabcolsep}{6pt} % default
+\newpage
+\subsubsection{Vectors and functions}\add{See if want lebesgue measure stuff}
+For a vector $x\in\R^{n}$ we write $\norm{x}{p}$ the $p$-norm of $x$ with $\norm{x}{p}^{p}=\sum_{i=1:n}\abs{x_{i}}^{p}$, for $x,y\in\R^{n}$, we write $\scal{x,y}=\sum_{i=1:n}x_{i}y_{i}$ the inner product of $x$ and $y$. For a real-valued measurable function $f$ on a set $\mathcal X$, we write $\|f\|_{p}^{p}=\int_{\mathcal X} \|f(x)\|^{p}\dx$. We write $L^{1}(\mathcal X)$ the set of functions such that $\|f\|_{1}<\infty$ and $\mathcal P(\mathcal X) \subset L^{1}(\mathcal X)$ denotes the restriction to nonnegative functions integrating to one (probability density functions). For a real-valued, twice differentiable function $f$, we write $\nabla f(x)$ the gradient of $f$ and $\nabla^{2} f$ its Hessian.
+
+\subsubsection{Topology and convex analysis}
+Let $B\subset\R^{n}$ denote the Euclidean unit ball with $B=\{x\in\R^{n}\mid \|x\|_{2}\le 1\}$. For any subset $C\subseteq\R^{n}$, we write $\mathrm{int}\,(C)$ the interior of $C$ with $\mathrm{int}\,(C)=\{x\in C \mid \exists \epsilon>0, x+\epsilon B \subset C\}$. A set $C$ is convex if for any $x,y\in C$, $(1-\lambda)x+\lambda y\in C$ for all $\lambda\in[0,1]$. Let $\Omega$ be an arbitrary subset of $\R^{n}$; a function $f:\Omega\to\R$ is said to be convex if $f((1-\lambda)x+\lambda y)\le (1-\lambda)f(x)+\lambda f(y)$. For an arbitrary function $f:\Omega\to\R$, we denote by $f^{\star}$ the convex-conjugate of $f$ with $f^{\star}(y)=\sup_{y\in \R^{n}}[\scal{x,y}-f(x)]$. The set of minimisers of a function $f$ on a open, nonempty set $C$ will be denoted by $\arg\min_{x\in C}\,f(x)$ i.e. the set $\pab{x\in C\mid f(y)\ge f(x), \,\forall y\in C}$. 
+%If the function $f$ is convex and differentiable on $C$ we call \emph{first-order condition} the fact that this set is equivalent to the set of points $x\in C$ such that $\nabla f(x)=0$.

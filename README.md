@@ -23,6 +23,7 @@
 * pass @ end to fix image placement ignore until publish time (add fig on individual pages)
 * if only very few propositions/theorems, maybe don't use
 * hunt for `(??)` in last pass.
+* hessian -> Hessian
 
 ## Useful tex resources
 
