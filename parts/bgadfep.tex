@@ -2,9 +2,17 @@
 \todofr{WIP April 15: uncomment as you go, write story on paper first.}
 
 \subsubsection{Variational inference in the exponential family}
+%
+The premises of both ADF and EP is performing variational inference directly in the exponential family $\mathcal F_{\phi}(\mathcal X)$.\add{check EP/ADF introduced} In the previous point, we showed that a target distribution $p$ could be associated with a point $\mu\in\mathcal M$ with $\mu=\E_{p}[\phi(X)]$ for some sufficient statistic $\phi$. Further, we showed that $\mu$ could also be associated to a distribution in $\mathcal F_{\phi}$ with parameter $\theta$ given by $\nabla A^{\star}(\mu)$. It is therefore natural to consider this distribution $q_{\theta}$ as potentially forming a good approximation to $p$ in $\mathcal F_{\phi}(\mathcal X)$. 
+%
+\begin{figure}[!h]
+    \center
+	\includegraphics[width=.5\textwidth]{figures/expf/mapping2}
+\caption{blah}
+\end{figure}
 
-The premises of both ADF and EP is performing variational inference directly in the exponential family $\mathcal F_{\phi}$.\add{check EP/ADF introduced} 
-Additionally, in contrast to variational Bayes, we will now consider the Kullback-Leibler divergence between the target distribution $p$ and its approximate representation $q_{\theta}\in\mathcal F_{\phi}$ i.e.:\add{make sure the contrast is clear/clarified}
+\vspace*{2cm}\dred{gap}
+Additionally, in contrast to variational Bayes, we will now consider the Kullback-Leibler divergence between the target distribution $p$ and its approximate representation $q_{\theta}\in\mathcal F_{\phi}(\mathcal X)$ i.e.:\add{make sure the contrast is clear/clarified}
 %
 \eqa{
 	\KL{p,q_{\theta}} 

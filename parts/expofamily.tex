@@ -8,7 +8,7 @@
 
 \subsubsection*{Log partition function and natural parameter space
 }
-Following \dred{WJ08} we define the \emph{exponential family} $\mathcal F_\phi$ associated with a sufficient statistic $\phi:\mathcal X\to\R^{d}$ on a set $\mathcal X\subseteq \R^{n}$ as the collection of probability distribution functions indexed by a parameter $\theta\in\R^{d}$ and of the form\add{review notations, stick to theta}
+Following \dred{WJ08} we define the \emph{exponential family} $\mathcal F_\phi(\mathcal X)\subset\mathcal P(\mathcal X)$ associated with a sufficient statistic $\phi:\mathcal X\to\R^{d}$ on a set $\mathcal X\subseteq \R^{n}$ as the collection of probability distribution functions indexed by a parameter $\theta\in\R^{d}$ and of the form\add{review notations, stick to theta}
 %
 \eqa{
 	q_\theta(x)&=& \exp\pat{\scal{\theta,\phi(x)}-A(\theta)}
@@ -32,7 +32,7 @@ The log-partition function $A$ is convex on $\Omega$. Indeed, let $\theta_1,\the
 	 &\le& \exp(A(\theta_1))^{1-\lambda} \exp(A(\theta_2))^{\lambda}.\label{eq:holderlogp}
 }
 Taking the logarithm of that inequality shows that $A$ is convex on $\Omega$ and therefore that $\Omega$ itself is convex.\check{april 16}\todo{Actually $\Omega$ is the \emph{effective domain} of $A$, Rockafellar p.23}
-
+%
 \subsubsection*{Gradient and convex-conjugate of $A$}
 In a regular exponential family, it is well known (see e.g.\ \citet[theorem 2.2]{brown86}) that the log-partition function is infinitely continuously differentiable and that its gradient and Hessian are related to the first two moments of the sufficient statistic:\add{make sure the notations are clarified somewhere}
 %
@@ -89,22 +89,14 @@ Since this inequality holds for any $\mu^{+}\neq \mu^{\star}$, $\theta^{\star}$ 
 	\includegraphics{figures/expf/mapping}
 	\caption{\label{bijOmM}Illustration of the bijection between the set of natural parameters $\Omega$ and its image under $\nabla A$, $\mathcal M^{\star}$.}
 \end{figure}
-
+%
+\subsubsection*{Mean parameter space}
 It remains to characterise more precisely the set $\mathcal M^{\star}=\nabla A(\Omega)$. It is a subset of the set of realisable \emph{mean parameters}:\add{notations, set of pdfs in L1}
 %
 \eqa{
 	\mathcal M^{\star} \esp\subset\esp \mathcal M &:=& \pab{\mu\in\mathbb R^{d}\mid \exists\, p \in\mathcal P(\mathcal X) \,\,\text{s.t.}\,\, \mu=\E_{p}[\phi(X)] },
 }
 %
-where $\mathcal P(\mathcal X)$ denotes the set of all probability density functions on $\mathcal X$. This space $\mathcal M$ is also known as the \emph{mean parameter space}. It is easy to see that it is convex since $\mathcal P(\mathcal X)$ is trivially convex. More interestingly, it can be shown that, for a minimal exponential family, $\mathcal M^{\star}$ is, in fact, the interior of $\mathcal M$ \citep[theorem 3.3]{wainwright08}. Note that, since the interior of a convex set is necessarily convex, $\mathcal M^{\star}$ is itself convex. Finally, note that since $\mathcal M^{\star}=\mathrm{int}\,(\mathcal M)$, $A^{\star}$ can be continuously extended on $\mathcal M$ by changing the $\max$ in a $\sup$ in \eqref{eq:defconja}. \check{april 17}
-\add{max/sup in notations?}
-%For any point $\mu\in\mathcal M\backslash \mathcal M^{\star}$ we then have to consider the limit  of $A^{\star}(\mu_{n}^{\star})$ for a sequence $\{\mu_{n}^{\star}\}$ in $\mathcal M^{\star}$ converging to $\mu$. 
-%
-
-%A consequence of $\mathcal M^{\star}$ being the interior of $\mathcal M$ is that any realisable mean can be achieved by a member of the exponential family or possibly through the limit of a sequence of exponential family distributions $\{p_{\theta_{n}}\}_{n=1}^{\infty}$  with $\theta_{n}\in\Omega$ for $n=1,\dots$, such that
-%%
-%\eqa{
-%	\lim_{n\to\infty}\nabla A(\theta_{n}) &=& \mu
-%}
-%
+where $\mathcal P(\mathcal X)$ denotes the set of all probability density functions on $\mathcal X$. This space $\mathcal M$ is also known as the \emph{mean parameter space}. It is easy to see that it is convex since $\mathcal P(\mathcal X)$ is trivially convex. More interestingly, it can be shown that, for a minimal exponential family, $\mathcal M^{\star}$ is, in fact, the interior of $\mathcal M$ \citep[theorem 3.3]{wainwright08}. Note that, since the interior of a convex set is necessarily convex, $\mathcal M^{\star}$ is itself convex. Finally, note that since $\mathcal M^{\star}=\mathrm{int}\,(\mathcal M)$, $A^{\star}$ can be continuously extended on $\mathcal M$ by changing the $\max$ in a $\sup$ in \eqref{eq:defconja}. \check{april 17}In a similar fashion, for a point $\mu\in\mathcal M\backslash \mathcal M^{\star}$, we can consider a sequence of points $\mu_{1},\mu_{2},\dots$ in $\mathcal M^{\star}$ such that $\lim_{i\to\infty}\mu_{i}=\mu$ and identify $\nabla A^{\star}(\mu)$ to $\lim_{i\to\infty}\nabla A^{\star}(\mu_{i})$. Note that some care has to be taken in that this limit may be on the boundary of $\Omega$ and hence may not correspond to a proper distribution in $\mathcal F_{\phi}(\mathcal X)$.  
+\add{max/sup in notations?, discussion of boundary of Omega for EP when problem in projecting}\check{april 22}
 
