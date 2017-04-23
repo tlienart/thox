@@ -1,6 +1,7 @@
 % !TEX root = ../thesis.tex
 \todofr{WIP April 15: uncomment as you go, write story on paper first.}
 
+% -------------------------------------------------------------
 \subsubsection{Variational inference in the exponential family}
 %
 The premises of both ADF and EP is performing variational inference in the exponential family $\mathcal F_{\phi}(\mathcal X)$.\add{check EP/ADF introduced} In the previous point, we showed that a target distribution $p$ could be associated with a point $\mu\in\mathcal M$ with $\mu=\E_{p}[\phi(X)]$ for some sufficient statistic $\phi$. Further, we showed that if the family is minimal and if $\mu\in\mathcal M^{\star}$, the mean parameter $\mu$ could be directly associated to a distribution in $\mathcal F_{\phi}$ with parameter $\theta$ given by $\nabla A^{\star}(\mu)$. It is therefore natural to consider this distribution $q_{\theta}$ as potentially forming a good approximation to $p$ in $\mathcal F_{\phi}(\mathcal X)$.
@@ -25,9 +26,20 @@ which is a strictly convex function in $\theta'$. By definition, a parameter $\t
 %
 It will also be convenient to use the following abuse of notation: for an unnormalised distribution $p_{u}$ with normalisation constant $Z_{p_{u}}\inv$ we will write $\mathbf P_{\phi}(p_{u})$ to implicitly mean $\mathbf P_{\phi}(Z_{p_{u}}\inv p_{u})$.\\
 
-The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu=\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu$, we need to be able to recover the corresponding natural parameter by applying the inverse mapping $\nabla A^{\star}(\mu)$. We will see that by putting ourselves in a setting where the target distribution factorises into simple factors, the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing this inverse mapping can be done explicitly or is cheap to approximate. Overwhelmingly, it is the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix.\add{probably add a section here on how to compute forward backward operator. Also cite lots of stuff that uses the Gaussian, if you find anything that doesn't...} 
+The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu=\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu$, we need to be able to recover the corresponding natural parameter by applying the inverse mapping $\nabla A^{\star}(\mu)$. We will see that by putting ourselves in a setting where the target distribution factorises into simple factors, the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing the inverse mapping $\nabla A^{\star}$ can be done explicitly or is cheap to approximate. For continuous state spaces, it is overwhelmingly the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix.\add{probably add a section here on how to compute forward backward operator, maybe put this in appendix. Also cite lots of stuff that uses the Gaussian, if you find anything that doesn't...} 
+%
+% ----------------------------------------
+\subsubsection*{Assumed Density Filtering}
+%
+Let us consider the context of online Bayesian learning where one is interested in the evolution of a posterior distribution $p(x\st y_{1:t})$ given observed data up to current time $t$ and a new data point $y_{t+1}$. The new posterior is given directly by Bayes rule with $p(x\st y_{1:t+1})\propto p(y_{t+1}\st x) p(x\st y_{1:t})$. Let us now assume, as in \citet{opper98}, that the exact posteriors are intractable but that we are interested in constructing a sequence of approximations in the exponential family $\mathcal F_{\phi}(\mathcal X)$. 
 
+%\add{Add some history stuff suggesting there's multiple stuff called ADF, cite stuff following Minka}
+%In the context of online Bayesian learning, one is interested in approximating the posterior given a 
 
+%
+% --------------------------------------
+\subsubsection*{Expectation Propagation}
+%
 
 \vspace*{2cm}\dred{gap}
 Additionally, in contrast to variational Bayes, we will now consider the Kullback-Leibler divergence between the target distribution $p$ and its approximate representation $q_{\theta}\in\mathcal F_{\phi}(\mathcal X)$ i.e.:\add{make sure the contrast is clear/clarified}
