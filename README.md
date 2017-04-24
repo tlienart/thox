@@ -25,6 +25,8 @@
 * hunt for `(??)` in last pass.
 * hessian -> Hessian
 * check for irregular spaces after `\subsubsections`
+* check for huge white spaces after/before algorithms, figures, tables, anything really significantly ugly.
+* use we mostly, don't use things like "consider now" but rather "Let us now" blah
 
 ## Useful tex resources
 
