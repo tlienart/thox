@@ -30,15 +30,15 @@ The application of this projection operator implicitly requires the ability to p
 % ----------------------------------------
 \subsubsection*{Online Bayesian Learning and Assumed Density Filtering}
 %
-Let us consider the context of online Bayesian learning where one is interested in the evolution of a posterior distribution $p(x\st y_{1:t})$ given observed \iid\add{notations} data up to current time $t$ and a new data point $y_{t+1}$. The new posterior is given directly by Bayes rule with $p(x\st y_{1:t+1})\propto p(y_{t+1}\st x) p(x\st y_{1:t})$. In \citet{opper98}, the author considers that the exact posteriors are intractable but suggests constructing a sequence of approximations in the exponential family $\mathcal F_{\phi}(\mathcal X)$. Using the notations from the previous point, the algorithm corresponds to a sequence of iteration of the form
+Let us consider the context of online Bayesian learning where one is interested in the evolution of a posterior distribution $p(x\st y_{1:t})$ given observed \iid\add{notations iid} data points $y_{1:t}$ up to current time $t$ and a new \iid data point $y_{t+1}$. The new posterior is given directly by Bayes rule with $p(x\st y_{1:t+1})\propto p(y_{t+1}\st x) p(x\st y_{1:t})$. In \citet{opper98}, the author considers that the exact posteriors are intractable but suggests constructing a sequence of approximations in the exponential family $\mathcal F_{\phi}(\mathcal X)$. Using the notations from the previous point, the algorithm corresponds to a sequence of iteration of the form
 \eqa{	\theta_{t+1} &=& \mathbf P_{\phi}[p(y_{t+1}\st \cdot)q_{\theta_{t}}].	\label{adfonline}}
 In words, the posterior up to time $t$ is approximated by the exponential family distribution $q_{\theta_{t}}$ which then serves as prior to form an approximate posterior $p(y_{t+1}\st x)q_{\theta_{t}}(x)$. Given that this approximate posterior is not necessarily in the exponential family, it needs to be projected as per \eqref{adfonline}. At time $t+1$, the distribution $q_{\theta_{t+1}}$ can be now interpreted as an approximation of the posterior distribution given all the data up to that time or 
 %
 \eqa{	q_{\theta_{t+1}}(x) \esp\approx\esp p(x) &\propto& \pi_{0}(x)\prod_{s=1}^{t+1}p(y_{s}\st x).
 }
 %
-We can therefore reinterpret the algorithm more generally as targeting a distribution $p$ that factorises in a fixed number (say $K$) of factors $p(x)\propto \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x)$.\add{notations: make sure it's clear that $\pi_{0}$ is always the prior} this is the Assumed Density Filtering algorithm. Note that in this case there is no ``natural ordering'' as in the online learning case and hence the algorithm can be done for any permutation of the factors.
-%
+We can therefore reinterpret the algorithm more generally as targeting a distribution $p$ that factorises in a fixed number (say $K$) of factors $p(x)\propto \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x)$.\add{notations: make sure it's clear that $\pi_{0}$ is always the prior} This is the Assumed Density Filtering algorithm. Note that in this case there is no ``natural ordering'' as in the online learning case and the algorithm can be done with any permutation of the factors.
+
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:adf}\dblue{\emph{\small Assumed Density Filtering}}}
 	\begin{algorithmic}[1]
@@ -50,154 +50,31 @@ We can therefore reinterpret the algorithm more generally as targeting a distrib
 	\end{algorithmic}
 \end{algorithm} 
 
-The parameter $\omega_{i}$ introduced in the \hyperref[alg:adf]{algorithm~\ref*{alg:adf}} can be interpreted as the update made to the previous parameter $\theta_{i-1}$ once the term $t_{i}$ has been integrated in the approximation. Correspondingly, $\theta_{K}=\sum_{i=1}^{K}\omega_{i}$ and letting $\tilde t_{i}(x):=\exp(\scal{\omega_{i},\phi(x)})$, we can write $q_{\theta_{K}}(x)\propto \pi_{0}(x)\prod_{i=1}^{K}\tilde t_{i}(x)$.\\
-The main issue with the ADF algorithm is that the order in which the factors $t_{i}$ are considered will affect the final approximation $q_{\theta_{K}}$. Where, in the online learning context, there was a natural ordering, in an MRF context there usually is not.
-
-%In the Assumed Density Filtering algorithm, the approach is very similar except that we just consider that the target density factorises into $K$ terms: $p(x)\propto\prod_{i=1:K}t_{i}(x)$ 
-
-\todofr{ok good, now explain how this can be recycled for a fixed number of terms but then how the question of ordering arises which leads to EP}
-
-%\add{Add some history stuff suggesting there's multiple stuff called ADF, cite stuff following Minka}
-%In the context of online Bayesian learning, one is interested in approximating the posterior given a 
-
+The parameter $\omega_{i}$ introduced in the \hyperref[alg:adf]{algorithm~\ref*{alg:adf}} can be interpreted as the update made to the previous parameter $\theta_{i-1}$ once the term $t_{i}$ has been integrated in the approximation. Correspondingly, $\theta_{K}=\sum_{i=1}^{K}\omega_{i}$ and letting $\tilde t_{i}(x):=\exp\scal{\omega_{i},\phi(x)}$, we can write 
+%
+\eqa{
+	q_{\theta_{K}}(x) &\propto& \pi_{0}(x)\prod_{i=1}^{K}\tilde t_{i}(x).\label{eq:approxadf}
+}
+% 
+The main issue with using ADF on an MRF is that the order in which the graph is read, i.e.: the order in which the factors $t_{i}$ are considered will affect the final approximation $q_{\theta_{K}}$. A natural extension is then to perform ADF multiple times considering random orderings of the factors and to adjust the approximation accordingly. This is the Expectation Propagation algorithm.
 %
 % --------------------------------------
 \subsubsection*{Expectation Propagation}
 %
+In the Expectation Propagation algorithm \citep{minka01, minka01b, seeger07, gelman14}, we consider that we have an initial approximation $q_{\theta}\in\mathcal F_{\phi}(\mathcal X)$ that we can write as in \eqref{eq:approxadf} (typically obtained with a pass of ADF) and we seek to iteratively improve its parameter $\theta$. At each step, a factor $t_{i}$ is considered and, by contrast to ADF, we now consider the projection $\theta_{i}=\mathbf P_{\phi}[q_{\theta}t_{i}/\tilde t_{i}]$. The difference with ADF is therefore that we now remove the previous factor approximation $\tilde t_{i}$ from the current approximation $q_{\theta}$ before projecting. ADF can then be viewed as a simple version of EP where we initially set all the factor approximations to $\tilde t_{i}\equiv 1$.
 
-\vspace*{2cm}\dred{gap}
-Additionally, in contrast to variational Bayes, we will now consider the Kullback-Leibler divergence between the target distribution $p$ and its approximate representation $q_{\theta}\in\mathcal F_{\phi}(\mathcal X)$ i.e.:\add{make sure the contrast is clear/clarified}
-%
-\eqa{
-	\KL{p,q_{\theta}} 
-		&=& \E_{p}[\log p(X)] - \E_{p}[\log q_{\theta}(X)]\nn\\
-		&=& \scal{\theta,\E_{p}[\phi(X)]} + A(\theta).
-}
-%
-This expression is convex in $\theta$ and the first-order condition suggests minimisers in $\theta$ of the form
-%
-\eqa{
-	\theta^{\star} &\in& \{\theta\in\Omega \mid \E_{p}[\phi(X)] = \nabla A(\theta) \}\nn\\
-	&\in& \{\theta\in\Omega \mid \E_{p}[\phi(X)] = \E_{q_{\theta}}[\phi(X)]\}.\label{eq:globMM}
-}
-%
-The condition in \eqref{eq:globMM} is called a \emph{global moment matching} condition.\add{ref to Heskes/Zoeter and co} 
-Finding a parameter meeting this condition requires first the ability of computing the expected value of $\phi$ with respect to $p$ which is usually intractable.
-Assuming we do find $q_{\theta^{\star}}$ minimising $\KL{p,q_{\theta}}$, we can consider it as a projection of $p$ onto $\mathcal F_{\phi}$. More generally, it is useful to define an operator $P_{\phi}:\mathcal P(\mathcal X)\to\mathcal F_{\phi}$ such that a distribution $p\in\mathcal P(\mathcal X)$ is mapped to a $q_{\theta^{\star}}\in\mathcal F_{\phi}$ verifying:
-%
-\eqa{
-	q_{\theta^{\star}} \spe P_{\phi}[p] &\Longleftrightarrow& \E_{q_{\theta^{\star}}}[\phi(X)] \spe \E_{p}[\phi(X)].
-}
-%
-\subsubsection{Assumed Density Filtering}
+\begin{algorithm}[!h]\small
+	\caption{\label{alg:ep}\dblue{\emph{\small Expectation Propagation}}}
+	\begin{algorithmic}[1]
+	\State Initialise $\theta,\omega_{1},\dots,\omega_{K}$ such that $\theta=\sum_{i=1}^{K}\omega_{i} \in \Omega$ (e.g. via ADF)
+	\For{$k=1:N_{\text{EP}}$}
+		\State Let $\sigma$ be a random permutation of $(1,\dots,K)$
+		\For{i=1:K}
+    		\State $\theta^{\text{new}}=\mathbf P_{\phi}[q_{\theta^{\text{old}}}t_{\sigma(i)}/\tilde t_{\sigma(i)}]$
+    		\State $\omega_{\sigma(i)} = \theta^{\text{new}}-\theta^{\text{old}}$
+		\EndFor
+	\EndFor
+	\end{algorithmic}
+\end{algorithm} 
 
-\vspace*{2cm}
-In Assumed Density Filtering (ADF), we consider the problem of approximating a target distribution $p$
-By contrast to MFVI, let us require the approximating distribution to be in the exponential family $\mathcal F_\phi$ associated with the sufficient statistic $\phi$. This imposes the form
-\eqa{	q_\nu(x) &=& \exp\pat{\scal{\nu,\phi(x)}-A(\nu)},	}
-where $\nu$ is the natural parameter of the distribution, $\phi$ the sufficient statistic of the exponential family and $A$ is the log-partition function.\footnote{We follow here the notations of \citet{wainwright08} and refer to that review for further details on the exponential family.} \\
-%
-%If we then look at determining the natural parameter that minimises the discrepancy $\KL{p,q_\nu}$ with
-%\eqa{	\KL{p,q_\nu} &=& \E_p[\log p] - \scal{\nu,\E_p[\phi]}+A(\nu),	\nn}
-%it is a convex function in $\nu$. The first order optimality condition leads to the \emph{global moment matching condition\margnote{mom.\ matching}} (using $\nabla A(\nu)=\E_{q_{\nu}}[\phi]$):
-%\eqa{	\E_{q_\nu}[\phi] &=& \E_p[\phi]. 	}
-%The right-hand side is intractable in general and an approximation method must be sought. At this point, we can define a projection operator $\mathcal P_\phi$ which corresponds to the projection in the KL sense onto $\mathcal F_\phi$ and is equivalently defined via the moment-matching condition:
-%\eqa{		q_\nu \spe \mathcal P_\phi[p] \esp\Longleftrightarrow\esp  \E_{q_\nu}[\phi] \spe \E_p[\phi],	}
-%since this condition is equivalent to minimising the KL. Note that this operator implicitly requires the ability to compute the expectation of $\phi$ with respect to $p$ as well as the ability to identify the distribution $q_{\nu}$ (i.e.: go from the mean parameter $\E_{q_{\nu}}[\phi]$ to the natural parameter $\nu$). The need to be able to perform this second step often constraints users to the Gaussian exponential family for which it is straightforward to go from the mean to the natural-parameter space.\\
-%
-%\textbf{Remark}: in the rest of this document, we will use the following slight abuse of notation: if $p$ is a distribution proportional to an unnormalised distribution $p_{u}$ with $p=Z_{p}\inv p_{u}$, we will also write $\mathcal P_{\phi}[p_{u}]$ to designate $\mathcal P_{\phi}[p]$. This will allow us to avoid writing explicitly normalisation constants without loss of generality.\\ 
-%
-%In the case where the target distribution $p$ factorises in $K$ terms $t_i$, i.e.:
-%\eqa{		p(x) &=& Z_{p}\inv \prod_{i=1}^{K}t_{i}(x),\nn	}
-%the \emph{assumed density filtering} (ADF)\margnote{ADF} algorithm suggests the following iteration over the natural parameter:
-%\eqa{	\nu^{\text{new}} &\in& \arg\min_\nu \quad \KL{p_i,q_\nu},	\nn}
-%where $p_i \propto t_i q_{\nu^{\text{old}}}$. By definition, each iteration is equivalent to a projection with:
-%\eqa{	
-% q_{\nu^{\text{new}}} 
-%	&=& \mathcal P_\phi[ p_i],	\label{eq1 ADF}}
-%except that, in the right-hand side of \eqref{eq1 ADF}, $\E_{\hat p_i}[\phi]$ is now potentially cheaper to compute or approximate. The algorithm stops when all sites have been included.\\
-%
-%A key issue with the ADF algorithm is that the approximating distribution depends heavily on the order in which the sites are added \citep{minka01b}. A way around this issue is the expectation propagation algorithm which, empirically, tends to outperform ADF.
-%
-%\subsection{\label{bg:pointEP}Expectation propagation}
-%
-%The expectation propagation (EP)\margnote{EP} algorithm \citep{minka01b,seeger07,gelman14}, works in much the same way as the ADF except that the sites are included in a random order and continuously. Each side is added after removing the last site approximation $\tilde t_{i}$ from the global approximation. More specifically, the core of the basic EP algorithm is formed of the following steps for each site $i$ browsed in a random order:
-%\begen\itsep0
-%	\item form the \emph{cavity}\margnote{cavity} by removing from $q_\nu$ the most recent approximation of the current site: $q_{\neg i} := q_\nu/\tilde t_i$,
-%	\item include the true site and form the \emph{tilted distribution}\margnote{tilted} $q_i \propto q_{\neg i} t_i$,
-%	\item moment-matching update: update $\nu$ s.t.\ $q_\nu\leftarrow \mathcal P_\phi[q_i]$,
-%	\item store the new site approximation $\tilde t_i=q_\nu/q_{\neg i}$.
-%\stopen
-%The algorithm loops over the sites in a random order until convergence is reached or until the number of passes exceeds a pre-defined limit. By contrast to MFVI, convergence is not guaranteed but often observed in practice. Failure to converge is usually more telling of the selected exponential family being a poor fit to the exact posterior \citep{minka01}. Finally, EP is often empirically observed to converge much faster than MFVI and can be much better adapted to a high-dimensional setting.\footnote{For a range of applications of EP, see \url{http://research.microsoft.com/en-us/um/people/minka/papers/ep/roadmap.html}.} \\
-%
-%The fixed points of EP correspond to the \emph{local moment matching} conditions:
-%\eqa{\E_{q_{\nu}}[\phi] &=& \E_{q_{i}}[\phi], \quad\text{for}\quad i=1,\dots,K.,\label{eq:fixedpointsep}}
-%and correspond to the fixed points of the \emph{EP Energy} introduced below.
-%
-%\subsubsection{EP Energy}
-%In the algorithm above, let us write $\tilde t_{i}(x)=\exp(\scal{\omega_{i},\phi(x)})$ the current approximation to the $i$th site. Consequently, prior to an update,
-%\eqa{		q_{\neg i}(x) &=&  \exp\pat{\scal{\nu-\omega_{i},\phi(x)}}.}
-%Let us define $\lambda_{i}:=\nu-\omega_{i}$ the parameter of the cavity. Then, we can write
-%\eqa{ q_{i}(x) &=& t_{i}(x)\exp(\scal{\lambda_{i},\phi(x)}-A_{i}(\lambda_{i}))\nn
-%	}
-%where $A_{i}(\lambda_{i})$ is the log-partition function of $q_{i}$. Note also that, by definition, 
-%\eqa{		\sum_{i=1}^{K}\lambda_{i} &=& (K-1)\nu.	\label{ep:condition1}}
-%The \emph{EP energy} is an objective function that has the same fixed points as those corresponding to the local moment-matching condition \eqref{eq:fixedpointsep}:
-%\eqa{		\mathcal E(\nu,\lambda_{1},\dots,\lambda_{K}) &:=& (K-1)A(\nu)-\sum_{i=1}^{K}A_{i}(\lambda_{i}),		}
-%with $\nu$ satisfying the equality constraint \eqref{ep:condition1}. Indeed, setting the gradient of $\mathcal E$ in $\lambda_{i}$ to zero leads to precisely all the local moment matching conditions. This energy function is concave in $\lambda_{i}$, convex in $\nu$ and subject to an affine constraint. Finding EP fixed points can therefore be written as a saddle point problem:
-%\eqa{		\min_{\nu}\max_{\{\lambda_{i}\}}\quad \mathcal E(\nu,\lambda_{1},\dots,\lambda_{K}), \quad \text{s.t.}\quad (K-1)\nu = \sum_{i=1}^{K}\lambda_{i}.}
-%This perspective of the EP algorithm led to the so-called \emph{double-loop} algorithm of \citet{heskes03} and further theoretical considerations in \citet{opper05}. The double-loop algorithm suggests running an inner loop for the maximisation part of the saddle-point problem and alternate with an outer loop for the minimisation part. In theory, if the inner-loop is run for an infinitely long time, the algorithm can then be claimed to converge. This is however obviously impractical so that, in practice, we may suggest running the inner loop for a finite number of steps and then alternate with the outer loop. The resulting algorithm can however not be proved to converge. In some particular cases, however, it is possible to modify the algorithm so that it becomes provably convergent \citep{seeger11}.
-%
-%%\subsubsection{Link between EP energy and KL}
-%%To get a better feel for what this EP energy represents, it is interesting to observe that both the $\KL{p,q}$ and $\KL{q,p}$ can be related to it:
-%%\eqa{	
-%%\KL{q,p} - \log Z_{p} &=& \mathcal E + \sum_{i=1}^{K}\KL{q,q_{i}},\nn\\
-%% \KL{p,q}+\log Z_{p} &=& -\mathcal E + \sum_{i=1}^{K}\E_{p}\pac{\log {q_{i}\over q}}.\nn	}
-%\subsubsection{Natural and mean parameters notations} 
-%A distribution $q_{\nu}\in \mathcal F_{\phi}$ is entirely described by its natural parameter $\nu$. An alternative parametrisation is its mean parameter $\mu$ with
-%\eqa{		\mu &=& \E_{q_{\nu}}[\phi].	\nn}
-%%To write the EP updates in a condensed manner, it is useful to introduce the following operations that retrieve the natural and mean-parameter of a distribution $q_{\nu} \in \mathcal F_{\phi}$:
-%%\eqa{	 \theta[q_{\nu}] &=& \nu\quad\text{and}\quad \mu[q_{\nu}] \spe \E_{q_{\nu}}[\phi]\nn.	}
-%Under mild technical conditions, the mean and the natural parameter of $q_{\nu}$ are one to one through the gradient of the log-partition function $\nabla A$ and its inverse $\nabla A^{\star}$ with:\footnote{Here $A^{\star}$ denotes the convex conjugate of the log-partition function $A$ with $A^{\star}(\mu) = \sup_{\nu} \scal{\nu,\mu}-A(\nu)$. We refer to \citet{Rockafellar70} for more details on (sub)gradients of convex-conjugates of functions and their properties.}
-%\eqa{	\nabla A^{\star}(\mu) &=& \nu.	\nn}
-%With these operators, we can write the standard EP update in the following condensed form:
-%\eqa{		\nu &\leftarrow&  \nabla A^{\star}[\E_{q_{i}}[\phi]].	\nn}
-%Indeed, one step requires $\mu=\E_{q_{\nu}}[\phi]=\E_{q_{i}}[\phi]$ and to go from $\E_{q_{i}}[\phi]$ to $\nu$ we need to apply the operator $\nabla A^{\star}$. 
-%Note that, equivalently, this update can be considered in the mean-parameter space with:
-%\eqa{		\mu &\leftarrow& \E_{q_{i}}[\phi].	\nn}
-%This makes a difference when damping is considered, as shown below.
-%
-%\subsubsection{\label{bg:pointMDEP}Damped update and mirror descent}
-%To help convergence to a fixed point, the updates can be \emph{damped} 
-%%[
-%with a damping parameter $\gamma \in (0,1]$ (that need not be constant). If the damping is done in the natural-parameter space, the updates are modified as follows:
-%%)
-%\eqa{		\nu &\leftarrow&  (1-\gamma)\nu + \gamma \nabla A^{\star}\pac{\E_{q_{i}}[\phi]}.	\label{eq:ep-damped-classical}}
-%It is easy to show that the corresponding update for the parameter of the local site approximation is:
-%\eqa{\omega_{i} &\leftarrow& \omega_{i} + \gamma\pat{\nabla A^{\star}\pac{\E_{q_{i}}[\phi]} - \nu}.\label{sms:localupdate}}
-%If the damping is done in the mean-parameter space however, the update \eqref{eq:ep-damped-classical} is modified as follows:
-%\eqa{		\mu &\leftarrow& (1-\gamma)\mu + \gamma \E_{q_{i}}[\phi]
-%\spe \mu + \gamma(\E_{q_{i}}[\phi] - \mu).\nn}
-%This second update, when written in terms of a natural-parameter space update, corresponds to:
-%\eqa{		\nu &\leftarrow& \nabla A^{\star}\pac{ \nabla A(\nu) + \gamma(\E_{q_{i}}[\phi]-\nabla A(\nu)) }.	}
-%At this point, note that $\pat{\E_{q_{i}}[\phi]-\nabla A(\nu)}$ corresponds to $-\nabla_{\lambda_{i}} \mathcal E$. One can observe how this update reminds of the \emph{mirror descent algorithm}\margnote{mirror desc.} with a KL geometry. We refer to  \citet{beck03,nemirovski83} for the \emph{mirror descent algorithm} and to \citet{amari98} for the specific case of the KL geometry which yields what is know as the \emph{natural-gradient descent}\margnote{nat.\ grad.\ desc.}.\footnote{We give more details about the MDA and show the link with natural-gradient in \hyperref[app:MDA+NGD]{point~\ref*{app:MDA+NGD}}.}. \\
-%%If we actually consider the MDA for this problem the update is:
-%%\eqa{ \lambda_{i} &\leftarrow& \nabla A^{\star}\pac{\nabla A(\lambda_{i}) + \gamma\pat{\E_{q_{i}}[\phi]-\nabla A(\nu)} } ,	}
-%%for the parameters of the cavities. This has the advantage that it can be written in terms of local stepping schemes with the shared information of the the global parameter $\nu$. 
-%In line with \eqref{sms:localupdate} we can then suggest the following update for the parameters of the local site approximations:
-%\eqa{\omega_{i} &\leftarrow& \nabla A^{\star}\pac{\nabla A(\omega_{i}) + \gamma\pat{\E_{q_{i}}[\phi]-\nabla A(\nu)} }.}
-%This is the update considered in \citet{hasenclever16}, we will come back to it in \hyperref[sec:snep]{section~\ref*{sec:snep}}. We will show empirically how this update is more robust to noise when considering Monte Carlo estimators of $\E_{q_{i}}[\phi]$ than the natural-parameter space update \eqref{sms:localupdate}.
-%
-%\subsubsection{Power EP}
-%We have shown that a central part of EP was the KL projection of the tilted distributions $q_{i}$ onto the exponential family. A simple extension of this framework is to consider a broader class of divergences than just the KL, the $\alpha$-divergences, which leads to the \emph{power EP} algorithm of \citet{minka04}. The basic EP algorithm is simply modified as follows:
-%\begen\itsep0
-%	\item form the cavity by removing from $q_\nu$ the last site approximation taken to the power $1/\beta_{i}$: $q_{\neg i}' = q_\nu/\tilde t_i^{1/\beta_{i}}$,
-%	\item include the true site taken to the power $1/\beta_{i}$ and form the {tilted distribution} $q_i' \propto q_{\neg i} t_i^{1/\beta_{i}}$,
-%	\item moment-matching update: update $\nu$ s.t.\ $q_\nu\leftarrow \mathcal P_\phi[q_i']$,
-%	\item store the new site approximation $\tilde t_i=(q_\nu/q_{\neg i}')^{\beta_{i}}$.
-%\stopen
-%The rationale behind choosing the $\alpha$-divergence instead of simply the KL divergence used before is that playing with the local power $\beta_{i}$ adds a level of tuning to the framework which can help avoid overfitting, or help convergence. The precise impact of modifying the $\beta_{i}$ is however ill-understood in general but it is discussed in basic low-dimensional cases in \citet{minka05}. \\
-%
-%In terms of the natural-parameter space update, power EP only requires changing how the tilted distribution is constructed:
-%\eqa{\omega_{i} &\leftarrow& \omega_{i} + \gamma'\pat{\nabla A^{\star}\pac{\E_{q_{i}'}[\phi]} - \nu},\nn}
-%where $\gamma'=\beta_{i}\gamma$ and $q_{i}'=(t_{i}/\tilde t_{i})^{1/\beta_{i}} q$. Considering the broader framework of power EP is therefore straightforward be it for the natural or the mean-parameter space updates and adds a layer of flexibility to the framework.
+\todofr{maybe mention cavity/tilted still, express the GD as well or maybe leave that for SNEP. Also in SNEP trick of the trade where the projection doesn't work, that kind of stuff}
