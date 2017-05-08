@@ -1,6 +1,4 @@
 % !TEX root = ../thesis.tex
-\todofr{WIP April 15: uncomment as you go, write story on paper first.}
-
 % -------------------------------------------------------------
 \subsubsection{Variational inference in the exponential family}
 %
@@ -23,7 +21,13 @@ which is a strictly convex function in $\theta'$. By definition, a parameter $\t
 	\theta \,\,=\,\, \mathbf P_{\phi}[p] &\Longleftrightarrow& \theta \,\,=\,\, \nabla A^{\star}(\E_{p}[\phi(X)]).
 }
 %
-Assuming $\mathbf P_{\phi}[p] \in \Omega$, $q_{\theta}$ is a proper distribution in $\mathcal F_{\phi}(\mathcal X)$ that minimises the KL \eqref{kldivadf} and equivalently verifies the \emph{moment matching  condition} $\E_{q_{\theta}}[\phi(X)]=\E_{p}[\phi(X)]$. It will also be convenient to use the following abuse of notation: for an unnormalised distribution $p_{u}$ with some normalisation constant $Z_{p_{u}}\inv$ we will write $\mathbf P_{\phi}[p_{u}]$ to implicitly mean $\mathbf P_{\phi}[Z_{p_{u}}\inv p_{u}]$.\check{april 24}\\
+Assuming $\mathbf P_{\phi}[p] \in \Omega$, $q_{\theta}$ is a proper distribution in $\mathcal F_{\phi}(\mathcal X)$ that minimises the KL \eqref{kldivadf} and equivalently verifies the \emph{global moment matching condition} (GMMC) 
+%
+\eqa{
+	(\text{GMMC})\qquad \E_{q_{\theta}}[\phi(X)]&=&\E_{p}[\phi(X)].
+\label{eq:GMMC}}
+%
+It will also be convenient to use the following abuse of notation: for an unnormalised distribution $p_{u}$ with some normalisation constant $Z_{p_{u}}\inv$ we will write $\mathbf P_{\phi}[p_{u}]$ to implicitly mean $\mathbf P_{\phi}[Z_{p_{u}}\inv p_{u}]$.\check{april 24}
 
 The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu=\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu$, we need to be able to apply the inverse mapping $\nabla A^{\star}(\mu)$. We will introduce below contexts in which the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing the inverse mapping $\nabla A^{\star}$ can be done explicitly or is cheap to approximate. For continuous state spaces, it is overwhelmingly the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix.\add{probably add a section here on how to compute forward backward operator, maybe put this in appendix. Also cite lots of stuff that uses the Gaussian, if you find anything that doesn't...}\check{april24} 
 %
@@ -31,37 +35,38 @@ The application of this projection operator implicitly requires the ability to p
 \subsubsection*{Online Bayesian Learning and Assumed Density Filtering}
 %
 Let us consider the context of online Bayesian learning where one is interested in the evolution of a posterior distribution $p(x\st y_{1:t})$ given observed \iid\add{notations iid} data points $y_{1:t}$ up to current time $t$ and a new \iid data point $y_{t+1}$. The new posterior is given directly by Bayes rule with $p(x\st y_{1:t+1})\propto p(y_{t+1}\st x) p(x\st y_{1:t})$. In \citet{opper98}, the author considers that the exact posteriors are intractable but suggests constructing a sequence of approximations in the exponential family $\mathcal F_{\phi}(\mathcal X)$. Using the notations from the previous point, the algorithm corresponds to a sequence of iteration of the form
-\eqa{	\theta_{t+1} &=& \mathbf P_{\phi}[p(y_{t+1}\st \cdot)q_{\theta_{t}}].	\label{adfonline}}
-In words, the posterior up to time $t$ is approximated by the exponential family distribution $q_{\theta_{t}}$ which then serves as prior to form an approximate posterior $p(y_{t+1}\st x)q_{\theta_{t}}(x)$. Given that this approximate posterior is not necessarily in the exponential family, it needs to be projected as per \eqref{adfonline}. At time $t+1$, the distribution $q_{\theta_{t+1}}$ can be now interpreted as an approximation of the posterior distribution given all the data up to that time or 
+\eqa{	\theta_{t+1} &=& \mathbf P_{\phi}[p(y_{t+1}\st \cdot)q_{\theta_{t}}],	\label{adfonline}}
+where, at the first step, $q_{\theta_{0}}$ is replaced by the prior $\pi_{0}$. In words, the posterior up to time $t$ is approximated by the exponential family distribution $q_{\theta_{t}}$ which then serves as prior to form an approximate posterior $p(y_{t+1}\st x)q_{\theta_{t}}(x)$. Given that this approximate posterior is not necessarily in the exponential family, it needs to be projected as per \eqref{adfonline}.\check{april27} At time $t+1$, the distribution $q_{\theta_{t+1}}$ can be now interpreted as an approximation of the posterior distribution given all the data up to that time or 
 %
 \eqa{	q_{\theta_{t+1}}(x) \esp\approx\esp p(x) &\propto& \pi_{0}(x)\prod_{s=1}^{t+1}p(y_{s}\st x).
 }
 %
-We can therefore reinterpret the algorithm more generally as targeting a distribution $p$ that factorises in a fixed number (say $K$) of factors $p(x)\propto \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x)$.\add{notations: make sure it's clear that $\pi_{0}$ is always the prior} This is the Assumed Density Filtering algorithm. Note that in this case there is no ``natural ordering'' as in the online learning case and the algorithm can be done with any permutation of the factors.
+We can therefore reinterpret the algorithm more generally as targeting a distribution $p$ that factorises in a fixed number (say $K$) of factors: $p(x)\propto \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x)$.\add{notations: make sure it's clear that $\pi_{0}$ is always the prior} This is the Assumed Density Filtering algorithm. Note that in this case there is no ``natural ordering'' as in the online learning case and the algorithm can be done with any permutation of the factors.\check{april27}
 
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:adf}\dblue{\emph{\small Assumed Density Filtering}}}
 	\begin{algorithmic}[1]
-	\State Let $\omega_{1}=\theta_{1}=\mathbf P_{\phi}[\pi_{0}t_{1}]$
+	\State Let $\theta_{1}=\mathbf P_{\phi}[\pi_{0}t_{1}]$
 	\For{$i=2:K$}
-		\State $\theta_{i}=\mathbf P_{\phi}[q_{\theta_{i-1}}t_{i}]$
-		\State $\omega_{i} = \theta_{i}-\theta_{i-1}$
-	\EndFor
+		\State $\theta_{i}\leftarrow\mathbf P_{\phi}[q_{\theta_{i-1}}t_{i}]$ \Comment{parameter of the new approximation}
+%		\State $\omega_{i} \leftarrow \theta_{i}-\theta_{i-1}$\Comment{parameter of the local approximation}
+	\EndFor\\
+	\Return{$\theta_{K}$}
 	\end{algorithmic}
 \end{algorithm} 
 
-The parameter $\omega_{i}$ introduced in the \hyperref[alg:adf]{algorithm~\ref*{alg:adf}} can be interpreted as the update made to the previous parameter $\theta_{i-1}$ once the term $t_{i}$ has been integrated in the approximation. Correspondingly, $\theta_{K}=\sum_{i=1}^{K}\omega_{i}$ and letting $\tilde t_{i}(x):=\exp\scal{\omega_{i},\phi(x)}$, we can write 
+Let $\omega_{i}=(\theta_{i}-\theta_{i-1})$ denote the difference between subsequent parameters (with $\omega_{1}=\theta_{1}$). Correspondingly $\theta_{K}=\sum_{i=1}^{K}\omega_{i}$, and letting $\tilde t_{i}(x):=\exp\scal{\omega_{i},\phi(x)}$, which can be interpreted as an approximation to the factor $t_{i}$, we can write 
 %
 \eqa{
 	q_{\theta_{K}}(x) &\propto& \pi_{0}(x)\prod_{i=1}^{K}\tilde t_{i}(x).\label{eq:approxadf}
 }
 % 
-The main issue with using ADF on an MRF is that the order in which the graph is read, i.e.: the order in which the factors $t_{i}$ are considered will affect the final approximation $q_{\theta_{K}}$. A natural extension is then to perform ADF multiple times considering random orderings of the factors and to adjust the approximation accordingly. This is the Expectation Propagation algorithm.
+The main issue with using ADF on an MRF is that the order in which the graph is read or equivalently the order in which the factors $t_{i}$ are considered will affect the final approximation $q_{\theta_{K}}$. A natural extension is then to perform ADF multiple times considering random orderings of the factors and to adjust the approximation accordingly. This is the Expectation Propagation algorithm.\check{april27}
 %
 % --------------------------------------
 \subsubsection*{Expectation Propagation}
 %
-In the Expectation Propagation algorithm \citep{minka01, minka01b, seeger07, gelman14}, we consider that we have an initial approximation $q_{\theta}\in\mathcal F_{\phi}(\mathcal X)$ that we can write as in \eqref{eq:approxadf} (typically obtained with a pass of ADF) and we seek to iteratively improve its parameter $\theta$. At each step, a factor $t_{i}$ is considered and, by contrast to ADF, we now consider the projection $\theta_{i}=\mathbf P_{\phi}[q_{\theta}t_{i}/\tilde t_{i}]$. The difference with ADF is therefore that we now remove the previous factor approximation $\tilde t_{i}$ from the current approximation $q_{\theta}$ before projecting. ADF can then be viewed as a simple version of EP where we initially set all the factor approximations to $\tilde t_{i}\equiv 1$.
+In the Expectation Propagation algorithm \citep{minka01, minka01b, seeger07, gelman14}, we consider that we have an initial approximation $q_{\theta}\in\mathcal F_{\phi}(\mathcal X)$ that we can write as in \eqref{eq:approxadf} (typically obtained with a pass of ADF) and we seek to iteratively improve its parameter $\theta$. At each step, a factor $t_{i}$ is considered and, by contrast to ADF, we now consider the projection $\theta_{i}=\mathbf P_{\phi}[q_{\theta}t_{i}/\tilde t_{i}]$. The difference with ADF is therefore the removal of the previous factor approximation $\tilde t_{i}$ from the current approximation $q_{\theta}$ before the projection. ADF can also be reinterpreted as EP where, initially, all the factor approximations are set to $\tilde t_{i}\equiv 1$.\check{april27}
 
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:ep}\dblue{\emph{\small Expectation Propagation}}}
@@ -69,12 +74,20 @@ In the Expectation Propagation algorithm \citep{minka01, minka01b, seeger07, gel
 	\State Initialise $\theta,\omega_{1},\dots,\omega_{K}$ such that $\theta=\sum_{i=1}^{K}\omega_{i} \in \Omega$ (e.g. via ADF)
 	\For{$k=1:N_{\text{EP}}$}
 		\State Let $\sigma$ be a random permutation of $(1,\dots,K)$
-		\For{i=1:K}
-    		\State $\theta^{\text{new}}=\mathbf P_{\phi}[q_{\theta^{\text{old}}}t_{\sigma(i)}/\tilde t_{\sigma(i)}]$
-    		\State $\omega_{\sigma(i)} = \theta^{\text{new}}-\theta^{\text{old}}$
+		\For{$i=1:K$}
+    		\State $\theta \leftarrow \mathbf P_{\phi}[q_{\theta^{\text{old}}}t_{\sigma(i)}/\tilde t_{\sigma(i)}]$\Comment{\emph{parameter of the new global approximation}}
+    		\State $\omega_{\sigma(i)} \leftarrow \omega_{\sigma(i)} + \theta-\theta^{\text{old}}$\Comment{\emph{parameter of the new factor approximation $\tilde t_{\sigma(i)}$}}
+			\State $\theta^{\text{old}} \leftarrow \theta$
 		\EndFor
-	\EndFor
+	\EndFor\\	
+	\Return{$\theta$}
 	\end{algorithmic}
 \end{algorithm} 
 
-\todofr{maybe mention cavity/tilted still, express the GD as well or maybe leave that for SNEP. Also in SNEP trick of the trade where the projection doesn't work, that kind of stuff}
+In Expectation Propagation, we denote by $q_{-i}\propto q_{\theta}/\tilde t_{i}$ a \emph{cavity distribution} and by $q_{i}\propto q_{-i}t_{i}$ a \emph{tilted distribution} \cite{gelman14}. If the EP algorithm converges, then the global parameter $\theta$ is necessarily such that all the \emph{local moment matching conditions} (LMMC) are met:
+%
+\eqa{
+	(\text{LMMC})\qquad	\E_{q_{i}}[\phi(X)]=\E_{q_{\theta}}[\phi(X)].\label{eq:LMMC}
+} 
+%
+These conditions can be interpreted as a relaxation of the GMMC \eqref{eq:GMMC} and the EP algorithm can be seen as a fixed point algorithm targeting the LMMC.\add{depending on how much you discuss in SNEP, link here to that part and say will discuss in more details.}

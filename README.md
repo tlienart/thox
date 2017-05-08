@@ -13,6 +13,7 @@
 * write more about SNEP + your own way
 * skip blah from body and shove it in technical intro
 * discuss why only consider marginals (see same discussion in W&J08), discuss alternatives (SMC on GM, Naesseth etc)
+* **style**: try to remove "we do this" then "we do that" which is a bit too informal. (leave that kind of comments to supervisors as well)
 
 ### Formatting
 
@@ -76,7 +77,7 @@
             * [ ] LBP, problems advantages
         * [ ] Expectation propagation
             * [x] Exponential family and convexity
-            * [ ] ADF and EP (not in details)
+            * [x] ADF and EP (not in details)
         * [ ] Discussion
     * EPBP
         * [ ] PBP and the problem
