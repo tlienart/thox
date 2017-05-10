@@ -80,10 +80,11 @@ TFS 	& Two Filter Smoothing\\
 \setlength{\tabcolsep}{6pt} % default
 \newpage
 
-\subsubsection{Vectors and functions}
+\subsubsection{Vectors, matrices and functions} 
 For a vector $x\in\R^{n}$ we write $\norm{x}{p}$ the $p$-norm of $x$ with $\norm{x}{p}^{p}=\sum_{i=1:n}\abs{x_{i}}^{p}$ for $p\in[1,\infty)$. 
 For $x,y\in\R^{n}$, we write $\scal{x,y}=\sum_{i=1:n}x_{i}y_{i}$ the inner product of $x$ and $y$. 
-We denote the transpose of $x$ by $x^{t}$. 
+We denote the transpose of a matrix $A\in\R^{n\times n}$ by $A\transp$.
+A matrix $A\in\R^{n\times n}$ is said to be symmetric if $A=A\transp$. $A$ is said to be semi positive definite if $\scal{x,Ax}\ge 0$ for all $x\in\R^{n}$ and positive definite if the inequality holds strictly for all $x\neq 0$. We denote by $\mathbb S_+^{n}\subset \mathbb R^{n\times n}$ the set of symmetric positive definite matrices. 
 For a real-valued measurable function $f$ on a set $\mathcal X$, we write $\|f\|_{p}^{p}=\int_{\mathcal X} |f(x)|^{p}\dx$ the $p$-norm of $f$ for $p\in[1,\infty)$. 
 We write $L^{1}(\mathcal X)$ the set of functions such that $\|f\|_{1}<\infty$ and $\mathcal P(\mathcal X) \subset L^{1}(\mathcal X)$ denotes the restriction to nonnegative functions integrating to one (probability density functions). 
 For a real-valued, differentiable function $f$, we write $\nabla f$ its gradient and $\nabla^{2} f$ its Hessian provided $f$ is twice differentiable.\check{april27}

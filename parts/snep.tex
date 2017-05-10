@@ -7,17 +7,65 @@
 	\end{itemize}
 }
 
+%%%%%%%%%%%%%%%%%
 \section{Context}
 \todofr{
 \begin{itemize}
+	\item distributed bayesian inference various stuff
 	\item using EP for distributed stuff
-	\item SMS (also Turner's work, SEP etc)
-	\item 
+	\item (just mention, explain after) SMS (also Turner's work, SEP etc)
+	\item mention here noise
 \end{itemize}
 }
 
-\section{The SNEP algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{EP variants for distributed inference}
+\todofr{
+The sectioning has to be given a bit of thinking: should probably discuss updates in NP and MP space 
+\begin{itemize}
+	\item Natural 
+	\item EP Energy (SMS and SNEP)
+\end{itemize}
+}
+\subsection{\dred{SMS algorithm}}
+We showed \hyperref[s:ADF+EP]{(point \ref*{s:ADF+EP})} that the basic Expectation Propagation algorithm can be understood as a kind of fixed point iteration targeting the Local Moment Matching Conditions (LMMC) \eqref{eq:LMMC}.
+At a given step of the algorithm when considering the inclusion of a factor $t_i$, the global parameter is updated in such a way that $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
+%
+\eqa{	
+	\theta &\leftarrow & \nabla A^{\star}(\mu_i).	\label{eq:ep-np-update}
+}
+%
+In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}. In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \dred{CITE XXX probably SMS}. Damping the update \eqref{eq:ep-np-update} leads to the modified update:
+%
+\eqa{
+	\theta &\leftarrow & (1-\kappa)\theta + \kappa \nabla A^{\star}(\mu_i),
+}
+%
+where $\kappa \in(0,1]$ is the damping parameter. As in the gradient descent algorithm, the damping parameter can be decreased according to a schedule in order to further help convergence.\add{We will explore the connection to GD in more details later}
+Writing $\theta=\lambda_i+\omega_i$ with $\omega_i$ the parameter of the current factor approximation $\tilde t_i$ and $\lambda_i=(\theta-\omega_i)$ the parameter corresponding to the cavity, the update above can be expressed as
+%
+\eqa{
+	\omega_i &\leftarrow& \omega_i - \kappa(\omega_i+\lambda_i - \nabla A^{\star}(\mu_i)),
+}
+%
+which is useful for the parallel setting.\add{make sure it connects with context}.\todofr{describe SMS algorithm in full} 
 
-\section{Comparison of the SNEP and SMS algorithms}
+\subsection{\dred{SNEP algorithm}}
+\todofr{describe damping in MP space then explain full algorithm}
 
+\subsection{\dred{Parameter tying, SEP and BBa}}
+
+\subsection{\dred{The EP energy perspective}}
+
+%%%%%%%%%%%%%%%%%%%%%
+\section{Comparisons}
+\todofr{Explain primary comparison between SMS and SNEP since parameter tying is a further assumption (or say something of the sorts following Distbayes paper). Redo the experiments from ages ago (see if still has notebooks) comparing different EP approaches for BLR on single machine, discuss. Then discuss in distributed setting (graph from Distbayes paper)}
+
+
+%%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
+\todofr{
+\begin{itemize}
+	\item pitfalls of using EP / VB for large dimensional, have to revert to diagonal gaussians in which case maybe not so interesting. As a result and since we are using a large number of points, the uncertainty recovered is often extremely small in both EP and VB and unusable in practice. One may therefore wonder whether a purely optimisation based approach effectively targeting the MAP directly is not all that we can afford etc.
+\end{itemize}
+}
