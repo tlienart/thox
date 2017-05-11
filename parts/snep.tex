@@ -18,6 +18,16 @@
 \end{itemize}
 }
 
+In this section we are interested in performing Bayesian inference in the situation where the data is distributed across different compute nodes. 
+Let us assume that there are $K$ such compute nodes each holding independent parts of the data $y_i$ (with $i=1,\dots,K$) such that these parts form a partition of the entire data $y$. 
+In a Bayesian setting, we are interested in the posterior distribution over a parameter of interest $x$ given the entire data $y$. We can write this posterior as the product of $K$ terms corresponding to the parts $y_i$:
+%
+\eqa{
+	p(x\st y) &\propto& p_0(x) \prod_{i=1}^{K} p(y_i\st x)
+}
+%
+where $p_0$ is a prior distribution. Each of the likelihood term itself factors \add{COMPLETE}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{EP variants for distributed inference}
 \todofr{
@@ -28,34 +38,42 @@ The sectioning has to be given a bit of thinking: should probably discuss update
 \end{itemize}
 }
 \subsection{\dred{SMS algorithm}}
+\subsubsection*{Noisy EP iterations in natural parameter space}
 We showed \hyperref[s:ADF+EP]{(point \ref*{s:ADF+EP})} that the basic Expectation Propagation algorithm can be understood as a kind of fixed point iteration targeting the Local Moment Matching Conditions (LMMC) \eqref{eq:LMMC}.
-At a given step of the algorithm when considering the inclusion of a factor $t_i$, the global parameter is updated in such a way that $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
+At a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter is updated in such a way that $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
 %
 \eqa{	
 	\theta &\leftarrow & \nabla A^{\star}(\mu_i).	\label{eq:ep-np-update}
 }
 %
-In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}. In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \dred{CITE XXX probably SMS}. Damping the update \eqref{eq:ep-np-update} leads to the modified update:
+In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}. In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \dred{CITE XXX probably SMS}. Damping \eqref{eq:ep-np-update} leads to the modified update:\check{may11}
 %
 \eqa{
-	\theta &\leftarrow & (1-\kappa)\theta + \kappa \nabla A^{\star}(\mu_i),
+	\theta &\leftarrow & (1-\kappa)\theta + \kappa \nabla A^{\star}(\mu_i),\label{eq:damped-update-np}
 }
 %
-where $\kappa \in(0,1]$ is the damping parameter. As in the gradient descent algorithm, the damping parameter can be decreased according to a schedule in order to further help convergence.\add{We will explore the connection to GD in more details later}
-Writing $\theta=\lambda_i+\omega_i$ with $\omega_i$ the parameter of the current factor approximation $\tilde t_i$ and $\lambda_i=(\theta-\omega_i)$ the parameter corresponding to the cavity, the update above can be expressed as
+where $\kappa \in(0,1]$ is the damping parameter. As in the gradient descent algorithm, the damping parameter can be decreased over iterations according to a schedule in order to further help convergence.\add{We will explore the connection to GD in more details later}
+Writing $\theta=\lambda_i+\omega_i$ with $\omega_i$ the parameter of the current factor approximation $\tilde t_i$ and $\lambda_i=(\theta-\omega_i)$ the parameter corresponding to the cavity, the damped update \eqref{eq:damped-update-np} can be expressed as
 %
 \eqa{
-	\omega_i &\leftarrow& \omega_i - \kappa(\omega_i+\lambda_i - \nabla A^{\star}(\mu_i)),
+	\omega_i &\leftarrow& \omega_i - \kappa(\omega_i+\lambda_i - \nabla A^{\star}(\mu_i)).
 }
 %
-which is useful for the parallel setting.\add{make sure it connects with context}.\todofr{describe SMS algorithm in full} 
+This form is useful in the parallel context since it can be interpreted in terms of a local update on one compute node corresponding to the factor $t_i$.\add{make sure it connects with context, say this better}.
+
+\subsubsection*{The SMS algorithm}
+\todofr{describe SMS algorithm in full} 
 
 \subsection{\dred{SNEP algorithm}}
-\todofr{describe damping in MP space then explain full algorithm}
+\subsubsection*{Noisy EP iterations in mean parameter space}
+
+\subsubsection*{The SNEP algorithm}
+
+\subsection{\dred{The ``EP energy'' perspective}}
+\todofr{
+Cite minka, mention energy, explain that it's not really something to increase or decrease but rather want stationary points and that's it, show that if write the KL and get rid of a part then get this energy (essentially use that to show that it's a bit pointless)}
 
 \subsection{\dred{Parameter tying, SEP and BBa}}
-
-\subsection{\dred{The EP energy perspective}}
 
 %%%%%%%%%%%%%%%%%%%%%
 \section{Comparisons}
