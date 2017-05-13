@@ -82,25 +82,50 @@ Another perspective to EP is to consider the so-called ``EP Energy''\add{citatio
 	\item the global approximating distribution $q$ with $q(x)=Z_q\inv \pi_0(x)\exp\scal{\theta,\phi(x)}$ which we can also write $Z_q\inv \pi_0(x)\exp\scal{\sum_{i=1:K}\omega_i,\phi(x)}$ as in \eqref{eq:approxadf},
 	\item the tilted distributions $q_i$ with $q_i(x)=Z_i\inv \pi_0(x)\exp\scal{\lambda_i,\phi(x)}$.
 \end{itemize}
-In the list above, $Z_p,Z_q$ and $Z_i$ designate normalisation constants and $\pi_0$ is the prior distribution. The parameters of the tilted distributions $\lambda_i$ are given by $\lambda_i=(\theta-\omega_i)$ and hence must be such that $\sum_{i=1:K}\lambda_i=(K-1)\theta$. Omitting to write the dependence in $x$ explicitly since it is clear from the context, we can write
+In the list above, $Z_p,Z_q$ and $Z_i$ designate normalisation constants (of course, $Z_q=\exp A(\theta)$) and $\pi_0$ is the prior distribution. The parameters of the tilted distributions $\lambda_i$ are given by $\lambda_i=(\theta-\omega_i)$ and hence must be such that $\sum_{i=1:K}\lambda_i=(K-1)\theta$. To simplify notations, we omit the dependence in $x$ and all sums and products are assumed to go over $i=1,\dots,K$ and write
 %
 \eqa{	
-	\KL{p,q} &=& \E_p\pac{\log\pat{Z_p\inv\pi_0\prod_{i=1:K}t_i}-\log q}	.
+	\KL{p,q} &=& \E_p\pac{\log\pat{Z_p\inv\pi_0\prod_{i}t_i}-\log q}	.
 \label{eq:decomposeKL}}
 %	
 We can manipulate the product $t_i$ to make the $q_i$ appear:
 %
 \eqa{
-	\prod_{i=1:K} t_i &=& \prod_{i=1:K}{\pi_0\exp\scal{\lambda_i,\phi}t_i\over \pi_0\exp\scal{\lambda_i,\phi}}\spe {\prod Z_iq_i\over \pi_0 (Z_q q)^{K-1}.}
+	\prod_{i} t_i &=& \prod_{i}{\pi_0\exp\scal{\lambda_i,\phi}t_i\over \pi_0\exp\scal{\lambda_i,\phi}}\spe {\prod_i Z_iq_i\over \pi_0 (Z_q q)^{K-1}.}
 }
 %
-Using this in \eqref{eq:decomposeKL} leads to
+Using this in \eqref{eq:decomposeKL} leads to\footnote{Note that if we consider the reverse KL we can write a very similar decomposition:
+\[\KL{q,p} - \log Z_p \spe -\mathcal E + \sum_i \KL{q,q_i}.\]}
 %
 \eqa{
-\KL{p,q} + \log Z_p &=& \underbrace{(1-K)\log Z_q + \sum_{i=1:K}\log Z_i}_{\mathcal E} + \mathbb E_p\pac{\log q_i/q}.
+\KL{p,q} + \log Z_p &=& \underbrace{(1-K)\log Z_q + \sum_{i}\log Z_i}_{\mathcal E} + \mathbb E_p\pac{\log q_i/q}.
 }
 %
-The first part, denoted by a $\mathcal E$ is the EP energy. 
+The first part, denoted by a $\mathcal E$ is the EP energy. Its gradient in $\lambda_i$ readily obtained:
+%
+\eqa{
+	\nabla_{\lambda_i}\mathcal E &=& (1-K)\nabla_{\lambda_i}A\pat{(K-1)\inv \sum_i\lambda_i} + {\nabla_{\lambda_i}\int \pi_0(x)\exp\scal{\lambda_i,\phi(x)}t_i(x)\dx\over Z_i} \nn\\
+	&=& -\nabla A(\theta) + \E_{q_i}[\phi].
+}
+%
+The stationary points of $\mathcal E$ in $\lambda_i$ therefore correspond to the LMMC \eqref{eq:LMMC} that the EP algorithm attempts to satisfy.
+It is also interesting to briefly look at the remainder of the right-hand side of \eqref{eq:decomposeKL}. Discarding the terms that don't depend on $\lambda_i$, we have
+%
+\eqa{
+	\nabla_{\lambda_i}\E_p[\log q_i/q] &=& \nabla_{\lambda_i}\E_p\pac{\scal{\lambda_i,\phi}-\log Z_i  - \scal{(K-1)\inv\sum_i\lambda_i,\phi}+ \log Z_q}\nn\\
+	&=& \mu-\mu_i-{1\over K-1}\mu + {1\over K-1}\nabla A(\theta).
+}
+%
+Therefore the gradient of the complete right hand side of \eqref{eq:decomposeKL} (i.e. the gradient of $\KL{p,q}$) in $\lambda_i$ is in fact proportional to $(\mu-\nabla A(\theta))$ leading to the same stationary points as the GMMC.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Analysis of the EP energy}
+\todofr{Think first about how you want to present information. Would be good not to go along the crappy road of the dev a la Teh, just showing that we're actually doing some kind of Newton's method would already be quite nice use for this \url{http://homes.soic.indiana.edu/classes/spring2012/csci/b553-hauserk/newtons_method.pdf} and probably ``Information geometry of mirror descent'' \citep{raskutti15}}
+
+
+We know that the stationary points of $\mathcal E$ in $\lambda_i$ correspond to the LMMC. We can now seek to characterise this energy function in more details as a function of the $\lambda_i$ and in order to follow the literature, we will consider $-\mathcal E$. We also introduce the notation $A_i(\lambda_i) = \log Z_i$ so that the energy can be written as
+\eqa{-\mathcal E(\lambda_1,\dots,\lambda_K) &=& \eta A\left(\eta\inv \sum_i\lambda_i\right) - \sum_i A_i(\lambda_i),}
+with $\eta:=(K-1)$.\add{the function is not convex, not concave either, cool. See if useful to even write it like this}
 
 \subsection{\dred{Parameter tying, SEP and BBa}}
 
