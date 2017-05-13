@@ -60,18 +60,47 @@ Writing $\theta=\lambda_i+\omega_i$ with $\omega_i$ the parameter of the current
 }
 %
 This form is useful in the parallel context since it can be interpreted in terms of a local update on one compute node corresponding to the factor $t_i$.\add{make sure it connects with context, say this better}.
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection*{The SMS algorithm}
 \todofr{describe SMS algorithm in full} 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\dred{SNEP algorithm}}
 \subsubsection*{Noisy EP iterations in mean parameter space}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection*{The SNEP algorithm}
 
 \subsection{\dred{The ``EP energy'' perspective}}
 \todofr{
 Cite minka, mention energy, explain that it's not really something to increase or decrease but rather want stationary points and that's it, show that if write the KL and get rid of a part then get this energy (essentially use that to show that it's a bit pointless)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Obtaining the energy}
+Another perspective to EP is to consider the so-called ``EP Energy''\add{citations}. This ``energy'' is more a function that has the same fixed points as EP than an energy. One way to obtain it is to decompose the KL divergence between $p$ and $q$. First, let us write explicitly the objects considered:
+\begin{itemize}
+	\item the target distribution $p$ with $p(x)=Z_p\inv \pi_0(x)\prod_{i=1:K}t_i(x)$,
+	\item the global approximating distribution $q$ with $q(x)=Z_q\inv \pi_0(x)\exp\scal{\theta,\phi(x)}$ which we can also write $Z_q\inv \pi_0(x)\exp\scal{\sum_{i=1:K}\omega_i,\phi(x)}$ as in \eqref{eq:approxadf},
+	\item the tilted distributions $q_i$ with $q_i(x)=Z_i\inv \pi_0(x)\exp\scal{\lambda_i,\phi(x)}$.
+\end{itemize}
+In the list above, $Z_p,Z_q$ and $Z_i$ designate normalisation constants and $\pi_0$ is the prior distribution. The parameters of the tilted distributions $\lambda_i$ are given by $\lambda_i=(\theta-\omega_i)$ and hence must be such that $\sum_{i=1:K}\lambda_i=(K-1)\theta$. Omitting to write the dependence in $x$ explicitly since it is clear from the context, we can write
+%
+\eqa{	
+	\KL{p,q} &=& \E_p\pac{\log\pat{Z_p\inv\pi_0\prod_{i=1:K}t_i}-\log q}	.
+\label{eq:decomposeKL}}
+%	
+We can manipulate the product $t_i$ to make the $q_i$ appear:
+%
+\eqa{
+	\prod_{i=1:K} t_i &=& \prod_{i=1:K}{\pi_0\exp\scal{\lambda_i,\phi}t_i\over \pi_0\exp\scal{\lambda_i,\phi}}\spe {\prod Z_iq_i\over \pi_0 (Z_q q)^{K-1}.}
+}
+%
+Using this in \eqref{eq:decomposeKL} leads to
+%
+\eqa{
+\KL{p,q} + \log Z_p &=& \underbrace{(1-K)\log Z_q + \sum_{i=1:K}\log Z_i}_{\mathcal E} + \mathbb E_p\pac{\log q_i/q}.
+}
+%
+The first part, denoted by a $\mathcal E$ is the EP energy. 
 
 \subsection{\dred{Parameter tying, SEP and BBa}}
 
