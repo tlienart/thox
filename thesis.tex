@@ -12,14 +12,14 @@
 
 \tocfalse
 \introfalse
-\bgsfalse % background sampling
+\bgsfalse
 \tfsfalse
 \lbpsfalse
-\bgmtrue % background mess pass
+\bgmtrue
 \pbpfalse
 \sneptrue
 
-%\setlength\parindent{0pt} % no paragraph indentation
+\newcommand{\itsepa}{\itsep0} % adjust all itseps in one shot
 
 \reversemarginpar
 \newcommand{\margnote}[1]{\marginpar{\hfill\fontsize{8}{0}{\idblue{(#1)}}}}
@@ -119,7 +119,7 @@
 
 \ifpbp\input{parts/pbp}\fi
 
-\chapter[SNEP]{Expectation Propagation for\\ Distributed Bayesian Inference}
+\chapter[EP for Distributed Bayesian Inference]{Expectation Propagation for\\ Distributed Bayesian Inference}
 \ifsnep\input{parts/snep}\fi
 
 %%%%%%%%%%%%%%%%%%%%

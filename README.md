@@ -18,7 +18,7 @@
 ### Formatting
 
 * pick notation for messages (with/without arrow), use it throughout. Leaning for without. Requires a comma in HMM setting. Arrows are confusing for pre-message.
-* itsep should be the same everywhere
+* itsep should be the same everywhere (and probably not as huge as Latex wants it to be) use `\itsepa`
 * consistency: lower case *expectation propagation* and *belief propagation*
 * caption of algorithms: blue/not
 * pass @ end to fix image placement ignore until publish time (add fig on individual pages)

@@ -41,7 +41,13 @@ where, at the first step, $q_{\theta_{0}}$ is replaced by the prior $\pi_{0}$. I
 \eqa{	q_{\theta_{t+1}}(x) \esp\approx\esp p(x) &\propto& \pi_{0}(x)\prod_{s=1}^{t+1}p(y_{s}\st x).
 }
 %
-We can therefore reinterpret the algorithm more generally as targeting a distribution $p$ that factorises in a fixed number (say $K$) of factors: $p(x)\propto \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x)$.\add{notations: make sure it's clear that $\pi_{0}$ is always the prior} This is the Assumed Density Filtering algorithm. Note that in this case there is no ``natural ordering'' as in the online learning case and the algorithm can be done with any permutation of the factors.\check{april27}
+We can therefore reinterpret the algorithm more generally as targeting a distribution $p$ that factorises in a fixed number (say $K$) of factors: 
+%
+\eqa{
+	p(x) & \propto&  \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x)
+}
+%
+where the factors $t_i$ are nonnegative.\add{notations: make sure it's clear that $\pi_{0}$ is always the prior} This is the \emph{Assumed Density Filtering} algorithm. Note that in this case there is no ``natural ordering'' as in the online learning case and the algorithm can be applied after any permutation of the factors.\check{april27}
 
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:adf}\dblue{\emph{\small Assumed Density Filtering}}}
@@ -61,7 +67,7 @@ Let $\omega_{i}=(\theta_{i}-\theta_{i-1})$ denote the difference between subsequ
 	q_{\theta_{K}}(x) &\propto& \pi_{0}(x)\prod_{i=1}^{K}\tilde t_{i}(x).\label{eq:approxadf}
 }
 % 
-The main issue with using ADF on an MRF is that the order in which the graph is read or equivalently the order in which the factors $t_{i}$ are considered will affect the final approximation $q_{\theta_{K}}$. A natural extension is then to perform ADF multiple times considering random orderings of the factors and to adjust the approximation accordingly. This is the Expectation Propagation algorithm.\check{april27}
+The main issue with using ADF on an MRF is that the order in which the graph is read, or equivalently the order in which the factors $t_{i}$ are considered, will affect the final approximation $q_{\theta_{K}}$. A natural extension is therefore to perform multiple passes of ADF while considering random orderings of the factors and correct for the fact that each factor is considered multiple times. This is the core idea behind the \emph{Expectation Propagation} algorithm.\check{may14}
 %
 % --------------------------------------
 \subsubsection*{Expectation Propagation}
