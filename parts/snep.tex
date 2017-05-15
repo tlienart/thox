@@ -18,15 +18,18 @@
 \end{itemize}
 }
 
-In this section we are interested in performing Bayesian inference in the situation where the data is distributed across different compute nodes. 
+In this section we are interested in performing Bayesian inference in the situation where the relevant data is distributed across different compute nodes. 
 Let us assume that there are $K$ such compute nodes each holding independent parts of the data $y_i$ (with $i=1,\dots,K$) such that these parts form a partition of the entire data $y$. 
 In a Bayesian setting, we are interested in the posterior distribution over a parameter of interest $x$ given the entire data $y$. We can write this posterior as the product of $K$ terms corresponding to the parts $y_i$:
 %
 \eqa{
-	p(x\st y) &\propto& p_0(x) \prod_{i=1}^{K} p(y_i\st x)
+	p(x\st y) &\propto& \pi_0(x) \prod_{i=1}^{K} p(y_i\st x)\label{eq:distrposterior}
 }
 %
-where $p_0$ is a prior distribution. Each of the likelihood term itself factors \add{COMPLETE, go from this to general factorised form, assume that the $t_i$ are positive}
+where $\pi_0$ is a prior distribution. Each of the likelihood term itself factors over the individual data points of $y_i$, i.e.: $p(y_i\st x)=\prod_{j=1}^{N_i}p(y_{ij}\st x)$ with $N_i$ the number of individual data points held by the compute node $i$.
+The form \eqref{eq:distrposterior} corresponds to the form \eqref{eq:targetfactorises} that we had used to motivate the introduction of the ADF and EP algorithms (point \ref{s:ADF+EP}) with the nonnegative factors $t_i$ being given by $t_i(x)=p(y_i\st x)$.
+
+In this chapter, we show how different variants of the EP algorithm can be used to perform parallel variational inference in the presence of distributed data.\add{come back to this, add litt, see also confirmation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{EP variants for distributed inference}
@@ -39,14 +42,13 @@ The sectioning has to be given a bit of thinking: should probably discuss update
 }
 \subsection{\dred{SMS algorithm}}
 \subsubsection*{Noisy EP iterations in natural parameter space}
-We showed \hyperref[s:ADF+EP]{(point \ref*{s:ADF+EP})} that the basic Expectation Propagation algorithm can be understood as a kind of fixed point iteration targeting the Local Moment Matching Conditions (LMMC) \eqref{eq:LMMC}.
-At a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter is updated in such a way that $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
+We showed earlier that the basic EP algorithm could be interpreted as a kind of fixed point iteration targeting the Local Moment Matching Conditions \eqref{eq:LMMC} (LMMC): at a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter is updated in such a way that $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
 %
 \eqa{	
 	\theta &\leftarrow & \nabla A^{\star}(\mu_i).	\label{eq:ep-np-update}
 }
 %
-In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}. In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \dred{CITE XXX probably SMS}. Damping \eqref{eq:ep-np-update} leads to the modified update:\check{may11}
+In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}.\add{would be good to come back further to this when considering the gaussian case (inversion of noisy matrix)} In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \citep{heskes03}. Damping \eqref{eq:ep-np-update} leads to the modified update:\check{may11}
 %
 \eqa{
 	\theta &\leftarrow & (1-\kappa)\theta + \kappa \nabla A^{\star}(\mu_i),\label{eq:damped-update-np}
@@ -66,6 +68,14 @@ This form is useful in the parallel context since it can be interpreted in terms
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\dred{SNEP algorithm}}
+\todofr{
+	\begin{itemize}\itsepa
+		\item should explain why there's a problem with SMS in presence of noise (in particular with gaussian case)
+		\item should then suggest that damping in MP space is a good idea
+		\item then suggest algorithm
+		\item then suggest that we will also obtain the same algorithm by looking at energy
+	\end{itemize}
+}
 \subsubsection*{Noisy EP iterations in mean parameter space}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,50 +86,52 @@ This form is useful in the parallel context since it can be interpreted in terms
 Cite minka, mention energy, explain that it's not really something to increase or decrease but rather want stationary points and that's it, show that if write the KL and get rid of a part then get this energy (essentially use that to show that it's a bit pointless)}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection*{Obtaining the energy}
-Another perspective to EP is to consider the so-called ``EP Energy''\add{citations}. This ``energy'' is more a function that has the same fixed points as EP than an energy. One way to obtain it is to decompose the KL divergence between $p$ and $q$. First, let us write explicitly the objects considered:
+Another perspective to EP is to consider the so-called ``EP Energy''\add{citations}. This ``energy'' is more a function that has the same fixed points as EP than an energy.\add{should probably clarify this or not put this sentence (here)} One way to obtain it is to decompose the KL divergence between $p$ and $q$. First, let us write explicitly the objects considered:
 \begin{itemize}\itsepa
 	\item the target distribution $p$ with $p(x)=Z_p\inv \pi_0(x)\prod_{i=1:K}t_i(x)$,
 	\item the global approximating distribution $q$ with $q(x)=Z_q\inv \pi_0(x)\exp\scal{\theta,\phi(x)}$ which we can also write $Z_q\inv \pi_0(x)\exp\scal{\sum_{i=1:K}\omega_i,\phi(x)}$ as in \eqref{eq:approxadf},
-	\item the tilted distributions $q_i$ with $q_i(x)=Z_i\inv \pi_0(x)\exp\scal{\lambda_i,\phi(x)}$.
+	\item the tilted distributions $q_i$ with $q_i(x)=Z_i\inv \pi_0(x)\exp\scal{\lambda_i,\phi(x)}t_i(x)$.
 \end{itemize}
-In the list above, $Z_p,Z_q$ and $Z_i$ designate normalisation constants and $\pi_0$ is the prior distribution. From before, $\log Z_q=A(\theta)$ and, in a similar fashion, we can define $A_i(\lambda_i):=\log Z_i$ which enjoys similar property as $A$. In particular, it is convex and $\nabla_{\lambda_i} A_i(\lambda_i) = \E_{q_i}[\phi(X)]$.\footnote{Indeed, $A_i$ is the log partition function associated with $\mathcal F_\phi$ under a modified base-measure.} The parameters of the tilted distributions $\lambda_i$ are given by $\lambda_i=(\theta-\omega_i)$ and hence must be such that $\sum_{i=1:K}\lambda_i=(K-1)\theta$. To simplify notations, we omit the dependence in $x$ and all sums and products are assumed to go over $i=1,\dots,K$ and write
+In the list above, $\pi_0$ is the prior distribution and $Z_p,Z_q$ and $Z_i$ designate normalisation constants. From before, we have $\log Z_q=A(\theta)$ and, in a similar fashion, we can define $A_i(\lambda_i):=\log Z_i$ which enjoy similar property as $A$. In particular, it is convex and $\nabla_{\lambda_i} A_i(\lambda_i) =\mu_{i}$.\footnote{Indeed, $A_i$ is the log partition function associated with $\mathcal F_\phi$ under a modified base-measure.} The parameters of the tilted distributions $\lambda_i$ are given by $\lambda_i=(\theta-\omega_i)$ and hence must be such that $\sum_{i=1:K}\lambda_i=(K-1)\theta$.\\
+To simplify notations over the next few equations we omit the dependence in $x$ which is obvious from the context and all sums and products are assumed to go over $i=1,\dots,K$. The KL divergence between $p$ and $q$ can then be written as\check{may15}
 %
 \eqa{	
 	\KL{p,q} &=& \E_p\pac{\log\pat{Z_p\inv\pi_0\prod_{i}t_i}-\log q}	.
 \label{eq:decomposeKL}}
 %	
-We can manipulate the product $t_i$ to make the $q_i$ appear:
+Consequently, the product $t_i$ can be manipulated to make the $q_i$ appear:
 %
 \eqa{
-	\prod_{i} t_i &=& \prod_{i}{\pi_0\exp\scal{\lambda_i,\phi}t_i\over \pi_0\exp\scal{\lambda_i,\phi}}\spe {\prod_i Z_iq_i\over \pi_0 (Z_q q)^{K-1}.}
+	\prod_{i} t_i &=& \prod_{i}{\pi_0\exp\scal{\lambda_i,\phi}t_i\over \pi_0\exp\scal{\lambda_i,\phi}}\spe {\prod_i Z_iq_i\over \pi_0 (Z_q q)^{K-1},}
 }
 %
-Using this in \eqref{eq:decomposeKL} leads to:\footnote{Note that considering the reverse KL leads to a very similar decomposition:
+and using this in \eqref{eq:decomposeKL} leads to:\footnote{Note that considering the reverse KL leads to a very similar decomposition:
 \[\KL{q,p} - \log Z_p \spe -\mathcal E + \sum_i \KL{q,q_i}.\]}
 %
 \eqa{
 \KL{p,q} + \log Z_p &=& \underbrace{(1-K) A(\theta) + \sum_{i}A_i(\lambda_i)}_{\mathcal E} + \mathbb E_p\pac{\log q_i/q}.
 }
 %
-The first part, denoted by a $\mathcal E$ is the EP energy.\add{add footnote explaining that sometimes defined with different sign but that it doesn't matter} Note that its gradient in $\lambda_i$ is simply $\nabla_{\lambda_i}\mathcal E = (-\nabla A(\theta) + \E_{q_i}[\phi])$. 
+The first part, denoted by $\mathcal E$ is the \emph{EP energy}.\add{add footnote explaining that sometimes defined with different sign but that it doesn't matter} Note that its gradient in $\lambda_i$ is simply $\nabla_{\lambda_i}\mathcal E = (-\nabla A(\theta) + \mu_{i})$. 
 The stationary points of $\mathcal E$ in $\lambda_i$ therefore correspond to the LMMC \eqref{eq:LMMC} that the EP algorithm attempts to satisfy.
 It is also interesting to briefly look at the remainder of the right-hand side of \eqref{eq:decomposeKL}. Discarding the terms that don't depend on $\lambda_i$, we have
 %
 \eqa{
 	\nabla_{\lambda_i}\E_p[\log q_i/q] &=& \nabla_{\lambda_i}\E_p\pac{\scal{\lambda_i,\phi}-A_i(\lambda_i)  - \scal{(K-1)\inv\sum_i\lambda_i,\phi}+A(\theta)}\nn\\
-	&=& \mu-\mu_i-{1\over K-1}\mu + {1\over K-1}\nabla A(\theta).
+	&=& \E_{p}[\phi]-\mu_i-{1\over K-1}\E_{p}[\phi] + {1\over K-1}\nabla A(\theta).
 }
 %
-Therefore the gradient of the complete right hand side of \eqref{eq:decomposeKL} (i.e. the gradient of $\KL{p,q}$) in $\lambda_i$ is in fact proportional to $(\mu-\nabla A(\theta))$ leading to the same stationary points as the GMMC \eqref{eq:GMMC}.
+Therefore the gradient of the complete right hand side of \eqref{eq:decomposeKL} (i.e. the gradient of $\KL{p,q}$) in $\lambda_i$ is in fact proportional to $(\E_{p}[\phi]-\nabla A(\theta))$ leading to the same stationary points as the GMMC \eqref{eq:GMMC}.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection*{Analysis of the EP energy}
+\subsubsection*{Looking for a saddle point of the EP energy}
 \todofr{Think first about how you want to present information. Would be good not to go along the crappy road of the dev a la Teh, just showing that we're actually doing some kind of Newton's method would already be quite nice use for this \url{http://homes.soic.indiana.edu/classes/spring2012/csci/b553-hauserk/newtons_method.pdf} and probably ``Information geometry of mirror descent'' \citep{raskutti15}}
 
-
-We know that the stationary points of $\mathcal E$ in $\lambda_i$ correspond to the LMMC. We can now seek to characterise this energy function in more details as a function of the $\lambda_i$ and in order to follow the literature, we will consider $-\mathcal E$. We also introduce the notation $A_i(\lambda_i) = \log Z_i$ so that the energy can be written as
-\eqa{-\mathcal E(\lambda_1,\dots,\lambda_K) &=& \eta A\left(\eta\inv \sum_i\lambda_i\right) - \sum_i A_i(\lambda_i),}
-with $\eta:=(K-1)$.\add{the function is not convex, not concave either, cool. See if useful to even write it like this}
+The energy $\mathcal E$ as a function of $\theta$ and the $\lambda_i$ is given by
+\eqa{\mathcal E(\theta,\lambda_1,\dots,\lambda_K)&=& (1-K)A(\theta) + \sum_{i=1}^{K} A_i(\lambda_i)}
+under the condition that $\theta=(K-1)\inv \sum_{i=1:K}\lambda_i$. The first term is concave in $\theta$ while each of the terms in the sum is convex in $\lambda_i$. It is therefore justified to interpret a stationary point as the solution of the following min-max problem:
+\eqa{	\min	_\theta\max_{\{\lambda_i\}} \quad(K-1)A(\theta)-\sum_{i=1}^{K}A_i(\lambda_i), \quad \text{s.t.}\quad \theta = (K-1)\inv\sum_{i=1}^{K}\lambda_i.}
+This is what Minka calls the \emph{EP dual energy function} \citep{minka01c}.\add{This is full of shit, its a minimisation on a collapsed domain, should refrain from using if possible...}
 
 \subsection{\dred{Parameter tying, SEP and BBa}}
 

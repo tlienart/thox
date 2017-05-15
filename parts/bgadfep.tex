@@ -2,7 +2,7 @@
 % -------------------------------------------------------------
 \subsubsection{Variational inference in the exponential family}
 %
-The premises of both ADF and EP is performing variational inference in the exponential family $\mathcal F_{\phi}(\mathcal X)$.\add{check EP/ADF introduced} In the previous point, we showed that a target distribution $p$ could be associated with a point $\mu\in\mathcal M$ with $\mu=\E_{p}[\phi(X)]$ for some sufficient statistic $\phi$. Further, we showed that if the family is minimal and if $\mu\in\mathcal M^{\star}$, the mean parameter $\mu$ could be directly associated to a distribution in $\mathcal F_{\phi}(\mathcal X)$ with parameter $\theta$ given by $\nabla A^{\star}(\mu)$. It is therefore natural to consider this distribution $q_{\theta}$ as potentially forming a good approximation to $p$ in $\mathcal F_{\phi}(\mathcal X)$.\check{april24}
+The premises of both ADF and EP is performing variational inference in the exponential family $\mathcal F_{\phi}(\mathcal X)$.\add{check EP/ADF introduced} In the previous point, we showed that a target distribution $p$ could be associated with a point $\mu_p\in\mathcal M$ with $\mu_p=\E_{p}[\phi(X)]$ for a sufficient statistic $\phi$. Further, we showed that if the family is minimal and if $\mu_p\in\mathcal M^{\star}$, the mean parameter could be directly associated to a distribution in $\mathcal F_{\phi}(\mathcal X)$ with parameter $\theta$ given by $\nabla A^{\star}(\mu_p)$. It is therefore natural to consider this distribution $q_{\theta}$ as potentially forming a good approximation to $p$ in $\mathcal F_{\phi}(\mathcal X)$.\check{may15,april24}
 %
 %\begin{figure}[!h]
 %    \center
@@ -12,10 +12,10 @@ The premises of both ADF and EP is performing variational inference in the expon
 This is supported by the fact that this distribution actually minimises the divergence $\KL{p,q_{\theta'}}$. Indeed, observe that
 %
 \eqa{
-	\KL{p,q_{\theta'}} &=& \E_{p}[\log p] - \scal{\theta', \mu} + A(\theta'), \label{kldivadf}
+	\KL{p,q_{\theta'}} &=& \E_{p}[\log p] - \scal{\theta', \mu_p} + A(\theta'), \label{kldivadf}
 }
 %
-which is a strictly convex function in $\theta'$. By definition, a parameter $\theta=\nabla A^{\star}(\mu)$ is such that $\nabla A(\theta)=\mu$ and therefore verifies the first order condition. This shows that $q_{\theta}$ minimises the divergence \eqref{kldivadf}. It is useful at this point to define a projection operator $\mathbf P_{\phi}:\mathcal P(\mathcal X) \to \mathrm{cl}(\Omega)$\, with
+which is a strictly convex function in $\theta'$. By definition, a parameter $\theta=\nabla A^{\star}(\mu_p)$ is such that $\nabla A(\theta)=\mu_p$ and therefore verifies the first order condition. This shows that $q_{\theta}$ minimises the divergence \eqref{kldivadf}. It is useful at this point to define a projection operator $\mathbf P_{\phi}:\mathcal P(\mathcal X) \to \mathrm{cl}(\Omega)$\, with
 %
 \eqa{	
 	\theta \,\,=\,\, \mathbf P_{\phi}[p] &\Longleftrightarrow& \theta \,\,=\,\, \nabla A^{\star}(\E_{p}[\phi(X)]).
@@ -27,9 +27,9 @@ Assuming $\mathbf P_{\phi}[p] \in \Omega$, $q_{\theta}$ is a proper distribution
 	(\text{GMMC})\qquad \E_{q_{\theta}}[\phi(X)]&=&\E_{p}[\phi(X)].
 \label{eq:GMMC}}
 %
-It will also be convenient to use the following abuse of notation: for an unnormalised distribution $p_{u}$ with some normalisation constant $Z_{p_{u}}\inv$ we will write $\mathbf P_{\phi}[p_{u}]$ to implicitly mean $\mathbf P_{\phi}[Z_{p_{u}}\inv p_{u}]$.\check{april 24}
+It will also be convenient to use the following abuse of notation: for an unnormalised distribution $p_{u}$ with some normalisation constant $Z_{p_{u}}\inv$ we will write $\mathbf P_{\phi}[p_{u}]$ to implicitly mean $\mathbf P_{\phi}[Z_{p_{u}}\inv p_{u}]$.\check{may15,april24}
 
-The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu=\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu$, we need to be able to apply the inverse mapping $\nabla A^{\star}(\mu)$. We will introduce below contexts in which the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing the inverse mapping $\nabla A^{\star}$ can be done explicitly or is cheap to approximate. For continuous state spaces, it is overwhelmingly the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix.\add{probably add a section here on how to compute forward backward operator, maybe put this in appendix. Also cite lots of stuff that uses the Gaussian, if you find anything that doesn't...}\check{april24} 
+The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu_p\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu_p$, we need to be able to apply the inverse mapping $\nabla A^{\star}(\mu_p)$. We will introduce below contexts in which the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing the inverse mapping $\nabla A^{\star}$ can be done explicitly or is cheap to approximate. For continuous state spaces, it is overwhelmingly the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix.\add{probably add a section here on how to compute forward backward operator, maybe put this in appendix. Also cite lots of stuff that uses the Gaussian, if you find anything that doesn't...}\check{may15,april24} 
 %
 % ----------------------------------------
 \subsubsection*{Online Bayesian Learning and Assumed Density Filtering}
@@ -44,7 +44,7 @@ where, at the first step, $q_{\theta_{0}}$ is replaced by the prior $\pi_{0}$. I
 We can therefore reinterpret the algorithm more generally as targeting a distribution $p$ that factorises in a fixed number (say $K$) of factors: 
 %
 \eqa{
-	p(x) & \propto&  \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x)
+	p(x) & \propto&  \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x) \label{eq:targetfactorises}
 }
 %
 where the factors $t_i$ are nonnegative.\add{notations: make sure it's clear that $\pi_{0}$ is always the prior} This is the \emph{Assumed Density Filtering} algorithm. Note that in this case there is no ``natural ordering'' as in the online learning case and the algorithm can be applied after any permutation of the factors.\check{april27}
@@ -72,7 +72,7 @@ The main issue with using ADF on an MRF is that the order in which the graph is 
 % --------------------------------------
 \subsubsection*{Expectation Propagation}
 %
-In the Expectation Propagation algorithm \citep{minka01, minka01b, seeger07, gelman14}, we consider that we have an initial approximation $q_{\theta}\in\mathcal F_{\phi}(\mathcal X)$ that we can write as in \eqref{eq:approxadf} (typically obtained with a pass of ADF) and we seek to iteratively improve its parameter $\theta$. At each step, a factor $t_{i}$ is considered and, by contrast to ADF, we now consider the projection $\theta_{i}=\mathbf P_{\phi}[q_{\theta}t_{i}/\tilde t_{i}]$. The difference with ADF is therefore the removal of the previous factor approximation $\tilde t_{i}$ from the current approximation $q_{\theta}$ before the projection. ADF can also be reinterpreted as EP where, initially, all the factor approximations are set to $\tilde t_{i}\equiv 1$.\check{april27}
+In the Expectation Propagation algorithm \citep{minka01, minka01b, seeger07, gelman14}, we consider that we have an initial approximation $q_{\theta}\in\mathcal F_{\phi}(\mathcal X)$ that we can write as in \eqref{eq:approxadf} (typically obtained with a pass of ADF) and seek to iteratively improve its parameter $\theta$. At each step, a factor $t_{i}$ is considered and, by contrast to ADF, we now consider the projection $\theta_{i}=\mathbf P_{\phi}[q_{\theta}t_{i}/\tilde t_{i}]$. The difference with ADF is therefore the removal of the previous factor approximation $\tilde t_{i}$ from the current approximation $q_{\theta}$ before the projection. ADF can also be reinterpreted as a single pass of EP where, initially, all the factor approximations are set to $\tilde t_{i}\equiv 1$.\check{may15,april27}
 
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:ep}\dblue{\emph{\small Expectation Propagation}}}
@@ -90,10 +90,10 @@ In the Expectation Propagation algorithm \citep{minka01, minka01b, seeger07, gel
 	\end{algorithmic}
 \end{algorithm} 
 
-In Expectation Propagation, we denote by $q_{-i}\propto q_{\theta}/\tilde t_{i}$ a \emph{cavity distribution} and by $q_{i}\propto q_{-i}t_{i}$ a \emph{tilted distribution} \cite{gelman14}. If the EP algorithm converges, then the global parameter $\theta$ is necessarily such that all the \emph{local moment matching conditions} (LMMC) are met:
+In Expectation Propagation, we denote by $q_{-i}\propto q_{\theta}/\tilde t_{i}$ a \emph{cavity distribution} and by $q_{i}\propto q_{-i}t_{i}$ a \emph{tilted distribution} \citep{gelman14}. If the EP algorithm converges, then the global parameter $\theta$ is equal to $\mathbf P_\phi[q_i]$ for all $i$ and therefore is such that all the \emph{local moment matching conditions} (LMMC) are met:
 %
 \eqa{
 	(\text{LMMC})\qquad	\E_{q_{i}}[\phi(X)]=\E_{q_{\theta}}[\phi(X)], \quad i=1,\dots,K.\label{eq:LMMC}
 } 
 %
-These conditions can be interpreted as a relaxation of the GMMC \eqref{eq:GMMC} and the EP algorithm can be interpreted as a fixed point algorithm targeting the LMMC.\add{depending on how much you discuss in SNEP, link here to that part and say will discuss in more details.}\add{maybe add ``expectation consistent inference'' the stuff by Heskes etc}
+These conditions can be interpreted as a relaxation of the GMMC \eqref{eq:GMMC} and the EP algorithm can be interpreted as a fixed point algorithm targeting the LMMC.\check{may15}\add{depending on how much you discuss in SNEP, link here to that part and say will discuss in more details.}\add{maybe add ``expectation consistent inference'' the stuff by Heskes etc}
