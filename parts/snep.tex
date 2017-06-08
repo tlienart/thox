@@ -11,8 +11,8 @@
 \section{Distributed Bayesian inference}
 
 In this section we consider the problem of performing Bayesian inference when the relevant data is distributed across different compute nodes. 
-Let us assume that there are $K$ such compute nodes each holding independent parts of the data $y_i$ (with $i=1,\dots,K$) such that these parts form a partition of the entire data $y$. 
-In a Bayesian setting, we are interested in the posterior distribution over a parameter of interest $x$ given the entire data $y$. We can write this posterior as the product of $K$ terms corresponding to the parts $y_i$:
+Let us assume that there are $K$ such compute nodes each holding independent parts of the data $y_i$ (with $i=1,\dots,K$) such that these parts form a partition of the complete data $y$. 
+In a Bayesian setting, we are interested in the posterior distribution over a parameter of interest $x$ given the entire data $y$. We can write this posterior as the product of $K$ terms corresponding to the parts $y_i$: \check{june8}
 %
 \eqa{
 	p(x\st y) &\propto& \pi_0(x) \prod_{i=1}^{K} p(y_i\st x)\label{eq:distrposterior}
@@ -23,62 +23,116 @@ where $\pi_0$ is a prior distribution. Each of the likelihood term itself factor
 \todofr{Add here litt, why is this relevant, some basic stuff that have been tried + references}
 
 Defining $t_i$ to be nonnegative factors with $t_i(x)=p(y_i\st x)$, the factorised form \eqref{eq:distrposterior} reads $\pi_0(x)\prod_{i=1:K}t_i(x)$ which is the form \eqref{eq:targetfactorises} that we had used to motivate the introduction of the ADF and EP algorithms (cf.\ point \ref{s:ADF+EP}).
-In the rest of this chapter, we show how different variants of the EP algorithm can be used to perform parallel variational inference in the presence of distributed data. 
+In the rest of this chapter, we show how different variants of the EP algorithm can be used to perform parallel variational inference in the presence of distributed data.\check{jun8} 
 
 \add{come back to this, add litt for distr bayesian (see SNEP paper), see also confirmation}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{EP variants for distributed inference}
-We consider a target distribution of the form $p(x)\propto \pi_0\prod_{i=1:K}t_i(x)$ where the evaluation of one of the $t_i$ requires access to the compute node $i$. We consider an approximation $q\in\mathcal F_\phi$ with
+As indicated in the introductory point, we consider a target distribution of the form $p(x)\propto \pi_0\prod_{i=1:K}t_i(x)$ where the evaluation of one of the $t_i$ requires access to the compute node $i$. The aim is to construct an approximation $q\in\mathcal F_\phi$ parametrised by a vector $\theta$ with
 %
 \eqa{
 	q(x) &=& \pi_0(x)\exp(\scal{\theta,\phi(x)}-A(\theta)) \spe \pi_0(x)\exp(-A(\theta))\prod_{i=1}^{K}\tilde t_i(x)
 }
 %
-where $\tilde t_i(x)=\exp\scal{\omega_i,\phi(x)}$ and therefore, $\sum_{i=1:K}\omega_i=\theta$. The tilted distributions associated with each of the factors are given by
+where $\tilde t_i(x):=\exp\scal{\omega_i,\phi(x)}$, and therefore: $\sum_{i=1:K}\omega_i=\theta$. The tilted distributions associated with each of the factors are given by
 %
 \eqa{
 	q_i(x) &=& \pi_0(x)t_i(x)\exp(\scal{\lambda_i,\phi(x)}-A_i(\lambda_i))
 }
 % 
-where $\lambda_i=(\theta-\omega_i)$ and $A_i(\lambda_i)$ is the log-partition function. Much like the log-partition function of $q$, the $A_i$ are convex and $\nabla A_i(\lambda_i)=\E_{q_i}[\phi(X)]$. Indeed, each $A_i$ is simply the log-partition functions of the exponential-family $\mathcal F_\phi$ with respect to a modified base-measure.
+where $\lambda_i=(\theta-\omega_i)$ and $A_i(\lambda_i)$ is the corresponding log-partition function. Much like the log-partition function of $q$, the $A_i$ are convex and $\nabla A_i(\lambda_i)=\E_{q_i}[\phi(X)]$. Indeed, each $A_i$ is simply the log-partition functions of the exponential-family $\mathcal F_\phi$ with respect to a modified base-measure including $t_i$.
 In the EP setting, we seek to determine the parameters $\omega_1,\dots,\omega_K$ such that the LMMC \eqref{eq:LMMC} hold, i.e.: $\E_q[\phi(X)]=\E_{q_i}[\phi(X)]$ for each $i=1,\dots,K$.
-The general computational framework we consider goes as follows: 
+The general parallel computational framework considered iterates on the following steps:
 \begin{enumerate}\itsepa
 	\item the master node sends a global parameter $\theta$ to each compute node,
-	\item each compute node $i$ attempts to find a new $\omega_i$ such that the corresponding LMMC is approximately met and sends the updated $\omega_i$ to the master node,
-	\item the master node integrates the new $\omega_i$ into $\theta$. Go back to (1).
-\end{enumerate}
+	\item each compute node $i$ attempts to find a new $\omega_i$ such that the corresponding LMMC is (approximately) met and sends the updated $\omega_i$ to the master node,
+	\item the master node integrates the new $\omega_i$ into $\theta$.
+\end{enumerate} 
 
 As we will see, there are different ways to implement this general framework.
 We will show empirically that a determining element in the performance of a particular implementation is its robustness to Monte Carlo noise. 
-Indeed, in our general setting we do not assume that computing $\E_{q_i}[\phi(X)]$ can be done exactly. Rather, we assume that it is approximated by a Monte Carlo estimator.
+Indeed, in our general setting we do not assume that computing $\E_{q_i}[\phi(X)]$ can be done exactly. Rather, we assume that it is approximated by a Monte Carlo estimator.\check{june8}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Damped updates in the natural parameter space}
+In their paper, \citet{xu14} suggest a method to synchronise Monte Carlo samplers ran on independent compute nodes. They call it \emph{Sequential Moment Sharing} or SMS for short. Effectively, SMS corresponds precisely to the case mentioned at the previous point consisting of running EP across multiple physical nodes while using noisy estimates of $\E_{q_i}[\phi(X)]$, the expected value of the sufficient statistics under the tilted distribution. 
+Below, we introduce the algorithm as a damped fixed-point iteration in the natural parameter space. This will prove useful when comparing different EP-like algorithms.\check{june8,may27}\\
 
-\subsection{\dred{SMS algorithm}}
-\subsubsection*{Noisy EP iterations in natural parameter space}
-We showed earlier that the basic EP algorithm could be interpreted as a kind of fixed point iteration targeting the Local Moment Matching Conditions \eqref{eq:LMMC} (LMMC): at a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter is updated in such a way that $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
+We showed that the basic EP algorithm could be interpreted as a kind of fixed point iteration targeting the Local Moment Matching Conditions \eqref{eq:LMMC} (LMMC). At a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter should therefore be updated such as to verify $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
 %
 \eqa{	
 	\theta &\leftarrow & \nabla A^{\star}(\mu_i).	\label{eq:ep-np-update}
 }
 %
-In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}.\add{would be good to come back further to this when considering the gaussian case (inversion of noisy matrix)} In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \citep{heskes03}. Damping \eqref{eq:ep-np-update} leads to the modified update:\check{may11}
+In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}.\add{would be good to come back further to this when considering the gaussian case (inversion of noisy matrix), mention it in discussion} In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \citep{heskes03}. Damping \eqref{eq:ep-np-update} leads to the modified update:\check{may11}
 %
 \eqa{
-	\theta &\leftarrow & (1-\kappa)\theta + \kappa \nabla A^{\star}(\mu_i),\label{eq:damped-update-np}
+	\theta &\leftarrow & (1-\kappa)\theta + \kappa \nabla A^{\star}(\hat\mu_i),\label{eq:damped-update-np}
 }
 %
-where $\kappa \in(0,1]$ is the damping parameter. As in the gradient descent algorithm, the damping parameter can be decreased over iterations according to a schedule in order to further help convergence.\add{We will explore the connection to GD in more details later}
-The damped update \eqref{eq:damped-update-np} can also be expressed in terms of the $\omega_i$ (parameter of the factor approximation $\tilde t_i$) and the $\lambda_i$ (parameter of the corresponding cavity):
+where $\kappa \in(0,1]$ is the damping parameter and $\hat\mu_i$ is an estimator for $\mu_i$. As in the gradient descent algorithm, the damping parameter can be decreased over iterations according to a schedule in order to further help convergence.\add{We will explore the connection to GD in more details later}
+The damped update \eqref{eq:damped-update-np} can also be expressed in terms of the $\omega_i$ (parameter of the factor approximation $\tilde t_i$) and the $\lambda_i$ (parameter of the corresponding cavity):\check{june8}
 %
 \eqa{
-	\omega_i &\leftarrow& \omega_i - \kappa(\omega_i+\lambda_i - \nabla A^{\star}(\mu_i)).
+	\omega_i &\leftarrow& \omega_i + \kappa(\nabla A^{\star}(\hat\mu_i)-\lambda_i).\label{eq:damped-update-np-w}
 }
 %
-One can also swap the role of $\lambda_i$ and $\omega_i$ and obtain another valid damped update mechanism. Both forms are useful in the parallel context since they are expressed in terms of local parameters attached to the $i$th compute node.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection*{The SMS algorithm}
-\todofr{describe SMS algorithm in full} 
+One can also swap the role of $\lambda_i$ and $\omega_i$ and obtain another valid damped update mechanism. Both forms are amenable to parallelisation since they can be expressed solely in terms of local parameters attached to the $i$th compute node.\add{review statement, potentially in lambdai less stable because cavity collapse but should check if can explain why}\check{june8,may27}\\
+
+The basic SMS algorithm operates synchronous updates.
+At step $k$, each node receives the current global parameter $\theta$ and computes the parameter corresponding to the current tilted distribution $q_i$ i.e.: $\lambda_i=(\theta-\omega_i)$. Each node then forms a Monte Carlo estimator $\hat\mu_i$ of $\E_{q_i}[\phi(X)]$, computes the damped step \eqref{eq:damped-update-np-w} and returns the updated local parameter $\omega_i$ to the master node. 
+The master node then aggregates all updated local parameters and updates the global parameter: 
+%
+\eqa{	\theta &\leftarrow& (1-\kappa')\theta+\kappa'\sum_{i=1}^{K}\omega_{i}	}
+%
+where $\kappa' \in (0,1]$ is a global damping parameter which may also help convergence. 
+These steps are summarised at the algorithm \ref{alg:ep-sms-synch} below.\check{june8}
+
+\begin{algorithm}[!h]\small
+	\caption{\label{alg:ep-sms-synch}\dblue{\emph{\small Sequential Moment Sharing (synchronous)}}}
+	\begin{algorithmic}[1]
+	\State Initialise $\theta,\omega_{1},\dots,\omega_{K}$ such that $\theta=\sum_{i=1}^{K}\omega_{i} \in \Omega$ and send to each compute node
+	\For{$k=1:N_{\text{EP}}$}
+		\State Send current global parameter $\theta$ to each node
+		\For{node $i=1:K$}
+			\State Update the cavity parameter $\lambda_{i}\leftarrow\theta-\omega_{i}$
+			\State Form an estimator $\hat\mu_{i}$ of $\E_{q_{i}}[\phi(X)]$
+			\State Update the local parameter $\omega_{i}\leftarrow\omega_{i}+\kappa(\nabla A^{\star}(\hat\mu_{i})-\lambda_i)$
+			\State Send the updated $\omega_{i}$ to the master node
+		\EndFor
+		\State Update global parameter $\theta\leftarrow (1-\kappa')\theta + \kappa'\sum_{i=1}^{K}\omega_{i}$
+	\EndFor\\	
+	\Return{$\theta$}
+	\end{algorithmic}
+\end{algorithm} 
+
+It is easy to see how this algorithm can be altered to accommodate asynchronous updates. Indeed, instead of waiting for all nodes to complete their tasks, each node could asynchronously request the most recent $\theta$ available from the master node while the master node would continuously integrate information it receives from the compute nodes. In fact, each node would then simply send the difference $\delta_{i} = (\omega_{i}^{\text{new}}-\omega_{i}^{\text{old}})$ which can be integrated directly into an update of $\theta$. \check{june8}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Damped updates in the mean parameter space}
+
+An issue with the SMS algorithm which we will expose in more details in the experiments\add{do it} is that it performs the projection of the noisy estimator $\hat\mu_{i}$ before damping it. Since this projection operator is likely non-linear and potentially numerically unstable\add{clarify} this can hinder the performances of the algorithm. It seems therefore sensible to damp the estimator before it gets projected. This leads to going from \eqref{eq:damped-update-np} to
+%
+\eqa{
+\nabla A(\theta) &\leftarrow& (1-\kappa)\nabla A(\theta) + \kappa \hat\mu_{i}
+}
+%
+or, equivalently, to
+%
+\eqa{
+\theta &\leftarrow& \nabla A^{\star}(\nabla A(\theta) + \kappa (\hat\mu_{i}-\nabla A(\theta))).
+\label{eq:damped-update-mp}
+}
+%
+Anyone familiar with convex optimisation will notice the similarity with the \emph{mirror-descent algorithm} \citep{nemirovski83, beck03}. We will explore and discuss this similarity later.\add{do it} 
+In order to have updates that are more amenable to parallelisation, one can compare the update \eqref{eq:damped-update-np-w} with the update \eqref{eq:damped-update-np} in the SMS case and suggest the following algorithm:
+%
+\eqa{
+\omega_{i} &\leftarrow& \nabla A^{\star}(\nabla A(\omega_{i}) + \kappa (\hat\mu_{i}-\nabla A(\theta))).
+\label{eq:damped-update-mp}
+}
+%
+\dred{Discuss the other update first, reason about $\lambda_{i}$ collapsing}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\dred{SNEP algorithm}}
