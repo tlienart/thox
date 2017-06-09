@@ -111,7 +111,7 @@ It is easy to see how this algorithm can be altered to accommodate asynchronous 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damped updates in the mean parameter space}
 
-An issue with the SMS algorithm which we will expose in more details in the experiments\add{do it} is that it performs the projection of the noisy estimator $\hat\mu_{i}$ before damping it. Since this projection operator is likely non-linear and potentially numerically unstable\add{clarify} this can hinder the performances of the algorithm. It seems therefore sensible to damp the estimator before it gets projected. This leads to going from \eqref{eq:damped-update-np} to
+The main issue with the SMS algorithm which we will expose in more details in the experiments\add{do it and refer} is that it performs the projection of the noisy estimator $\hat\mu_{i}$ \emph{before} the damping step. Since this projection operator is likely non-linear and potentially numerically unstable this can hinder the performances of the algorithm. In the case of the Gaussian distribution for instance, the projection effectively requires the inversion of a noisy matrix (see \eqref{proj-mp-np-gauss}). It seems therefore sensible to suggest damping the estimator before it gets projected. This leads to going from \eqref{eq:damped-update-np} to
 %
 \eqa{
 \nabla A(\theta) &\leftarrow& (1-\kappa)\nabla A(\theta) + \kappa \hat\mu_{i}
@@ -124,7 +124,7 @@ or, equivalently, to
 \label{eq:damped-update-mp}
 }
 %
-Anyone familiar with convex optimisation will notice the similarity with the \emph{mirror-descent algorithm} \citep{nemirovski83, beck03}. We will explore and discuss this similarity later.\add{do it} 
+Of course, if $\kappa=1$ (no damping), both approaches are equivalent. Anyone familiar with convex optimisation will notice the similarity with the \emph{mirror-descent algorithm} \citep{nemirovski83, beck03}. We will explore and discuss this similarity later.\add{do it} 
 In order to have updates that are more amenable to parallelisation, one can compare the update \eqref{eq:damped-update-np-w} with the update \eqref{eq:damped-update-np} in the SMS case and suggest the following algorithm:
 %
 \eqa{
