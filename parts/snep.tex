@@ -111,7 +111,7 @@ It is easy to see how this algorithm can be altered to accommodate asynchronous 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damped updates in the mean parameter space}
 
-The main issue with the SMS algorithm which we will expose in more details in the experiments\add{do it and refer} is that it performs the projection of the noisy estimator $\hat\mu_{i}$ \emph{before} the damping step. Since this projection operator is likely non-linear and potentially numerically unstable this can hinder the performances of the algorithm. In the case of the Gaussian distribution for instance, the projection effectively requires the inversion of a noisy matrix (see \eqref{proj-mp-np-gauss}). It seems therefore sensible to suggest damping the estimator before it gets projected. This leads to going from \eqref{eq:damped-update-np} to
+The main issue with the SMS algorithm which we will expose in more details in the experiments\add{do it and refer} is that it performs the projection of the noisy estimator $\hat\mu_{i}$ \emph{before} the damping step. Since this projection operator is likely non-linear and potentially numerically unstable this can hinder the performances of the algorithm. In the case of the Gaussian distribution for instance, the projection effectively requires the inversion of a noisy matrix (see \eqref{proj-mp-np-gauss}). It seems therefore sensible to suggest damping the estimator \emph{before} it gets projected. This leads to going from \eqref{eq:damped-update-np} to\check{june11}
 %
 \eqa{
 \nabla A(\theta) &\leftarrow& (1-\kappa)\nabla A(\theta) + \kappa \hat\mu_{i}
@@ -125,43 +125,32 @@ or, equivalently, to
 }
 %
 Of course, if $\kappa=1$ (no damping), both approaches are equivalent. Anyone familiar with convex optimisation will notice the similarity with the \emph{mirror-descent algorithm} \citep{nemirovski83, beck03}. We will explore and discuss this similarity later.\add{do it} 
-In order to have updates that are more amenable to parallelisation, one can compare the update \eqref{eq:damped-update-np-w} with the update \eqref{eq:damped-update-np} in the SMS case and suggest the following algorithm:
+These updates can also be expressed in terms of updates of the local parameters:
 %
 \eqa{
-\omega_{i} &\leftarrow& \nabla A^{\star}(\nabla A(\omega_{i}) + \kappa (\hat\mu_{i}-\nabla A(\theta))).
+\omega_{i} &\leftarrow& \nabla A^{\star}(\nabla A(\theta) + \kappa (\hat\mu_{i}-\nabla A(\theta))) - \lambda_{i}.
 \label{eq:damped-update-mp}
 }
 %
-\dred{Discuss the other update first, reason about $\lambda_{i}$ collapsing}
+As in \eqref{eq:damped-update-np-w} the role of $\omega_{i}$ and $\lambda_{i}$ can be swapped to obtain another valid damped update mechanism. We will show below how similar updates can be obtained by considering the so-called \emph{EP-Energy} running a Newton-Raphson-like update. 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\dred{SNEP algorithm}}
-\todofr{
-	\begin{itemize}\itsepa
-		\item should explain why there's a problem with SMS in presence of noise (in particular with gaussian case)
-		\item should then suggest that damping in MP space is a good idea
-		\item then suggest algorithm
-		\item then suggest that we will also obtain the same algorithm by looking at energy
-	\end{itemize}
-}
-\subsubsection*{Noisy EP iterations in mean parameter space}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection*{The SNEP algorithm}
-
-\subsection{\dred{The ``EP energy'' perspective}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{The EP energy perspective}
 \todofr{
 Cite minka, mention energy, explain that it's not really something to increase or decrease but rather want stationary points and that's it, show that if write the KL and get rid of a part then get this energy (essentially use that to show that it's a bit pointless)}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection*{Obtaining the energy}
-Another perspective to EP is to consider the so-called ``EP Energy''\add{citations}. This ``energy'' is more a function that has the same fixed points as EP than an energy.\add{should probably clarify this or not put this sentence (here)} One way to obtain it is to decompose the KL divergence between $p$ and $q$. First, let us write explicitly the objects considered:\add{This is now REDUNDANT with start}
-\begin{itemize}\itsepa
-	\item the target distribution $p$ with $p(x)=Z_p\inv \pi_0(x)\prod_{i=1:K}t_i(x)$,
-	\item the global approximating distribution $q$ with $q(x)=Z_q\inv \pi_0(x)\exp\scal{\theta,\phi(x)}$ which we can also write $Z_q\inv \pi_0(x)\exp\scal{\sum_{i=1:K}\omega_i,\phi(x)}$ as in \eqref{eq:approxadf},
-	\item the tilted distributions $q_i$ with $q_i(x)=Z_i\inv \pi_0(x)\exp\scal{\lambda_i,\phi(x)}t_i(x)$.
-\end{itemize}
-In the list above, $\pi_0$ is the prior distribution and $Z_p,Z_q$ and $Z_i$ designate normalisation constants. From before, we have $\log Z_q=A(\theta)$ and, in a similar fashion, we can define $A_i(\lambda_i):=\log Z_i$ which enjoy similar property as $A$. In particular, it is convex and $\nabla_{\lambda_i} A_i(\lambda_i) =\mu_{i}$.\footnote{Indeed, $A_i$ is the log partition function associated with $\mathcal F_\phi$ under a modified base-measure.} The parameters of the tilted distributions $\lambda_i$ are given by $\lambda_i=(\theta-\omega_i)$ and hence must be such that $\sum_{i=1:K}\lambda_i=(K-1)\theta$.\\
-To simplify notations over the next few equations we omit the dependence in $x$ which is obvious from the context and all sums and products are assumed to go over $i=1,\dots,K$. The KL divergence between $p$ and $q$ can then be written as\check{may15}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Obtaining the energy}
+In \citet{minka01c}, the author presents the LMMC \eqref{eq:LMMC} as a min-max problem of an objective function he calls the EP energy function.
+One way to obtain this is to decompose the KL divergence between $p$ and $q$. 
+%First, let us write explicitly the objects considered:\add{This is now REDUNDANT with start}
+%\begin{itemize}\itsepa
+%	\item the target distribution $p$ with $p(x)=Z_p\inv \pi_0(x)\prod_{i=1:K}t_i(x)$,
+%	\item the global approximating distribution $q$ with $q(x)=Z_q\inv \pi_0(x)\exp\scal{\theta,\phi(x)}$ which we can also write $Z_q\inv \pi_0(x)\exp\scal{\sum_{i=1:K}\omega_i,\phi(x)}$ as in \eqref{eq:approxadf},
+%	\item the tilted distributions $q_i$ with $q_i(x)=Z_i\inv \pi_0(x)\exp\scal{\lambda_i,\phi(x)}t_i(x)$.
+%\end{itemize}
+%In the list above, $\pi_0$ is the prior distribution and $Z_p,Z_q$ and $Z_i$ designate normalisation constants. From before, we have $\log Z_q=A(\theta)$ and, in a similar fashion, we can define $A_i(\lambda_i):=\log Z_i$ which enjoy similar property as $A$. In particular, it is convex and $\nabla_{\lambda_i} A_i(\lambda_i) =\mu_{i}$.\footnote{Indeed, $A_i$ is the log partition function associated with $\mathcal F_\phi$ under a modified base-measure.} The parameters of the tilted distributions $\lambda_i$ are given by $\lambda_i=(\theta-\omega_i)$ and hence must be such that $\sum_{i=1:K}\lambda_i=(K-1)\theta$.\\
+To simplify notations over the next few equations we omit the dependence of the functions in $x$ which is obvious from the context; all sums and products are assumed to go over the range $i=1,\dots,K$ with $K$ the number of factors. 
+The KL divergence can then be written as\check{june8,may15}
 %
 \eqa{	
 	\KL{p,q} &=& \E_p\pac{\log\pat{Z_p\inv\pi_0\prod_{i}t_i}-\log q}	.
@@ -180,7 +169,7 @@ and using this in \eqref{eq:decomposeKL} leads to:\footnote{Note that considerin
 \KL{p,q} + \log Z_p &=& \underbrace{(1-K) A(\theta) + \sum_{i}A_i(\lambda_i)}_{\mathcal E} + \mathbb E_p\pac{\log q_i/q}.
 }
 %
-The first part, denoted by $\mathcal E$ is the \emph{EP energy}.\add{add footnote explaining that sometimes defined with different sign but that it doesn't matter} Note that its gradient in $\lambda_i$ is simply $\nabla_{\lambda_i}\mathcal E = (-\nabla A(\theta) + \mu_{i})$. 
+The first part, denoted by $\mathcal E$ defines the \emph{EP energy}.\add{add footnote explaining that sometimes defined with different sign but that it doesn't matter} Note that its gradient in $\lambda_i$ is simply $\nabla_{\lambda_i}\mathcal E = (-\nabla A(\theta) + \mu_{i})$. 
 The stationary points of $\mathcal E$ in $\lambda_i$ therefore correspond to the LMMC \eqref{eq:LMMC} that the EP algorithm attempts to satisfy.
 It is also interesting to briefly look at the remainder of the right-hand side of \eqref{eq:decomposeKL}. Discarding the terms that don't depend on $\lambda_i$, we have
 %
@@ -189,19 +178,36 @@ It is also interesting to briefly look at the remainder of the right-hand side o
 	&=& \E_{p}[\phi]-\mu_i-{1\over K-1}\E_{p}[\phi] + {1\over K-1}\nabla A(\theta).
 }
 %
-Therefore the gradient of the complete right hand side of \eqref{eq:decomposeKL} (i.e. the gradient of $\KL{p,q}$) in $\lambda_i$ is in fact proportional to $(\E_{p}[\phi]-\nabla A(\theta))$ leading to the same stationary points as the GMMC \eqref{eq:GMMC}.
+Therefore the gradient of the complete right hand side of \eqref{eq:decomposeKL} (i.e. the gradient of $\KL{p,q}$) in $\lambda_i$ is in fact proportional to $(\E_{p}[\phi]-\nabla A(\theta))$ leading to the same stationary points as the GMMC \eqref{eq:GMMC} as could have been expected.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection*{Looking for a saddle point of the EP energy}
+\subsubsection*{Looking for a stationary point of the EP energy}
 \todofr{Think first about how you want to present information and in particular what you want to say. Could just present the min max problem. Say that if torture the problem you can get to a double loop that looks like SNEP. Would be good not to go along the crappy road of the dev a la Teh, just showing that we're actually doing some kind of Newton's method would already be quite nice use for this \url{http://homes.soic.indiana.edu/classes/spring2012/csci/b553-hauserk/newtons_method.pdf} and probably ``Information geometry of mirror descent'' \citep{raskutti15}}
 
 The energy $\mathcal E$ as a function of $\theta$ and the $\lambda_i$ is given by
 \eqa{\mathcal E(\theta,\lambda_1,\dots,\lambda_K)&=& (1-K)A(\theta) + \sum_{i=1}^{K} A_i(\lambda_i)}
-under the condition that $\theta=(K-1)\inv \sum_{i=1:K}\lambda_i$. The first term is concave in $\theta$ while each of the terms in the sum is convex in $\lambda_i$. This justifies the interpretation of the EP stationary point as being solutions to the following min-max problem called the \emph{EP dual energy} problem \citep{minka01c}:\add{this part is useful to talk about SEP/BBa potensh}
+under the constraint that $\theta=(K-1)\inv \sum_{i=1:K}\lambda_i$. The first term is concave in $\theta$ while each of the terms in the sum is convex in $\lambda_i$. This suggests writing an EP stationary point as corresponding to the following min-max problem called the \emph{EP dual energy} problem \citep{minka01c}:\add{this part is useful to talk about SEP/BBa potensh}
 \eqa{	\min	_\theta\max_{\{\lambda_i\}} \quad(K-1)A(\theta)-\sum_{i=1}^{K}A_i(\lambda_i), \quad \text{s.t.}\quad \theta = (K-1)\inv\sum_{i=1}^{K}\lambda_i.}
 \todofr{
 Here could add few citations for double loop stuff.
 }
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\dred{SNEP algorithm}}
+\todofr{
+	\begin{itemize}\itsepa
+		\item should explain why there's a problem with SMS in presence of noise (in particular with gaussian case)
+		\item should then suggest that damping in MP space is a good idea
+		\item then suggest algorithm
+		\item then suggest that we will also obtain the same algorithm by looking at energy
+	\end{itemize}
+}
+\subsubsection*{Noisy EP iterations in mean parameter space}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{The SNEP algorithm}
 
 
 
@@ -226,4 +232,5 @@ Key point is that the $\mathcal E_{BBA}$ is bounded from below for $\alpha\le N$
 \begin{itemize}
 	\item pitfalls of using EP / VB for large dimensional, have to revert to diagonal gaussians in which case maybe not so interesting. As a result and since we are using a large number of points, the uncertainty recovered is often extremely small in both EP and VB and unusable in practice. One may therefore wonder whether a purely optimisation based approach effectively targeting the MAP directly is not all that we can afford etc.
 \end{itemize}
+	\item mention that energy is misleading (not min or max really) 
 }
