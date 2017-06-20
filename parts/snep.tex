@@ -185,33 +185,59 @@ Therefore the gradient of the complete right hand side of \eqref{eq:decomposeKL}
 \todofr{Think first about how you want to present information and in particular what you want to say. Could just present the min max problem. Say that if torture the problem you can get to a double loop that looks like SNEP. Would be good not to go along the crappy road of the dev a la Teh, just showing that we're actually doing some kind of Newton's method would already be quite nice use for this \url{http://homes.soic.indiana.edu/classes/spring2012/csci/b553-hauserk/newtons_method.pdf} and probably ``Information geometry of mirror descent'' \citep{raskutti15}}
 
 The energy $\mathcal E$ as a function of $\theta$ and the $\lambda_i$ is given by
-\eqa{\mathcal E(\theta,\lambda_1,\dots,\lambda_K)&=& (1-K)A(\theta) + \sum_{i=1}^{K} A_i(\lambda_i)}
-under the constraint that $\theta=(K-1)\inv \sum_{i=1:K}\lambda_i$. The first term is concave in $\theta$ while each of the terms in the sum is convex in $\lambda_i$. This suggests writing an EP stationary point as corresponding to the following min-max problem called the \emph{EP dual energy} problem \citep{minka01c}:\add{this part is useful to talk about SEP/BBa potensh}
-\eqa{	\min	_\theta\max_{\{\lambda_i\}} \quad(K-1)A(\theta)-\sum_{i=1}^{K}A_i(\lambda_i), \quad \text{s.t.}\quad \theta = (K-1)\inv\sum_{i=1}^{K}\lambda_i.}
-\todofr{
-Here could add few citations for double loop stuff.
-}
+\eqa{\mathcal E(\theta,\lambda_1,\dots,\lambda_K)&=& (1-K)A(\theta) + \sum_{i=1}^{K} A_i(\lambda_i) \label{EP-energy}}
+under the constraint that $\theta=(K-1)\inv \sum_{i=1}^{K}\lambda_i$. In \citet{heskes05}, the authors show that this energy is in fact equivalent to the \emph{Expectation Consistent free energy}. Further, they indicate that several stationary points can exist and that the framework does not provide a criterion to pick an optimal one. Lastly, they remind the reader that since the energy is neither convex nor concave with respect to the parameters $\lambda_i$, it does not tell whether stationary points are minimum, maximum or saddle points. 
 
-
-
+%However, since the first term is concave in $\theta$ while each of the terms in the sum is convex in $\lambda_i$, \citet{minka01c} suggests writing the EP stationary points as corresponding to the following min-max problem 
+%%
+%\eqa{	\min	_\theta\max_{\{\lambda_i\}} \quad(K-1)A(\theta)-\sum_{i=1}^{K}A_i(\lambda_i), \quad \text{s.t.}\quad \theta = (K-1)\inv\sum_{i=1}^{K}\lambda_i.}
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\dred{SNEP algorithm}}
-\todofr{
-	\begin{itemize}\itsepa
-		\item should explain why there's a problem with SMS in presence of noise (in particular with gaussian case)
-		\item should then suggest that damping in MP space is a good idea
-		\item then suggest algorithm
-		\item then suggest that we will also obtain the same algorithm by looking at energy
-	\end{itemize}
+\subsection{Mirror descent for the EP energy}
+Let us define $\mathcal E_i(\lambda_i)$ as the energy \eqref{EP-energy} with all other parameters kept fixed. On the corresponding compute node, the aim is to determine $\lambda_i^{\text{new}}$ such that $\nabla \mathcal E_i(\lambda_i^{\text{new}})=0$. This is in fact equivalent to finding stationary points of $\mathcal F_i(\lambda_i)$ with
+\eqa{
+	\mathcal F_i(\lambda_i) &:=& A(\theta_{-i} + \eta\inv\lambda_i) - \eta\inv A_i(\lambda_i)	
 }
-\subsubsection*{Noisy EP iterations in mean parameter space}
+where $\theta_{-i}:=\eta\inv\sum_{j\neq i}\lambda_j$. A common approach to finding stationary points of a function is to consider Newton's method which revolves around a local quadratic approximation of that function. Let us denote $\lambda_i$ the current parameter and $\lambda_i^{\text{new}}$ the new one, we can write:
+%
+\eqa{
+\mathcal F_i(\lambda_i^{\text{new}}) 
+	&\approx&
+A(\theta) + \eta\inv\scal{\lambda_i^{\text{new}}-\lambda_i,\nabla A(\theta)} +\nn\\
+&& {\eta^{-2}\over 2}\scal{\lambda_i^{\text{new}}-\lambda_i, \nabla^{2} \mathcal F_i(\lambda_i)(\lambda_i^{\text{new}}-\lambda_i)} - \eta\inv A(\lambda_i).\label{ep-energy-newton}
+}
+%
+Taking the gradient in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a Newton-like step. However, it requires the inversion of the Hessian of $\mathcal F_i$ which may be expensive and unstable. An alternative can be obtained by observing that, if $\nabla^{2}\mathcal F_i(\lambda_i)$ is positive definite,\add{an argument can probably be made that this will likely be the case since if variance of q does not encompass that of qi we're in trouble (?) argue that variance can be decreased but not increased (?) at start should be ok, towards end, can see crappy stuff which may be caused by this.} then the quadratic term in the approximation is simply a measure of discrepancy between $\lambda_i^{\text{new}}$ and $\lambda_i$. As in the mirror-descent algorithm we could therefore try to replace it by a Bregman divergence.\add{Should MD be clarified somewhere? $f(x)=f(x_0)+\scal{x-x_0,\nabla f(x_0)}+B_\varphi(x,x_0)$..} In our case, it is convenient to consider the Bregman divergence induced by the log-partition function $A$ itself;\footnote{Recall that $B_A(\lambda_i^{\text{new}},\lambda_i):=A(\lambda_i^{\text{new}})-A(\lambda_i)-\scal{\lambda_i^{\text{new}},\nabla A(\lambda_i)}$} this leads to the alternative approximation:
+%
+\eqa{
+	\mathcal F_i(\lambda_i^{\text{new}}) &\approx&
+A(\theta) + \eta\inv\scal{\lambda_i^{\text{new}}-\lambda_i,\nabla A(\theta)} +\eta^{-2} B_A(\lambda_i^{\text{new}},\lambda_i) - \eta\inv A_i(\lambda_i)\nn,
+}
+%
+where $\kappa>0$ is a scaling factor. Taking the gradient of that approximation in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a mirror-descent-like step:
+%
+\eqa{
+	\lambda_i^{\text{new}} &=& \nabla A^{\star}\pac{\nabla A(\lambda_i)+\kappa'(\hat\mu_i-\nabla A(\theta))}
+}
+%
+where $\kappa'$ can be interpreted as a step-size and $\hat\mu_i$ is a noisy estimator of $\nabla A_i(\lambda_i)$. A similar approach leads to the corresponding mechanism for an update in terms of the local parameters $\omega_i$: 
+%
+\eqa{
+	\omega_i^{\text{new}} &=& \nabla A^{\star}\pac{\nabla A(\omega_i)+\kappa''(\hat\mu_i-\nabla A(\theta))}\label{eq:snep-updates}
+}
+%
+which resembles the damped updates in the mean-parameter space \eqref{eq:damped-update-mp} we had obtained earlier. 
+The updates \eqref{eq:snep-updates} form the core of the \emph{Stochastic Natural gradient Expectation Propagation} algorithm suggested in \citet{hasenclever16}.\add{Here add small discussion where you pre-announce results from experimental section}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection*{The SNEP algorithm}
-
-
 
 \subsection{\dred{Parameter tying, SEP and BBa}}
+
+\todofr{
+Check if can do this cleanly: take energy, set all cavities to same (don't discuss at length explain suggestion), suggest algorithm as presented in SEP, explain how can also be done in MP space. Then same stuff with BBa. (ideally compress in one). Then discuss comparison of all stuff.
+}
 
 \subsubsection{BBA}
 \dred{DRAFT with energy set to 1}
