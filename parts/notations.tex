@@ -2,63 +2,69 @@
 
 \chapter*{Notations}
 
-\todofr{
-    \begin{itemize}\itsep0
-    	\item see later if should be more formal like Jeremy, for now good to have a list of stuff
-    	\item pre-messages are actually confusing (notations $st$)
-    	\item a lot of notations are not self sufficient, think of text as in JH ($\rightarrow$ would probably be nice although maybe shorter)
-    	\item red highlights unclear or insufficient
-		\item sort style between notations and abbreviations (section/chapter)
-    \end{itemize}
-}
+We list here the notations used throughout the document that are commonly used in computational statistics. Non-standard notations will be introduced in the document explicitly.
 
-\dred{note} 
-\add{explain notations for message, explain add comma for t-1,t}
+\subsubsection{Vectors, matrices and functions} 
+For a vector $x\in\R^{n}$ we write $\norm{x}{p}$ the $p$-norm of $x$ with $\norm{x}{p}^{p}=\sum_{i=1:n}\abs{x_{i}}^{p}$ for $p\in[1,\infty)$. 
+For $x,y\in\R^{n}$, we write $\scal{x,y}=\sum_{i=1:n}x_{i}y_{i}$ the inner product of $x$ and $y$. 
+We denote the transpose of a matrix $A\in\R^{n\times n}$ by $A\transp$. $A$ is said to be semi positive definite if $\scal{x,Ax}\ge 0$ for all $x\in\R^{n}$ and positive definite if the inequality holds strictly for all $x\neq 0$. We denote by $\mathbb S_+^{n}\subset \mathbb R^{n\times n}$ the set of symmetric positive definite matrices and by $\mathbb S_-^{n}$ the set of matrices $B$ such that $-B\in\mathbb S_+^{n}$.
+For a real-valued measurable function $f$ on a set $\mathcal X$, we write $\|f\|_{p}^{p}=\int_{\mathcal X} |f(x)|^{p}\dx$ the $p$-norm of $f$ for $p\in[1,\infty)$. 
+We write $L^{1}(\mathcal X)$ the set of functions such that $\|f\|_{1}<\infty$ and $\mathcal P(\mathcal X) \subset L^{1}(\mathcal X)$ denotes the restriction to nonnegative functions integrating to one (probability density functions). 
+For a real-valued, differentiable function $f$, we write $\nabla f$ its gradient and $\nabla^{2} f$ its Hessian provided $f$ is twice differentiable.\check{jun21,may10}
 
-\setlength{\tabcolsep}{12pt}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{ll}
-\textbf{symbol} 		& \textbf{meaning}\\[.3cm]
-$\mathcal X$ 			& sample space\\
-$x,y,z \in \mathcal X$	& sampling points\\
-$X,Y,Z$ 				& random variables\\
-$x_{1:T}$ 				& collection $\{x_{t}\}_{t=1}^{T}$\\
-$X \sim q(\cdot)$ 		& random variable drawn from a distribution $q$\\
-$\mathcal N(\,\cdot\,; \mu, \Sigma)$ 
-						& Normal distribution with mean $\mu$ and covariance matrix $\Sigma$\\
-%$p(x_{1:T})$ & joint distribution over the collection $\{x_{t}\}_{t=1}^{T}$\\
-$p(x\st y)$ 				& conditional distribution at $x$ given that $y$ was observed\\
-$\text{supp}(p)$ 		& set of $x$ such that $p(x)>0$ where $p$ is a distribution\\
-$\delta_{a}(x)$ 		& Dirac-delta distribution with point mass at $x=a$\\
-$\hat p(x)$ 				& \dred{particle estimator of the distribution $p$}\\
-%$\pd_t(x_t)$ & \dred{(in HMM) predictive density $p(x_t\st y_{1:t-1})$}\\
-%$\bif_t(x_t)$ & \dred{(in HMM) backward information filter $p(y_{t:T}\st x_t)$}\\
-%$\tbif_t (x_t)$ & \dred{(in HMM) normalised backward information filter $\gamma_t(x_t)p(y_{t:T}\st x_t)$}\\
-$\psi_{u}$ 				& singleton potential on a node $u$\\
-$\psi_{uv}$ 				& pairwise potential on an edge between a node $u$ and a node $v$\\
-$\partial i$ 			& neighbourhood of node $i$ in a graph\\
-$m_{st}$ 				& message from node $s$ to node $t$\\
-$M_{st}$ 				& \dred{pre-message at $s$ going to $t$ in Belief Propagation}\\
-$\KL{p,q}$ 				& Kullback-Leibler divergence between two distributions $p$ and $q$\\
-$\mathcal F_\phi$ 		& exponential family with sufficient statistic $\phi$\\
-$q_\theta$ 				& distribution parametrised by $\theta$\\
-$A(\nu)$ 				& log-partition function of an $\mathcal F_{\phi}$ distribution parametrised by $\theta$\\
-$A^{\star}(\nu)$		& \dred{convex-conjugate of $A$}\\
-%$\theta[q]$ & natural parameter of distribution $q\in \mathcal F_{\phi}$\\
-%$\mu[q]$ & mean parameter of distribution $q\in \mathcal F_{\phi}$\\
-\dred{$\mathcal P_\phi[p]$} 	& Kullback-Leibler projection of a distribution $p$ on $\mathcal F_\phi$\\
-$\E_p[\phi]$ 			& expected value of $\phi(X)$ if $X\sim p(\cdot)$\\
-$\V_{p}[\phi]$ 			& \dred{variance of $\phi(X)$} if $X\sim p(\cdot)$  
+\subsubsection{Probabilities and expected values}
+We consider continuous sample spaces $\mathcal X\subseteq \R^{n}$ and, by default, we consider the associated Borel $\sigma$-algebra. Correspondingly, we use the shorthand $(\mathcal X,\P)$ to denote a probability space with $\P$ the probability measure. We consider probability measures that admit a probability density function $p$ with respect to a base measure $\nu$ with therefore $\P(x\in A)=\int_{A}p(x)\nudx$ for any open subset $A\subset \mathcal X$. In particular, $\mathcal N(\cdot; \mu,\Sigma)$ denotes the multivariate normal distribution function with mean $\mu\in \R^{d}$ and covariance matrix $\Sigma\in\mathbb S^{d}_+$. For such a probability space and a vector-valued mapping $\varphi:\mathcal X\to\R^{d}$, we write the expectation and the covariance matrix of $\varphi$ with respect to $p$ as $(\E_{p}[\varphi(X)])_{i}=\int_{\mathcal X}\varphi_{i}(x)p(x)\nudx$ and $\V_{p}[\varphi(X)]=\E_{p}[\varphi(X)\varphi(X)^{t}]-\E_{p}[\varphi(X)]\E_{p}[\varphi(X)]^{t}$ respectively. We write $\KL{p,q}=\E_{p}[\log p(X)]-\E_{p}[\log q(X))]$ the Kullback-Leibler divergence between two probability distribution functions $p$ and $q$ on $\mathcal X$. We write $x\sim p$ to denote a random draw from $p$ and $\{x_i\}_{i=1}^{N}\simiid p$ for an independent draw of $N$ samples according to $p$. \check{jun21,june15, june8,april27}
+ 
+\subsubsection{Convex analysis}
+Let $B\subset\R^{n}$ denote the Euclidean unit ball with $B=\{x\in\R^{n}\mid \|x\|_{2}\le 1\}$. For any subset $C\subseteq\R^{n}$, we write $\mathrm{int}\,(C)$ the interior of $C$ with $\mathrm{int}\,(C)=\{x\in C \mid \exists \epsilon>0, x+\epsilon B \subset C\}$. Correspondingly we write $\mathrm{cl}(C)$ the closure of $C$ with $\mathrm{cl}(C) = \cap\{C+\epsilon B\st \epsilon>0\}$. A set $C$ is convex if for any $x,y\in C$, $(1-\lambda)x+\lambda y\in C$ for all $\lambda\in(0,1)$. Let $\Omega$ be an arbitrary connected and nonempty subset of $\R^{n}$; a function $f:\Omega\to\R$ is said to be convex if $f((1-\lambda)x+\lambda y)\le (1-\lambda)f(x)+\lambda f(y)$. For an arbitrary function $f:\Omega\to\R$, we denote by $f^{\star}:\R\to \R\cup\{+\infty\}$ the convex-conjugate of $f$ with $f^{\star}(y)=\sup_{y\in \Omega}[\scal{x,y}-f(x)]$. The set of minimisers of a function $f$ on a open, nonempty set $C$ is denoted by $\arg\min_{x\in C}\,f(x)$ i.e. the set $\pab{x\in C\mid f(y)\ge f(x), \,\forall y\in C}$. For a differentiable, strictly convex function $\varphi:C\to\R$, we denote by $B_\varphi(x,y)$ the Bregman divergence associated to $\varphi$ between $x$ and $y$ in $C$ with $B_\varphi(x,y)=\varphi(x)-\varphi(y)-\scal{x-y,\nabla \varphi(y)}$.  \check{jun21,may13}
+%If the function $f$ is convex and differentiable on $C$ we call \emph{first-order condition} the fact that this set is equivalent to the set of points $x\in C$ such that $\nabla f(x)=0$.
 
-\end{tabular}
+%\dred{note} 
+%\add{explain notations for message, explain add comma for t-1,t}
+%
+%\setlength{\tabcolsep}{12pt}
+%\renewcommand{\arraystretch}{1.2}
+%\begin{tabular}{ll}
+%\textbf{symbol} 		& \textbf{meaning}\\[.3cm]
+%$\mathcal X$ 			& sample space\\
+%$x,y,z \in \mathcal X$	& sampling points\\
+%$X,Y,Z$ 				& random variables\\
+%$x_{1:T}$ 				& collection $\{x_{t}\}_{t=1}^{T}$\\
+%$X \sim q(\cdot)$ 		& random variable drawn from a distribution $q$\\
+%$\mathcal N(\,\cdot\,; \mu, \Sigma)$ 
+%						& Normal distribution with mean $\mu$ and covariance matrix $\Sigma$\\
+%%$p(x_{1:T})$ & joint distribution over the collection $\{x_{t}\}_{t=1}^{T}$\\
+%$p(x\st y)$ 				& conditional distribution at $x$ given that $y$ was observed\\
+%$\text{supp}(p)$ 		& set of $x$ such that $p(x)>0$ where $p$ is a distribution\\
+%$\delta_{a}(x)$ 		& Dirac-delta distribution with point mass at $x=a$\\
+%$\hat p(x)$ 				& \dred{particle estimator of the distribution $p$}\\
+%%$\pd_t(x_t)$ & \dred{(in HMM) predictive density $p(x_t\st y_{1:t-1})$}\\
+%%$\bif_t(x_t)$ & \dred{(in HMM) backward information filter $p(y_{t:T}\st x_t)$}\\
+%%$\tbif_t (x_t)$ & \dred{(in HMM) normalised backward information filter $\gamma_t(x_t)p(y_{t:T}\st x_t)$}\\
+%$\psi_{u}$ 				& singleton potential on a node $u$\\
+%$\psi_{uv}$ 				& pairwise potential on an edge between a node $u$ and a node $v$\\
+%$\partial i$ 			& neighbourhood of node $i$ in a graph\\
+%$m_{st}$ 				& message from node $s$ to node $t$\\
+%$M_{st}$ 				& \dred{pre-message at $s$ going to $t$ in Belief Propagation}\\
+%$\KL{p,q}$ 				& Kullback-Leibler divergence between two distributions $p$ and $q$\\
+%$\mathcal F_\phi$ 		& exponential family with sufficient statistic $\phi$\\
+%$q_\theta$ 				& distribution parametrised by $\theta$\\
+%$A(\nu)$ 				& log-partition function of an $\mathcal F_{\phi}$ distribution parametrised by $\theta$\\
+%$A^{\star}(\nu)$		& \dred{convex-conjugate of $A$}\\
+%%$\theta[q]$ & natural parameter of distribution $q\in \mathcal F_{\phi}$\\
+%%$\mu[q]$ & mean parameter of distribution $q\in \mathcal F_{\phi}$\\
+%\dred{$\mathcal P_\phi[p]$} 	& Kullback-Leibler projection of a distribution $p$ on $\mathcal F_\phi$\\
+%$\E_p[\phi]$ 			& expected value of $\phi(X)$ if $X\sim p(\cdot)$\\
+%$\V_{p}[\phi]$ 			& \dred{variance of $\phi(X)$} if $X\sim p(\cdot)$  
+%
+%\end{tabular}
 \setlength{\tabcolsep}{6pt} % default
 
-\section*{Abbreviations}
-\add{add reference of primary definition, may be nice}
+\subsubsection*{Abbreviations}
+\add{add reference of primary definition, may be nice (also checks that actually used)}
 \setlength{\tabcolsep}{12pt}
 \renewcommand{\arraystretch}{1.2}
 \begin{tabular}{ll}
-\textbf{abbreviation} & \textbf{meaning}\\[.3cm]
 BIF 	& Backward Information Filter\\
 BP/LBP 	& (Loopy) Belief Propagation\\
 EP	 	& Expectation Propagation\\
@@ -68,8 +74,8 @@ FFBS 	& Forward Filtering Backward Smoothing \\
 IPP 	& Inhomogeneous Poisson Process\\
 HMM 	& Hidden Markov Model\\
 MCMC 	& Markov Chain Monte Carlo\\
-(L/G)MMC& Local/Global Moment Matching Conditions (\ref{eq:LMMC},~\ref{eq:GMMC})\\
-MRF 	& Markov Random Field\\
+(L/G)MMC& Local/Global Moment Matching Conditions (equations \ref{eq:LMMC},~\ref{eq:GMMC})\\
+MRF 	& Markov Random Field (point \ref{subsection: mrf})\\
 NBP 	& Nonparametric Belief Propagation\\
 PBP 	& Particle Belief Propagation\\
 RMS(E) 	& Root Mean Squared (Error)\\
@@ -80,18 +86,3 @@ TFS 	& Two Filter Smoothing\\
 \end{tabular}
 \setlength{\tabcolsep}{6pt} % default
 \newpage
-
-\subsubsection{Vectors, matrices and functions} 
-For a vector $x\in\R^{n}$ we write $\norm{x}{p}$ the $p$-norm of $x$ with $\norm{x}{p}^{p}=\sum_{i=1:n}\abs{x_{i}}^{p}$ for $p\in[1,\infty)$. 
-For $x,y\in\R^{n}$, we write $\scal{x,y}=\sum_{i=1:n}x_{i}y_{i}$ the inner product of $x$ and $y$. 
-We denote the transpose of a matrix $A\in\R^{n\times n}$ by $A\transp$. $A$ is said to be semi positive definite if $\scal{x,Ax}\ge 0$ for all $x\in\R^{n}$ and positive definite if the inequality holds strictly for all $x\neq 0$. We denote by $\mathbb S_+^{n}\subset \mathbb R^{n\times n}$ the set of symmetric positive definite matrices and by $\mathbb S_-^{n}$ the set of matrices $B$ such that $-B\in\mathbb S_+^{n}$.
-For a real-valued measurable function $f$ on a set $\mathcal X$, we write $\|f\|_{p}^{p}=\int_{\mathcal X} |f(x)|^{p}\dx$ the $p$-norm of $f$ for $p\in[1,\infty)$. 
-We write $L^{1}(\mathcal X)$ the set of functions such that $\|f\|_{1}<\infty$ and $\mathcal P(\mathcal X) \subset L^{1}(\mathcal X)$ denotes the restriction to nonnegative functions integrating to one (probability density functions). 
-For a real-valued, differentiable function $f$, we write $\nabla f$ its gradient and $\nabla^{2} f$ its Hessian provided $f$ is twice differentiable.\check{may10}
-
-\subsubsection{Probabilities and expected values}
-We will consider continuous sample spaces $\mathcal X\subseteq \R^{n}$ and, by default, we will consider the corresponding Borel $\sigma$-algebra. Correspondingly we will use the shorthand $(\mathcal X,\P)$ to denote a probability space with $\P$ the probability measure. We will consider probability measures which admit a probability density function $p$ with respect to a base measure $\nu$ with therefore $\P(x\in A)=\int_{A}p(x)\nudx$ for any open subset $A\subset \mathcal X$. For such a probability space and a vector-valued mapping $\varphi:\mathcal X\to\R^{d}$, we write the expectation and the covariance matrix of $\varphi$ respectively as $(\E_{p}[\varphi(X)])_{i}=\int_{\mathcal X}\varphi_{i}(x)p(x)\nudx$ and $\V_{p}[\varphi(X)]=\E_{p}[\varphi(X)\varphi(X)^{t}]-\E_{p}[\varphi(X)]\E_{p}[\varphi(X)]^{t}$. We write $\KL{p,q}=\E_{p}[\log p(X)]-\E_{p}[\log q(X))]$ the Kullback-Leibler divergence between two probability distribution functions $p$ and $q$ on $\mathcal X$.\check{june15, june8,april27}
- 
-\subsubsection{Convex analysis}
-Let $B\subset\R^{n}$ denote the Euclidean unit ball with $B=\{x\in\R^{n}\mid \|x\|_{2}\le 1\}$. For any subset $C\subseteq\R^{n}$, we write $\mathrm{int}\,(C)$ the interior of $C$ with $C^{\circ}=\{x\in C \mid \exists \epsilon>0, x+\epsilon B \subset C\}$. Correspondingly we write $\mathrm{cl}(C)$ the closure of $C$ with $\mathrm{cl}(C) = \cap\{C+\epsilon B\st \epsilon>0\}$. A set $C$ is convex if for any $x,y\in C$, $(1-\lambda)x+\lambda y\in C$ for all $\lambda\in(0,1)$. Let $\Omega$ be an arbitrary connected and nonempty subset of $\R^{n}$; a function $f:\Omega\to\R$ is said to be convex if $f((1-\lambda)x+\lambda y)\le (1-\lambda)f(x)+\lambda f(y)$. For an arbitrary function $f:\Omega\to\R$, we denote by $f^{\star}:\R\to \R\cup\{+\infty\}$ the convex-conjugate of $f$ with $f^{\star}(y)=\sup_{y\in \Omega}[\scal{x,y}-f(x)]$. The set of minimisers of a function $f$ on a open, nonempty set $C$ will be denoted by $\arg\min_{x\in C}\,f(x)$ i.e. the set $\pab{x\in C\mid f(y)\ge f(x), \,\forall y\in C}$. For a differentiable, strictly convex function $\varphi:C\to\R$, we denote by $B_\varphi(x,y)$ the Bregman divergence associated to $\varphi$ between $x$ and $y$ in $C$ with $B_\varphi(x,y)=\varphi(x)-\varphi(y)-\scal{x-y,\nabla \varphi(y)}$.  \check{may13}
-%If the function $f$ is convex and differentiable on $C$ we call \emph{first-order condition} the fact that this set is equivalent to the set of points $x\in C$ such that $\nabla f(x)=0$.

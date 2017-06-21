@@ -13,10 +13,9 @@
 
 %
 A \margnote{MRF}\emph{Markov random field} (MRF) allows to represent specific conditional dependences between a set of random variables with a graph. 
-In this report, we will consider graphs determined by a finite index set $\mathcal V$, a set of edges $\mathcal E\subseteq \mathcal V\times \mathcal V$ connecting those nodes and potential functions on its cliques. Each node $i\in\mathcal V$ corresponds to one random variable taking values in a sample space $\mathcal X_i$, which, in this work, will be a subset of $\mathbb R^{d_i}$ for some dimension $d_i\in\mathbb N$. \\
-We will restrict ourselves to graphs with pairwise interactions i.e., uniquely determined by potential functions on their nodes and edges.\add{properties, measurability} 
+In this report, we consider graphs determined by a finite index set $\mathcal V$, a set of edges $\mathcal E\subseteq \mathcal V\times \mathcal V$ connecting those nodes and potential functions on its cliques. Each node $i\in\mathcal V$ corresponds to one random variable taking values in a sample space $\mathcal X_i \subseteq\mathbb R^{d_i}$ for some dimension $d_i\in\mathbb N$. We restrict ourselves to graphs with pairwise interactions i.e., uniquely determined by potential functions on their nodes and edges.\add{properties, measurability} 
 %Only considering pairwise MRF is not too constraining since any MRF can be reduced to a pairwise MRF by the introduction of auxiliary variables.\foot{Although this may lead to a very complex graph, see \citet{wainwright08} and references therein.} 
-Consequently, we will write
+Consequently, we write
 %
 \eqa{	
 	\psi_i : \mathcal X_i \to \mathbb R^{+}, \quad \text{and}\quad \psi_{ij}: \mathcal X_i\times \mathcal X_j \to \mathbb R^{+}, \nn	
@@ -45,23 +44,20 @@ A simple MRF is illustrated in \fig{fig:simple-MRF}.\\
 \end{tikzpicture}
 \caption{\label{fig:simple-MRF}Illustration of a simple MRF corresponding to distributions over 4 random variables admitting the following factorisation structure:\\ $p(w,x,y,z)\propto \psi_{w}(w)\psi_{x}(x)\psi_{y}(y)\psi_{z}(z)\psi_{wx}(w,x)\psi_{wz}(w,z)\psi_{wy}(w,y)$.}
 \end{figure}
-
 %The node potentials usually correspond to the likelihood of some observations $y_i$ (possibly a collection of observations) such that they can be written
 %\eqa{ \psi_i(x_i) &=& p_i(y_i\st x_i),	\nn	}
 %for some likelihood model $p_i$.
-
-When considering inference on MRF, we will be interested mainly in determining, or approximating, \emph{marginals}\margnote{marginals} $p_{\mathcal I}(x_{\mathcal I})$ for $\mathcal I\subseteq\mathcal V$  with
+In this work, we are mainly concerned in determining or approximating  \emph{marginals}\margnote{marginals} on the MRF i.e. the distributions $p_{\mathcal I}(x_{\mathcal I})$ for $\mathcal I\subseteq\mathcal V$  with
 \eqa{		p_{\mathcal I}(x_{\mathcal I}) &:=& \int p(x_{\mathcal V\backslash \mathcal I})\dx_{\mathcal V\backslash\mathcal I}	\label{eq:marginals}.}
-A particular case of interest is $\mathcal I=\{r\}$ corresponding to the case of singleton marginals.\add{Discuss why} The integrals of the form \eqref{eq:marginals} are typically intractable but exploiting the underlying factorisation structure can lead to good approximation methods.\\
+A particular case of interest is $\mathcal I=\{r\}$ corresponding to the case of singleton marginals.\add{Discuss why} The integrals of the form \eqref{eq:marginals} are typically intractable but exploiting the underlying factorisation structure can lead to good approximation methods.
 
-We will distinguish between two classes of undirected graph structures: the connected acyclic ones (\emph{trees}) and the rest (\emph{loopy graphs}). As we will see, in comparison to loopy graphs, computing marginals on a tree is simple. 
-Among the trees, two graph structures will be of particular interest in this document: the \emph{chain graph} and the \emph{star graph}. We also illustrate one specific type of loopy graph: the \emph{grid graph}.
+We distinguish between two classes of undirected graph structures: the connected acyclic ones (\emph{trees}) and the rest (\emph{loopy graphs}). As the rest of this document will make clear, in comparison to loopy graphs, computing marginals on a tree is relatively simple. Among the trees, two graph structures are of particular interest in this document: the \emph{chain graph} and the \emph{star graph}. We also illustrate one specific type of loopy graph: the \emph{grid graph}.
 
 %\dred{COULD ADD hierarchical model as tree graph}
 
 %%%%%%%%%%%
 \subsection{Examples of MRF}
-In this point, we present a brief overview of three examples of graph structures on which we will focus most of our effort throughout this document. We also present the type of applications they are connected with. They will be considered in more details in subsequent sections.
+In this point, we present a brief overview of three examples of graph structures on which we will focus most of our effort throughout this document. We also present the type of applications they are connected with. They will be considered in more details in subsequent sections.\add{check, come back}
 
 %%%%%%%%%%%%%%
 \subsubsection{Hidden Markov Models}
@@ -93,9 +89,9 @@ Chain graphs form the underlying structure of \emph{Hidden Markov Models} (HMM)\
 
 HMMs are used in a broad range of applications from modelling time series data to speech processing\add{cite stuff here}. In HMMs, the node potentials correspond to the likelihood of the corresponding observation and the edge potentials correspond to the \emph{transition density}:
 \eqa{	\psi_t (x_t) &=& p(y_t\st x_t), \quad\text{and}\quad \psi_{t-1,t}(x_{t-1},x_t) \spe p(x_t\st x_{t-1}).	\nn}
-A prior $p_{0}(x_{1})$ is usually given for the first node so that $\psi_1(x_1) = p_{0}(x_1)p(y_1\st x_1)$. In this case, obtaining or approximating the singleton marginals is known as a \emph{smoothing problem}\margnote{smoothing}. The marginals or \emph{smoothing densities} can be written $p(x_t\st y_{1:T})$ to make explicit the dependence on all available observations.\\
+A prior $p_{0}(x_{1})$ is assumed to be given for the first node so that $\psi_1(x_1) = p_{0}(x_1)p(y_1\st x_1)$. In this case, obtaining or approximating the singleton marginals is known as a \emph{smoothing problem}\margnote{smoothing}. The marginals or \emph{smoothing densities} can be written $p(x_t\st y_{1:T})$ to make explicit the dependence on all available observations.
 
-A particular case is the \emph{filtering problem}\margnote{filtering} where one is only interested in building the last singleton marginal or, to put the problem in the same framework as before, to build marginals taking only into account the observations available until the point considered. The densities of interest can therefore be written $p(x_t\st y_{1:t})$.\\ 
+A particular case is the \emph{filtering problem}\margnote{filtering} where one is only interested in building the last singleton marginal or, to put the problem in the same framework as before, to build marginals taking only into account the observations available until the point considered. The densities of interest can therefore be written $p(x_t\st y_{1:t})$.
 %This is particularly relevant for applications such as time series analysis.\\
 
 The \emph{linear-Gaussian} case is a particular instance of HMM, usually expressed as:
@@ -105,9 +101,9 @@ The \emph{linear-Gaussian} case is a particular instance of HMM, usually express
 			p(y_t\st x_t) 		&=& \mathcal N(y_t; B_t x_t+b_t, R_t)
 		}
 	\nn}
-where $\mu_0$ as well as the $Q_i$, $R_i$, $A_i$, $a_i$, $B_i$ and the $b_i$ are deterministic. In such a case, an analytical expression for both the filtering and the smoothing densities can be obtained through the well-known \emph{Kalman filter} and \emph{smoother} (see for example \citet{anderson79}). \\
+where $\mu_0$ as well as the $Q_i$, $R_i$, $A_i$, $a_i$, $B_i$ and the $b_i$ are deterministic. In such a case, an analytical expression for both the filtering and the smoothing densities can be obtained through the well-known \emph{Kalman filter} and \emph{smoother} (see for example \citet{anderson79}). 
 
-In the general case however (nonlinear and/or non-Gaussian), these densities are typically intractable. Approximation algorithms such as \emph{sequential Monte Carlo} (SMC)\margnote{SMC} methods can then be used. We will come back to this in \hyperref[bg:particle]{section~\ref*{bg:particle}}. 
+In the general case however (nonlinear and/or non-Gaussian), these densities are typically intractable. Approximation algorithms such as \emph{sequential Monte Carlo} (SMC)\margnote{SMC} methods can then be used. \add{link to section where discussed} 
 %We will show in this document a novel method to exploit a variational method known as \emph{expectation propagation} to help the performances of SMC smoothing algorithms. \dred{ADD SECTION NUMBER}
 
 %%%%%%%%%%%%%%
@@ -136,10 +132,10 @@ In this document, we define \emph{star graphs}\margnote{star graph} as correspon
 
 In this case, the singleton marginal can be written as:
 \eqa{	p(x\st y) &\propto& \pi_0(x) \prod_{i=1}^{K} p(y_k\st x)	\nn}
-where the $y_k$ are subsets of the entire observed data and $\pi_0$ is a prior on the hidden state. As we will show in \hyperref[sec:snep]{section~\ref*{sec:snep}}, this can be a useful representation for distributed inference where each of the observation node can correspond to a distinct physical machine with a portion of the relevant data.% We exploited this structure to come up with a novel way to perform distributed Bayesian inference. \dred{ADD SECTION NUMBER}
+where the $y_k$ are subsets of the entire observed data and $\pi_0$ is a prior on the hidden state. This can be a useful representation for distributed inference where each of the observation node can correspond to a distinct physical machine with a portion of the relevant data.\add{add link to section}\check{jun21}% We exploited this structure to come up with a novel way to perform distributed Bayesian inference. \dred{ADD SECTION NUMBER}
 
 \subsubsection{Grid and loopy graphs}
-So far the examples we have considered do not exhibit cycles. An example of a structure with cycles which is encountered in image processing is the \emph{grid graph}\margnote{grid graph} illustrated in \fig{fig:grid1} \citep{blake11}.
+The examples listed above do not exhibit cycles. An example of a common structure with cycles which is encountered, for instance, in image processing, is the \emph{grid graph}\margnote{grid graph} illustrated in \fig{fig:grid1} \citep{blake11}.
 
 \begin{figure}[!h]
 	\center
@@ -171,7 +167,7 @@ So far the examples we have considered do not exhibit cycles. An example of a st
 \caption{\label{fig:grid1} Generic structure of a grid graph.}
 \end{figure}
 
-
-In image processing, grid graphs can be used to model interaction between the pixels of an image. If we take the particular case of denoising for example, for each pixel $k$ we observe a value $y_k$ for which we can have a likelihood model for the hidden underlying value $p(y_k\st x_k)$. These form the node potentials. Additionally, we may have a similarity measure which could be used on the edges to mark as unlikely two neighbouring pixels being very dissimilar. These form the edge potentials.\\
-Finding or approximating the singleton marginals then corresponds to finding the likelihood of a particular pixel taking a specific value given all the noisy observations available. %\dred{ADD SECTION NUMBER WHERE WE SHOW HOW TO DO THIS}
+In image processing, grid graphs can be used to model interaction between the pixels of an image. In the case of image denoising for example, for each pixel $k$ a noisy value $y_k$ is observed and we can have a model for the likelihood of $y_k$ given the true pixel value $x_k$ in the form $p(y_k\st x_k)$. These then form the node potentials. 
+Additionally, we may have a similarity measure which can be used to penalise neighbouring pixels being very dissimilar. These form the edge potentials.\\
+The problem of finding or approximating the singleton marginals then corresponds to finding the likelihood of a particular pixel taking a specific value given all the noisy observations available.\check{jun21}\add{maybe link to relevant section} %\dred{ADD SECTION NUMBER WHERE WE SHOW HOW TO DO THIS}
 

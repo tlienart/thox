@@ -1,27 +1,16 @@
 % !TEX root = ../thesis.tex
 
-\dred{General stuff, discuss Variational Inference in general, you don't really need VB so introduce it very briefly}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Variational Inference}
 
 \todofr{
-    \begin{itemize}\itsep0
-    	\item general form (discuss things like alpha divergence, KStein, Wasserstein)
-    	\item VB, ELBO, guarantees
-    \end{itemize}
-}
+\begin{itemize}
+	\item general stuff, discuss variational inference in general. don't really need VB so introduce it very briefly
+	\item ORDERING: could do EPBP after EP for distributed because then the whole of EP is already discussed... 
+   	\item general form (discuss things like alpha divergence, KStein, Wasserstein)
+   	\item VB, ELBO, guarantees
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Belief Propagation}
-
-\todofr{
-    \begin{itemize}\itsep0
-    	\item BP on a tree
-		\item LBP when iterating
-		\item why is it / is it not a good idea (energy min and MERL stuff)
-	\end{itemize}
+\end{itemize}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,6 +30,17 @@
 \newpage
 \subsection{\label{s:ADF+EP}Assumed Density Filtering and Expectation Propagation}
 \input{parts/bgadfep}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Belief Propagation}
+
+\todofr{
+    \begin{itemize}\itsep0
+    	\item BP on a tree
+		\item LBP when iterating
+		\item why is it / is it not a good idea (energy min and MERL stuff)
+	\end{itemize}
+}
 
 % ==================
 \section{Discussion}

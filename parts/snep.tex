@@ -4,6 +4,7 @@
 	\begin{itemize}
 		\item Geometry and KL and mirror descent
 		\item trick of the trade when projections don't work and why
+		\item discuss briefly somewhere that could do power EP for all of those, trivial extension, but not well controlled (role of) so leaving that out
 	\end{itemize}
 }
 
@@ -132,14 +133,18 @@ These updates can also be expressed in terms of updates of the local parameters:
 \label{eq:damped-update-mp}
 }
 %
-As in \eqref{eq:damped-update-np-w} the role of $\omega_{i}$ and $\lambda_{i}$ can be swapped to obtain another valid damped update mechanism. We will show below how similar updates can be obtained by considering the so-called \emph{EP-Energy} running a Newton-Raphson-like update. 
+As in \eqref{eq:damped-update-np-w} the role of $\omega_{i}$ and $\lambda_{i}$ can be swapped to obtain another valid damped update mechanism. 
+The update \eqref{eq:damped-update-mp} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the mean-parameter variant which we will call \emph{MP-SMS}.\todo{maybe think about naming (+b for cavity or whatever)}
+
+ 
+%We will show below how similar updates can be obtained by considering the so-called \emph{EP-Energy} running a Newton-Raphson-like update. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The EP energy perspective}
 \todofr{
 Cite minka, mention energy, explain that it's not really something to increase or decrease but rather want stationary points and that's it, show that if write the KL and get rid of a part then get this energy (essentially use that to show that it's a bit pointless)}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{Obtaining the energy}
+%\subsubsection{Obtaining the energy}
 In \citet{minka01c}, the author presents the LMMC \eqref{eq:LMMC} as a min-max problem of an objective function he calls the EP energy function.
 One way to obtain this is to decompose the KL divergence between $p$ and $q$. 
 %First, let us write explicitly the objects considered:\add{This is now REDUNDANT with start}
@@ -166,10 +171,16 @@ and using this in \eqref{eq:decomposeKL} leads to:\footnote{Note that considerin
 \[\KL{q,p} - \log Z_p \spe -\mathcal E + \sum_i \KL{q,q_i}.\]}
 %
 \eqa{
-\KL{p,q} + \log Z_p &=& \underbrace{(1-K) A(\theta) + \sum_{i}A_i(\lambda_i)}_{\mathcal E} + \mathbb E_p\pac{\log q_i/q}.
+\KL{p,q} + \log Z_p &=& {(1-K) A(\theta) + \sum_{i}A_i(\lambda_i)} + \mathbb E_p\pac{\log q_i/q}.
 }
 %
-The first part, denoted by $\mathcal E$ defines the \emph{EP energy}.\add{add footnote explaining that sometimes defined with different sign but that it doesn't matter} Note that its gradient in $\lambda_i$ is simply $\nabla_{\lambda_i}\mathcal E = (-\nabla A(\theta) + \mu_{i})$. 
+The first part, denoted by $\mathcal E$ defines the \emph{EP energy} with
+%
+\eqa{
+	\mathcal E(\theta,\lambda_1,\dots,\lambda_K)&=& (1-K)A(\theta) + \sum_{i=1}^{K} A_i(\lambda_i) \label{EP-energy}
+}
+%
+under the constraint that $\theta=(K-1)\inv \sum_{i=1}^{K}\lambda_i$. Note that its gradient in $\lambda_i$ is simply $\nabla_{\lambda_i}\mathcal E = (\mu_i-\nabla A(\theta))$. 
 The stationary points of $\mathcal E$ in $\lambda_i$ therefore correspond to the LMMC \eqref{eq:LMMC} that the EP algorithm attempts to satisfy.
 It is also interesting to briefly look at the remainder of the right-hand side of \eqref{eq:decomposeKL}. Discarding the terms that don't depend on $\lambda_i$, we have
 %
@@ -181,37 +192,33 @@ It is also interesting to briefly look at the remainder of the right-hand side o
 Therefore the gradient of the complete right hand side of \eqref{eq:decomposeKL} (i.e. the gradient of $\KL{p,q}$) in $\lambda_i$ is in fact proportional to $(\E_{p}[\phi]-\nabla A(\theta))$ leading to the same stationary points as the GMMC \eqref{eq:GMMC} as could have been expected.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection*{Looking for a stationary point of the EP energy}
-\todofr{Think first about how you want to present information and in particular what you want to say. Could just present the min max problem. Say that if torture the problem you can get to a double loop that looks like SNEP. Would be good not to go along the crappy road of the dev a la Teh, just showing that we're actually doing some kind of Newton's method would already be quite nice use for this \url{http://homes.soic.indiana.edu/classes/spring2012/csci/b553-hauserk/newtons_method.pdf} and probably ``Information geometry of mirror descent'' \citep{raskutti15}}
-
-The energy $\mathcal E$ as a function of $\theta$ and the $\lambda_i$ is given by
-\eqa{\mathcal E(\theta,\lambda_1,\dots,\lambda_K)&=& (1-K)A(\theta) + \sum_{i=1}^{K} A_i(\lambda_i) \label{EP-energy}}
-under the constraint that $\theta=(K-1)\inv \sum_{i=1}^{K}\lambda_i$. In \citet{heskes05}, the authors show that this energy is in fact equivalent to the \emph{Expectation Consistent free energy}. Further, they indicate that several stationary points can exist and that the framework does not provide a criterion to pick an optimal one. Lastly, they remind the reader that since the energy is neither convex nor concave with respect to the parameters $\lambda_i$, it does not tell whether stationary points are minimum, maximum or saddle points. 
-
+%\subsubsection*{Looking for a stationary point of the EP energy}
+%\todofr{Think first about how you want to present information and in particular what you want to say. Could just present the min max problem. Say that if torture the problem you can get to a double loop that looks like SNEP. Would be good not to go along the crappy road of the dev a la Teh, just showing that we're actually doing some kind of Newton's method would already be quite nice use for this \url{http://homes.soic.indiana.edu/classes/spring2012/csci/b553-hauserk/newtons_method.pdf} and probably ``Information geometry of mirror descent'' \citep{raskutti15}}
+In \citet{heskes05}, the authors show that the energy \eqref{EP-energy} is in fact equivalent to their \emph{Expectation Consistent free energy}. Further, they indicate that several stationary points can exist and that the framework does not provide a criterion to pick an optimal one. Lastly, they remind the reader that since the energy is neither convex nor concave with respect to the parameters $\lambda_i$, it does not tell whether stationary points are minimum, maximum or saddle points. \check{june21}
 %However, since the first term is concave in $\theta$ while each of the terms in the sum is convex in $\lambda_i$, \citet{minka01c} suggests writing the EP stationary points as corresponding to the following min-max problem 
 %%
 %\eqa{	\min	_\theta\max_{\{\lambda_i\}} \quad(K-1)A(\theta)-\sum_{i=1}^{K}A_i(\lambda_i), \quad \text{s.t.}\quad \theta = (K-1)\inv\sum_{i=1}^{K}\lambda_i.}
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Mirror descent for the EP energy}
-Let us define $\mathcal E_i(\lambda_i)$ as the energy \eqref{EP-energy} with all other parameters kept fixed. On the corresponding compute node, the aim is to determine $\lambda_i^{\text{new}}$ such that $\nabla \mathcal E_i(\lambda_i^{\text{new}})=0$. This is in fact equivalent to finding stationary points of $\mathcal F_i(\lambda_i)$ with
+Let us define $\mathcal E_i(\lambda_i)$ as the energy \eqref{EP-energy} with all parameters other than $\lambda_i$ kept fixed. On the corresponding compute node, the aim is then to determine a stationary point $\lambda_i^{\text{new}}$ for $\mathcal E_i(\lambda_i)$. This is in fact equivalent to finding a stationary point for $\mathcal F_i(\lambda_i)$ with
 \eqa{
-	\mathcal F_i(\lambda_i) &:=& A(\theta_{-i} + \eta\inv\lambda_i) - \eta\inv A_i(\lambda_i)	
+	\mathcal F_i(\lambda_i) &:=& A(\theta_{-i} + \eta\lambda_i) - \eta A_i(\lambda_i)	
 }
-where $\theta_{-i}:=\eta\inv\sum_{j\neq i}\lambda_j$. A common approach to finding stationary points of a function is to consider Newton's method which revolves around a local quadratic approximation of that function. Let us denote $\lambda_i$ the current parameter and $\lambda_i^{\text{new}}$ the new one, we can write:
+where $\theta_{-i}:=\eta\sum_{j\neq i}\lambda_j$ and $\eta=(K-1)\inv$. A common approach to finding stationary points of a function is to consider Newton's method which revolves around a local quadratic approximation of that function. Let us denote $\lambda_i$ the current parameter and $\lambda_i^{\text{new}}$ the new one. We can consider the following development around $\lambda_i$:
 %
 \eqa{
 \mathcal F_i(\lambda_i^{\text{new}}) 
 	&\approx&
-A(\theta) + \eta\inv\scal{\lambda_i^{\text{new}}-\lambda_i,\nabla A(\theta)} +\nn\\
-&& {\eta^{-2}\over 2}\scal{\lambda_i^{\text{new}}-\lambda_i, \nabla^{2} \mathcal F_i(\lambda_i)(\lambda_i^{\text{new}}-\lambda_i)} - \eta\inv A(\lambda_i).\label{ep-energy-newton}
+\mathcal F_i(\lambda_i) + \eta\scal{\lambda_i^{\text{new}}-\lambda_i,\nabla A(\theta)-\nabla A_i(\lambda_i)} +\nn\\
+&& {\eta^{2}\over 2}\scal{\lambda_i^{\text{new}}-\lambda_i, \nabla^{2} \mathcal F_i(\lambda_i)(\lambda_i^{\text{new}}-\lambda_i)} .\label{ep-energy-newton}
 }
 %
-Taking the gradient in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a Newton-like step. However, it requires the inversion of the Hessian of $\mathcal F_i$ which may be expensive and unstable. An alternative can be obtained by observing that, if $\nabla^{2}\mathcal F_i(\lambda_i)$ is positive definite,\add{an argument can probably be made that this will likely be the case since if variance of q does not encompass that of qi we're in trouble (?) argue that variance can be decreased but not increased (?) at start should be ok, towards end, can see crappy stuff which may be caused by this.} then the quadratic term in the approximation is simply a measure of discrepancy between $\lambda_i^{\text{new}}$ and $\lambda_i$. As in the mirror-descent algorithm we could therefore try to replace it by a Bregman divergence.\add{Should MD be clarified somewhere? $f(x)=f(x_0)+\scal{x-x_0,\nabla f(x_0)}+B_\varphi(x,x_0)$..} In our case, it is convenient to consider the Bregman divergence induced by the log-partition function $A$ itself;\footnote{Recall that $B_A(\lambda_i^{\text{new}},\lambda_i):=A(\lambda_i^{\text{new}})-A(\lambda_i)-\scal{\lambda_i^{\text{new}},\nabla A(\lambda_i)}$} this leads to the alternative approximation:
+Taking the gradient in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a Newton-like step. However, this requires the inversion of the Hessian of $\mathcal F_i$ which may be expensive and numerically unstable to compute. An alternative can be obtained by observing that, if $\nabla^{2}\mathcal F_i(\lambda_i)$ is positive definite,\add{an argument can probably be made that this will likely be the case since if variance of q does not encompass that of qi we're in trouble (?) argue that variance can be decreased but not increased (?) at start should be ok, towards end, can see crappy stuff which may be caused by this.} then the quadratic term in the approximation is simply a measure of discrepancy between $\lambda_i^{\text{new}}$ and $\lambda_i$. As in the mirror-descent algorithm \citep{nemirovski83, beck03} we could therefore try to replace it by a Bregman divergence.\add{Should MD be clarified somewhere? $f(x)=f(x_0)+\scal{x-x_0,\nabla f(x_0)}+B_\varphi(x,x_0)$..} In our case, it is convenient to consider the Bregman divergence induced by the log-partition function $A$ itself;\footnote{Recall that $B_A(\lambda_i^{\text{new}},\lambda_i):=A(\lambda_i^{\text{new}})-A(\lambda_i)-\scal{\lambda_i^{\text{new}},\nabla A(\lambda_i)}$.} this leads to the alternative approximation:
 %
 \eqa{
 	\mathcal F_i(\lambda_i^{\text{new}}) &\approx&
-A(\theta) + \eta\inv\scal{\lambda_i^{\text{new}}-\lambda_i,\nabla A(\theta)} +\eta^{-2} B_A(\lambda_i^{\text{new}},\lambda_i) - \eta\inv A_i(\lambda_i)\nn,
+\mathcal F_i(\lambda_i) + \eta\scal{\lambda_i^{\text{new}}-\lambda_i,\nabla A(\theta)-\nabla A_i(\lambda_i)} +\kappa\eta^{2} B_A(\lambda_i^{\text{new}},\lambda_i) \nn,
 }
 %
 where $\kappa>0$ is a scaling factor. Taking the gradient of that approximation in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a mirror-descent-like step:
@@ -220,36 +227,37 @@ where $\kappa>0$ is a scaling factor. Taking the gradient of that approximation 
 	\lambda_i^{\text{new}} &=& \nabla A^{\star}\pac{\nabla A(\lambda_i)+\kappa'(\hat\mu_i-\nabla A(\theta))}
 }
 %
-where $\kappa'$ can be interpreted as a step-size and $\hat\mu_i$ is a noisy estimator of $\nabla A_i(\lambda_i)$. A similar approach leads to the corresponding mechanism for an update in terms of the local parameters $\omega_i$: 
+where $\kappa'=\eta/\kappa$ can be interpreted as a step-size and $\hat\mu_i$ is a noisy estimator of $\nabla A_i(\lambda_i)$. By analogy, we can also suggest the corresponding mechanism for an update in terms of the local parameters $\omega_i$: 
 %
 \eqa{
 	\omega_i^{\text{new}} &=& \nabla A^{\star}\pac{\nabla A(\omega_i)+\kappa''(\hat\mu_i-\nabla A(\theta))}\label{eq:snep-updates}
 }
 %
 which resembles the damped updates in the mean-parameter space \eqref{eq:damped-update-mp} we had obtained earlier. 
-The updates \eqref{eq:snep-updates} form the core of the \emph{Stochastic Natural gradient Expectation Propagation} algorithm suggested in \citet{hasenclever16}.\add{Here add small discussion where you pre-announce results from experimental section}
+More importantly, the updates \eqref{eq:snep-updates} form the core of the \emph{Stochastic Natural gradient Expectation Propagation} (SNEP) algorithm we suggested in \citet{hasenclever16}.\add{Here add small discussion where you pre-announce results from experimental section}\check{june21}
+The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the first ``SNEP'' variant which we will call \emph{SNEP-a}. Note that the complete algorithm presented in \citet{hasenclever16} includes a few additional elements in order to be a fully asynchronous algorithm.\add{come back to this probably if you compare call SNEP-a, SNEP, etc.} 
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{\dred{Parameter tying, SEP and BBa}}
-
-\todofr{
-Check if can do this cleanly: take energy, set all cavities to same (don't discuss at length explain suggestion), suggest algorithm as presented in SEP, explain how can also be done in MP space. Then same stuff with BBa. (ideally compress in one). Then discuss comparison of all stuff.
-}
-
-\subsubsection{BBA}
-\dred{DRAFT with energy set to 1}
-\eqa{	\mathcal E_{BBA}(\theta,\lambda) &=& (1-K)A(\theta)+\sum_{i=1}^{K}A_i(\lambda)	}
-under the condition that $\theta=K\lambda/(K-1)$. The stationary point of BBa 
-\eqa{	\nabla A(\theta) &=& K\inv \sum_{i=1}^{K} \nabla A_i(\lambda).	}
-(A form of average). 
-Key point is that the $\mathcal E_{BBA}$ is bounded from below for $\alpha\le N$ (see BBA) therefore convergence or something.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%\subsection{\dred{Parameter tying, SEP and BBa}}
+%
+%\todofr{
+%Check if can do this cleanly: take energy, set all cavities to same (don't discuss at length explain suggestion), suggest algorithm as presented in SEP, explain how can also be done in MP space. Then same stuff with BBa. (ideally compress in one). Then discuss comparison of all stuff.
+%}
+%
+%\subsubsection{BBA}
+%\dred{DRAFT with energy set to 1}
+%\eqa{	\mathcal E_{BBA}(\theta,\lambda) &=& (1-K)A(\theta)+\sum_{i=1}^{K}A_i(\lambda)	}
+%under the condition that $\theta=K\lambda/(K-1)$. The stationary point of BBa 
+%\eqa{	\nabla A(\theta) &=& K\inv \sum_{i=1}^{K} \nabla A_i(\lambda).	}
+%(A form of average). 
+%Key point is that the $\mathcal E_{BBA}$ is bounded from below for $\alpha\le N$ (see BBA) therefore convergence or something.
 
 %%%%%%%%%%%%%%%%%%%%%
 \section{Comparisons}
-\todofr{Explain primary comparison between SMS and SNEP since parameter tying is a further assumption (or say something of the sorts following Distbayes paper). Redo the experiments from ages ago (see if still has notebooks) comparing different EP approaches for BLR on single machine, discuss. Then discuss in distributed setting (graph from Distbayes paper)}
+\todofr{Explain primary comparison between SMS and SNEP since parameter tying is a further assumption (or say something of the sorts following Distbayes paper). Redo the experiments from ages ago (see if still has notebooks) comparing different EP approaches for BLR on single machine, discuss. Then discuss in distributed setting (graph from Distbayes paper). Discuss very briefly SEP/BBa (SEP is easy to implement BBa is dodgy because of log. But can just discuss parameter tying and then compare with tied params)}
 
 
 %%%%%%%%%%%%%%%%%%%%
@@ -259,4 +267,7 @@ Key point is that the $\mathcal E_{BBA}$ is bounded from below for $\alpha\le N$
 	\item pitfalls of using EP / VB for large dimensional, have to revert to diagonal gaussians in which case maybe not so interesting. As a result and since we are using a large number of points, the uncertainty recovered is often extremely small in both EP and VB and unusable in practice. One may therefore wonder whether a purely optimisation based approach effectively targeting the MAP directly is not all that we can afford etc.
 \end{itemize}
 	\item mention that energy is misleading (not min or max really) 
+
+Explain that just choice to go for $\omega$ vs $\lambda$ and that in fact not clear cut.\\
+Explain that more advanced examples with Neural Networks presented in the paper but with Diagonal Gaussian (+ it's not your work so leave it aside)
 }

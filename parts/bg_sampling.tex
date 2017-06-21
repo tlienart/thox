@@ -2,21 +2,21 @@
 
 \section{Monte Carlo estimators}
 
-\subsection{}
+\subsection{\dred{Review heavily}}
 
-In the first case, one is interested in computing the expected value of a test function $\varphi$ with respect to a distribution $\pi:\mathbb R^{d} \to \mathbb R_+$ i.e.: $I:=\E_\pi[\varphi(X)]$. Assuming it can't be computed analytically, a general approach is to consider a quadrature rule of the form:
+In the first case,\add{what first case} one is interested in computing the expected value of a test function $\varphi$ with respect to a distribution $\pi:\mathbb R^{d} \to \mathbb R_+$ i.e.: $I:=\E_\pi[\varphi(X)]$. Assuming it can't be computed analytically, a general approach is to consider a quadrature rule of the form:
 %
 \eqa{
 	I\esp\approx\esp \widehat I_n &=& \sum_{i=1}^{n} w(X^{(i)}) \varphi(X^{(i)})
 }
 %
-for some points $X^{(i)}\in\mathcal X$ and corresponding weights $w(X^{(i)})\in\mathbb R_+$. In low dimensions (typically, $d\le 4$), one can consider deterministic quadrature rules such as the Gauss-Hermite quadrature. However, as soon as the dimensionality increases, these deterministic rules tend to perform poorly even for a large number of integration points (``curse of dimensionality''). In that case, one can fall back to Monte Carlo integration with
+for some points $X^{(i)}\in\mathcal X$ and corresponding weights $w(X^{(i)})\in\mathbb R_+$. In low dimensions, we can consider deterministic quadrature rules such as the Gauss-Hermite quadrature. However, as the dimensionality increases, these deterministic rules tend to perform poorly even for a large number of integration points (``curse of dimensionality''). In that case, one can fall back to Monte Carlo integration with
 %
 \eqa{	
 	X^{(i)}\esp \simiid\esp \pi(\cdot),\quad\text{and}\quad w(X^{(i)})\spe n^{-1}. 	
 }
 %
-The strong law of large numbers then indicates that $\widehat I_n\to I$ almost surely with approximation error scaling like $\mathcal O(n^{-1/2})$ independently of the dimensionality of the problem. This is to be compared with deterministic rules which typically have approximation error scaling like $\mathcal O(n^{-\alpha/d})$ for a fixed $\alpha>0$ depending on the quadrature rule.\\
+The strong law of large numbers then indicates that $\widehat I_n\to I$ almost surely with approximation error scaling like $\mathcal O(n^{-1/2})$ independently of the dimensionality of the problem. This is to be compared with deterministic rules which typically have approximation error scaling like $\mathcal O(n^{-\alpha/d})$ for a fixed $\alpha>0$ depending on the quadrature rule.
 
 The problem then becomes one of drawing iid.\ samples from $\pi$. Often, this is also a hard problem and one can consider \emph{importance sampling} (IS)\margnote{IS} whereby samples are drawn from a \emph{proposal distribution}\margnote{proposal} $q\approx \pi$ and the quadrature weights are adjusted to reflect that:
 %
@@ -24,6 +24,6 @@ The problem then becomes one of drawing iid.\ samples from $\pi$. Often, this is
 	X^{(i)}\esp \simiid\esp q(\cdot), \quad\text{and}\quad w(X^{(i)})\spe {\pi(X^{(i)})\over n q(X^{(i)})}.
 } 
 %
-Provided the support of $q$ englobes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$ and provided that $\E_q[\abs{\varphi(X)}w(X)]$ is bounded, the importance sampling estimator is unbiased and consistent.\\check{apr1}
+Provided the support of $q$ englobes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$ and provided that $\E_q[\abs{\varphi(X)}w(X)]$ is bounded, the importance sampling estimator is unbiased and consistent.\check{apr1}
 
 
