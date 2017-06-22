@@ -27,14 +27,33 @@
 \usepackage{xspace}
 \usepackage[backgroundcolor=Yellow!30,
 			textsize=tiny]{todonotes}
-\renewcommand{\check}[1]{\todo{\textbf{checked}: #1}\xspace}
-\newcommand{\add}[1]{\todo[backgroundcolor=red!20,linecolor=red]{\textbf{add}: #1}\xspace}
 
 \renewcommand\margnote[1]{\xspace}
 \renewcommand{\P}{\mathbb P}
 
 \newcommand\nudx{\nu(\!\dx)}
 \renewcommand\transp{^t}
+
+\usepackage{longtable}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% COMMANDS FOR REVIEWING %
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\check}[1]{
+	\todo{\textbf{checked}: #1}\xspace
+	}
+\newcommand{\add}[1]{
+	\todo[backgroundcolor=red!20,linecolor=red]{
+		\textbf{add}: #1
+		}
+	\xspace
+}
+\newcommand{\addref}{
+	\todo[backgroundcolor=green!20,linecolor=green]{
+		\textbf{add citation}
+		}
+	}
+
 
 %%%%%%%%%%%%%%%%
 \begin{document}
@@ -66,7 +85,7 @@
 %%%% TABLE OF CONTENTS
 
 \singlespacing
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 \setcounter{secnumdepth}{2}
 \iftoc\tableofcontents\fi
 \pagenumbering{roman}
@@ -74,6 +93,7 @@
 \onehalfspacing
 %%%% NOTATIONS / ABBREVIATIONS
 
+\raggedbottom
 \input{parts/notations}
 
 % --------------------------------------

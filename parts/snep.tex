@@ -57,7 +57,7 @@ Indeed, in our general setting we do not assume that computing $\E_{q_i}[\phi(X)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damped updates in the natural parameter space}
 In their paper, \citet{xu14} suggest a method to synchronise Monte Carlo samplers ran on independent compute nodes. They call it \emph{Sequential Moment Sharing} or SMS for short. Effectively, SMS corresponds precisely to the case mentioned at the previous point consisting of running EP across multiple physical nodes while using noisy estimates of $\E_{q_i}[\phi(X)]$, the expected value of the sufficient statistics under the tilted distribution. 
-Below, we introduce the algorithm as a damped fixed-point iteration in the natural parameter space. This will prove useful when comparing different EP-like algorithms.\check{june8,may27}\\
+Below, we introduce the algorithm as a damped fixed-point iteration in the natural parameter space. This will prove useful when comparing different EP-like algorithms.\check{june8,may27}
 
 We showed that the basic EP algorithm could be interpreted as a kind of fixed point iteration targeting the Local Moment Matching Conditions \eqref{eq:LMMC} (LMMC). At a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter should therefore be updated such as to verify $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
 %
@@ -65,20 +65,20 @@ We showed that the basic EP algorithm could be interpreted as a kind of fixed po
 	\theta &\leftarrow & \nabla A^{\star}(\mu_i).	\label{eq:ep-np-update}
 }
 %
-In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}.\add{would be good to come back further to this when considering the gaussian case (inversion of noisy matrix), mention it in discussion} In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \citep{heskes03}. Damping \eqref{eq:ep-np-update} leads to the modified update:\check{may11}
+In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}.\add{would be good to come back further to this when considering the gaussian case (inversion of noisy matrix), mention it in discussion, cf also earlier in example} In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \citep{heskes03}. Damping \eqref{eq:ep-np-update} leads to the modified update:\check{may11}
 %
 \eqa{
 	\theta &\leftarrow & (1-\kappa)\theta + \kappa \nabla A^{\star}(\hat\mu_i),\label{eq:damped-update-np}
 }
 %
-where $\kappa \in(0,1]$ is the damping parameter and $\hat\mu_i$ is an estimator for $\mu_i$. As in the gradient descent algorithm, the damping parameter can be decreased over iterations according to a schedule in order to further help convergence.\add{We will explore the connection to GD in more details later}
+where $\kappa \in(0,1]$ is the damping parameter and $\hat\mu_i$ is an estimator for $\mu_i$. As in the gradient descent algorithm, the damping parameter can be decreased over iterations according to a schedule in order to further help convergence.\add{We will explore the connection to GD in more details later, add link}
 The damped update \eqref{eq:damped-update-np} can also be expressed in terms of the $\omega_i$ (parameter of the factor approximation $\tilde t_i$) and the $\lambda_i$ (parameter of the corresponding cavity):\check{june8}
 %
 \eqa{
 	\omega_i &\leftarrow& \omega_i + \kappa(\nabla A^{\star}(\hat\mu_i)-\lambda_i).\label{eq:damped-update-np-w}
 }
 %
-One can also swap the role of $\lambda_i$ and $\omega_i$ and obtain another valid damped update mechanism. Both forms are amenable to parallelisation since they can be expressed solely in terms of local parameters attached to the $i$th compute node.\add{review statement, potentially in lambdai less stable because cavity collapse but should check if can explain why}\check{june8,may27}\\
+One can also swap the role of $\lambda_i$ and $\omega_i$ and obtain another valid damped update mechanism. Both forms are amenable to parallelisation since they can be expressed solely in terms of local parameters attached to the $i$th compute node.\add{review statement, potentially in lambdai less stable because cavity collapse but should check if can explain why}\check{june8,may27}
 
 The basic SMS algorithm operates synchronous updates.
 At step $k$, each node receives the current global parameter $\theta$ and computes the parameter corresponding to the current tilted distribution $q_i$ i.e.: $\lambda_i=(\theta-\omega_i)$. Each node then forms a Monte Carlo estimator $\hat\mu_i$ of $\E_{q_i}[\phi(X)]$, computes the damped step \eqref{eq:damped-update-np-w} and returns the updated local parameter $\omega_i$ to the master node. 
@@ -112,7 +112,7 @@ It is easy to see how this algorithm can be altered to accommodate asynchronous 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damped updates in the mean parameter space}
 
-The main issue with the SMS algorithm which we will expose in more details in the experiments\add{do it and refer} is that it performs the projection of the noisy estimator $\hat\mu_{i}$ \emph{before} the damping step. Since this projection operator is likely non-linear and potentially numerically unstable this can hinder the performances of the algorithm. In the case of the Gaussian distribution for instance, the projection effectively requires the inversion of a noisy matrix (see \eqref{proj-mp-np-gauss}). It seems therefore sensible to suggest damping the estimator \emph{before} it gets projected. This leads to going from \eqref{eq:damped-update-np} to\check{june11}
+The main issue with the SMS algorithm which we will expose in more details in the experiments\add{link} is that it performs the projection of the noisy estimator $\hat\mu_{i}$ \emph{before} the damping step. Since this projection operator is likely non-linear and potentially numerically unstable this can hinder the performances of the algorithm. In the case of the Gaussian distribution for instance, the projection effectively requires the inversion of a noisy matrix (see \eqref{proj-mp-np-gauss}). It seems therefore sensible to suggest damping the estimator \emph{before} it gets projected. This leads to going from \eqref{eq:damped-update-np} to\check{june11}
 %
 \eqa{
 \nabla A(\theta) &\leftarrow& (1-\kappa)\nabla A(\theta) + \kappa \hat\mu_{i}
@@ -125,7 +125,7 @@ or, equivalently, to
 \label{eq:damped-update-mp}
 }
 %
-Of course, if $\kappa=1$ (no damping), both approaches are equivalent. Anyone familiar with convex optimisation will notice the similarity with the \emph{mirror-descent algorithm} \citep{nemirovski83, beck03}. We will explore and discuss this similarity later.\add{do it} 
+Of course, if $\kappa=1$ (no damping), both approaches are equivalent. Anyone familiar with convex optimisation will notice the similarity with the \emph{mirror-descent algorithm} \citep{nemirovski83, beck03}. We will explore and discuss this similarity later.\add{add link to appendix if necessary} 
 These updates can also be expressed in terms of updates of the local parameters:
 %
 \eqa{
@@ -134,18 +134,17 @@ These updates can also be expressed in terms of updates of the local parameters:
 }
 %
 As in \eqref{eq:damped-update-np-w} the role of $\omega_{i}$ and $\lambda_{i}$ can be swapped to obtain another valid damped update mechanism. 
-The update \eqref{eq:damped-update-mp} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the mean-parameter variant which we will call \emph{MP-SMS}.\todo{maybe think about naming (+b for cavity or whatever)}
+The update \eqref{eq:damped-update-mp} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the mean-parameter variant which we will call \emph{MP-SMS}.\add{nomenclature for EP algorithms? (cavity/local, parallel/serial, synch/asynch, MP/NP)}
 
  
 %We will show below how similar updates can be obtained by considering the so-called \emph{EP-Energy} running a Newton-Raphson-like update. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The EP energy perspective}
-\todofr{
-Cite minka, mention energy, explain that it's not really something to increase or decrease but rather want stationary points and that's it, show that if write the KL and get rid of a part then get this energy (essentially use that to show that it's a bit pointless)}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsubsection{Obtaining the energy}
-In \citet{minka01c}, the author presents the LMMC \eqref{eq:LMMC} as a min-max problem of an objective function he calls the EP energy function.
+In \citet{minka01c}, the author presents the LMMC \eqref{eq:LMMC} as a min-max problem of an objective function the author calls the \emph{EP energy function}.
 One way to obtain this is to decompose the KL divergence between $p$ and $q$. 
 %First, let us write explicitly the objects considered:\add{This is now REDUNDANT with start}
 %\begin{itemize}\itsepa
@@ -214,7 +213,7 @@ where $\theta_{-i}:=\eta\sum_{j\neq i}\lambda_j$ and $\eta=(K-1)\inv$. A common 
 && {\eta^{2}\over 2}\scal{\lambda_i^{\text{new}}-\lambda_i, \nabla^{2} \mathcal F_i(\lambda_i)(\lambda_i^{\text{new}}-\lambda_i)} .\label{ep-energy-newton}
 }
 %
-Taking the gradient in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a Newton-like step. However, this requires the inversion of the Hessian of $\mathcal F_i$ which may be expensive and numerically unstable to compute. An alternative can be obtained by observing that, if $\nabla^{2}\mathcal F_i(\lambda_i)$ is positive definite,\add{an argument can probably be made that this will likely be the case since if variance of q does not encompass that of qi we're in trouble (?) argue that variance can be decreased but not increased (?) at start should be ok, towards end, can see crappy stuff which may be caused by this.} then the quadratic term in the approximation is simply a measure of discrepancy between $\lambda_i^{\text{new}}$ and $\lambda_i$. As in the mirror-descent algorithm \citep{nemirovski83, beck03} we could therefore try to replace it by a Bregman divergence.\add{Should MD be clarified somewhere? $f(x)=f(x_0)+\scal{x-x_0,\nabla f(x_0)}+B_\varphi(x,x_0)$..} In our case, it is convenient to consider the Bregman divergence induced by the log-partition function $A$ itself;\footnote{Recall that $B_A(\lambda_i^{\text{new}},\lambda_i):=A(\lambda_i^{\text{new}})-A(\lambda_i)-\scal{\lambda_i^{\text{new}},\nabla A(\lambda_i)}$.} this leads to the alternative approximation:
+Taking the gradient in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a Newton-like step. However, this requires the inversion of the Hessian of $\mathcal F_i$ which may be expensive and numerically unstable to compute. An alternative can be obtained by observing that, if $\nabla^{2}\mathcal F_i(\lambda_i)$ is positive definite,\add{an argument can probably be made that this will likely be the case since if variance of q does not encompass that of qi we're in trouble (could test this), could in fact explain problems towards ``end'' of algorithm} then the quadratic term in the approximation is simply a measure of discrepancy between $\lambda_i^{\text{new}}$ and $\lambda_i$. As in the mirror-descent algorithm \citep{nemirovski83, beck03} we could therefore try to replace it by a Bregman divergence.\add{Should MD be clarified somewhere? $f(x)=f(x_0)+\scal{x-x_0,\nabla f(x_0)}+B_\varphi(x,x_0)$..} In our case, it is convenient to consider the Bregman divergence induced by the log-partition function $A$ itself;\footnote{Recall that $B_A(\lambda_i^{\text{new}},\lambda_i):=A(\lambda_i^{\text{new}})-A(\lambda_i)-\scal{\lambda_i^{\text{new}},\nabla A(\lambda_i)}$.} this leads to the alternative approximation:
 %
 \eqa{
 	\mathcal F_i(\lambda_i^{\text{new}}) &\approx&

@@ -2,7 +2,7 @@
 % -------------------------------------------------------------
 \subsubsection{Variational inference in the exponential family}
 %
-The premises of both ADF and EP is performing variational inference in the exponential family $\mathcal F_{\phi}(\mathcal X)$.\add{check EP/ADF introduced} In the previous point, we showed that a target distribution $p$ could be associated with a point $\mu_p\in\mathcal M$ with $\mu_p=\E_{p}[\phi(X)]$ for a sufficient statistic $\phi$. Further, we showed that if the family is minimal and if $\mu_p\in\mathcal M^{\star}$, the mean parameter could be directly associated to a distribution in $\mathcal F_{\phi}(\mathcal X)$ with parameter $\theta$ given by $\nabla A^{\star}(\mu_p)$. It is therefore natural to consider this distribution $q_{\theta}$ as potentially forming a good approximation to $p$ in $\mathcal F_{\phi}(\mathcal X)$.\check{may15,april24}
+The premises of both ADF and EP is performing variational inference in the exponential family $\mathcal F_{\phi}(\mathcal X)$.\add{check EP/ADF abbrev introduced} In the previous point, we showed that a target distribution $p$ could be associated with a point $\mu_p\in\mathcal M$ with $\mu_p=\E_{p}[\phi(X)]$ for a sufficient statistic $\phi$. Further, we showed that if the family is minimal and if $\mu_p\in\mathcal M^{\star}$, the mean parameter could be directly associated to a distribution in $\mathcal F_{\phi}(\mathcal X)$ with parameter $\theta$ given by $\nabla A^{\star}(\mu_p)$. It is therefore natural to consider this distribution $q_{\theta}$ as potentially forming a good approximation to $p$ in $\mathcal F_{\phi}(\mathcal X)$.\check{may15,april24}
 %
 %\begin{figure}[!h]
 %    \center
@@ -29,14 +29,23 @@ Assuming $\mathbf P_{\phi}[p] \in \Omega$, $q_{\theta}$ is a proper distribution
 %
 It will also be convenient to use the following abuse of notation: for an unnormalised distribution $p_{u}$ with some normalisation constant $Z_{p_{u}}\inv$ we will write $\mathbf P_{\phi}[p_{u}]$ to implicitly mean $\mathbf P_{\phi}[Z_{p_{u}}\inv p_{u}]$.\check{may15,april24}
 
-The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu_p=\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu_p$, we need to be able to apply the inverse mapping $\nabla A^{\star}(\mu_p)$. We will introduce below contexts in which the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing the inverse mapping $\nabla A^{\star}$ can be done explicitly or is cheap to approximate. For continuous state spaces, it is overwhelmingly the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix.\add{probably add a section here on how to compute forward backward operator, maybe put this in appendix. Also cite lots of stuff that uses the Gaussian, if you find anything that doesn't...}\check{may15,april24} 
+The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu_p=\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu_p$, we need to be able to apply the inverse mapping $\nabla A^{\star}(\mu_p)$. We will introduce below contexts in which the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing the inverse mapping $\nabla A^{\star}$ can be done explicitly or is cheap to approximate. For continuous state spaces, it is overwhelmingly the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix.\add{maybe add explicit comment here for the gaussian + discuss briefly stability}\check{may15,april24} 
 %
 % ----------------------------------------
 \subsubsection*{Online Bayesian Learning and Assumed Density Filtering}
 %
-Let us consider the context of online Bayesian learning where one is interested in the evolution of a posterior distribution $p(x\st y_{1:t})$ given observed \iid\add{notations iid} data points $y_{1:t}$ up to current time $t$ and a new \iid data point $y_{t+1}$. The new posterior is given directly by Bayes rule with $p(x\st y_{1:t+1})\propto p(y_{t+1}\st x) p(x\st y_{1:t})$. In \citet{opper98}, the author considers that the exact posteriors are intractable but suggests constructing a sequence of approximations in the exponential family $\mathcal F_{\phi}(\mathcal X)$. Using the notations from the previous point, the algorithm corresponds to a sequence of iteration of the form
-\eqa{	\theta_{t+1} &=& \mathbf P_{\phi}[p(y_{t+1}\st \cdot)q_{\theta_{t}}],	\label{adfonline}}
-where, at the first step, $q_{\theta_{0}}$ is replaced by the prior $\pi_{0}$. In words, the posterior up to time $t$ is approximated by the exponential family distribution $q_{\theta_{t}}$ which then serves as prior to form an approximate posterior $p(y_{t+1}\st x)q_{\theta_{t}}(x)$. Given that this approximate posterior is not necessarily in the exponential family, it needs to be projected as per \eqref{adfonline}.\check{april27} At time $t+1$, the distribution $q_{\theta_{t+1}}$ can be now interpreted as an approximation of the posterior distribution given all the data up to that time or 
+Let us consider the context of online Bayesian learning where one is interested in the evolution of a posterior distribution $p(x\st y_{1:t})$ given observed \iid data points $y_{1:t}$ up to current time $t$ and a new \iid data point $y_{t+1}$. 
+The new posterior is given directly by Bayes rule with $p(x\st y_{1:t+1})\propto p(y_{t+1}\st x) p(x\st y_{1:t})$. 
+In \citet{opper98}, the author considers that the exact posteriors are intractable but suggests constructing a sequence of approximations in the exponential family $\mathcal F_{\phi}(\mathcal X)$. 
+Using the notations from the previous point, the algorithm corresponds to a sequence of iteration of the form
+%
+\eqa{	
+	\theta_{t+1} &=& \mathbf P_{\phi}[p(y_{t+1}\st \cdot)q_{\theta_{t}}],	\label{adfonline}
+}
+%
+where, at the first step, $q_{\theta_{0}}$ is replaced by the prior $\pi_{0}$. In words, the posterior up to time $t$ is approximated by the exponential family distribution $q_{\theta_{t}}$ which then serves as prior to form an approximate posterior $p(y_{t+1}\st x)q_{\theta_{t}}(x)$. 
+Given that this approximate posterior is not necessarily in the exponential family, it needs to be projected as per \eqref{adfonline}.\check{april27} 
+At time $t+1$, the distribution $q_{\theta_{t+1}}$ can be now interpreted as an approximation of the posterior distribution given all the data up to that time or 
 %
 \eqa{	q_{\theta_{t+1}}(x) \esp\approx\esp p(x) &\propto& \pi_{0}(x)\prod_{s=1}^{t+1}p(y_{s}\st x).
 }
@@ -97,4 +106,4 @@ In Expectation Propagation, we denote by $q_{-i}\propto q_{\theta}/\tilde t_{i}$
 	(\text{LMMC})\qquad	\E_{q_{i}}[\phi(X)]=\E_{q_{\theta}}[\phi(X)], \quad i=1,\dots,K.\label{eq:LMMC}
 } 
 %
-These conditions can be interpreted as a relaxation of the GMMC \eqref{eq:GMMC} and the EP algorithm can be interpreted as a fixed point algorithm targeting the LMMC.\check{may15}\add{depending on how much you discuss in SNEP, link here to that part and say will discuss in more details.}\add{maybe add ``expectation consistent inference'' the stuff by Heskes etc}
+These conditions can be interpreted as a relaxation of the GMMC \eqref{eq:GMMC} and the EP algorithm can be interpreted as a fixed point algorithm targeting the LMMC.\add{depending on how much you discuss in SNEP, link here to that part and say will discuss in more details.}\check{may15}

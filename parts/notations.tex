@@ -2,9 +2,9 @@
 
 \chapter*{Notations}
 
-We list here the notations used throughout the document that are commonly used in computational statistics. Non-standard notations will be introduced in the document explicitly.
+We list here notations used throughout the document that are considered to be commonly used in computational statistics. Non-standard notations will be introduced in the document explicitly.
 
-\subsubsection{Vectors, matrices and functions} 
+\subsection*{Vectors, matrices and functions} 
 For a vector $x\in\R^{d}$ we write $\norm{x}{p}$ the $p$-norm of $x$ with $\norm{x}{p}^{p}=\sum_{i=1:d}\abs{x_{i}}^{p}$ for $p\in[1,\infty)$. 
 For $x,y\in\R^{d}$, we write $\scal{x,y}=\sum_{i=1:n}x_{i}y_{i}$ the inner product of $x$ and $y$. 
 We denote the transpose of a matrix $A\in\R^{d\times d}$ by $A\transp$. $A$ is said to be semi positive definite if $\scal{x,Ax}\ge 0$ for all $x\in\R^{d}$ and positive definite if the inequality holds strictly for all $x\neq 0$. We denote by $\mathbb S_+^{d}\subset \mathbb R^{d\times d}$ the set of symmetric positive definite matrices and by $\mathbb S_-^{d}$ the set of matrices $B$ such that $-B\in\mathbb S_+^{d}$.
@@ -12,10 +12,16 @@ For a real-valued measurable function $f$ on a set $\mathcal X$, we write $\|f\|
 We write $L^{1}(\mathcal X)$ the set of functions such that $\|f\|_{1}<\infty$ and $\mathcal P(\mathcal X) \subset L^{1}(\mathcal X)$ denotes the restriction to nonnegative functions integrating to one (probability density functions). 
 For a real-valued, differentiable function $f$, we write $\nabla f$ its gradient and $\nabla^{2} f$ its Hessian provided $f$ is twice differentiable.\check{jun21,may10}
 %
-\subsubsection{Probabilities and expected values}
-We consider continuous sample spaces $\mathcal X\subseteq \R^{n}$ and, by default, we consider the associated Borel $\sigma$-algebra. Correspondingly, we use the shorthand $(\mathcal X,\P)$ to denote a probability space with $\P$ the probability measure. We consider probability measures that admit a probability density function $p$ with respect to a base measure $\nu$ with therefore $\P(x\in A)=\int_{A}p(x)\nudx$ for any open subset $A\subset \mathcal X$. In particular, $\mathcal N(\cdot; \mu,\Sigma)$ denotes the multivariate normal distribution function with mean $\mu\in \R^{d}$ and covariance matrix $\Sigma\in\mathbb S^{d}_+$. For such a probability space and a vector-valued mapping $\varphi:\mathcal X\to\R^{d}$, we write the expectation and the covariance matrix of $\varphi$ with respect to $p$ as $(\E_{p}[\varphi(X)])_{i}=\int_{\mathcal X}\varphi_{i}(x)p(x)\nudx$ and $\V_{p}[\varphi(X)]=\E_{p}[\varphi(X)\varphi(X)^{t}]-\E_{p}[\varphi(X)]\E_{p}[\varphi(X)]^{t}$ respectively. We write $\KL{p,q}=\E_{p}[\log p(X)]-\E_{p}[\log q(X))]$ the Kullback-Leibler divergence between two probability distribution functions $p$ and $q$ on $\mathcal X$. We write $X\sim p$ to denote a random variable associated to $p$ and $\{X^{(i)}\}_{i=1}^{N}\simiid p$ for a set of independent such random variables. \check{jun21,june15, june8,april27}
+\subsection*{Probabilities and expected values}
+We consider continuous sample spaces $\mathcal X\subseteq \R^{n}$ and, by default, we consider the associated Borel $\sigma$-algebra. 
+Correspondingly, we use the shorthand $(\mathcal X,\P)$ to denote a probability space with $\P$ the probability measure. 
+We consider probability measures that admit a probability density function $p$ with respect to a base measure $\nu$ with therefore $\P(x\in A)=\int_{A}p(x)\nudx$ for any open subset $A\subset \mathcal X$. 
+In particular, $\mathcal N(\cdot; \mu,\Sigma)$ denotes the multivariate normal distribution function with mean $\mu\in \R^{d}$ and covariance matrix $\Sigma\in\mathbb S^{d}_+$. 
+For such a probability space and a vector-valued mapping $\varphi:\mathcal X\to\R^{d}$, we write the expectation and the covariance matrix of $\varphi$ with respect to $p$ as $(\E_{p}[\varphi(X)])_{i}=\int_{\mathcal X}\varphi_{i}(x)p(x)\nudx$ and $\V_{p}[\varphi(X)]=\E_{p}[\varphi(X)\varphi(X)^{t}]-\E_{p}[\varphi(X)]\E_{p}[\varphi(X)]^{t}$ respectively. 
+We write $\KL{p,q}=\E_{p}[\log p(X)]-\E_{p}[\log q(X))]$ the Kullback-Leibler divergence between two probability distribution functions $p$ and $q$ on $\mathcal X$. We write $X\sim p$ to denote a random variable associated to $p$ and $\{X^{(i)}\}_{i=1}^{N}\simiid p$ for a set of independent such random variables.\check{jun21,june15,june8,april27}
 %
-\subsubsection{Convex analysis}
+
+\subsection*{Convex analysis}
 Let $B\subset\R^{n}$ denote the Euclidean unit ball with $B=\{x\in\R^{n}\mid \|x\|_{2}\le 1\}$. For any subset $C\subseteq\R^{n}$, we write $\mathrm{int}\,(C)$ the interior of $C$ with $\mathrm{int}\,(C)=\{x\in C \mid \exists \epsilon>0, x+\epsilon B \subset C\}$. Correspondingly we write $\mathrm{cl}(C)$ the closure of $C$ with $\mathrm{cl}(C) = \cap\{C+\epsilon B\st \epsilon>0\}$. A set $C$ is convex if for any $x,y\in C$, $(1-\lambda)x+\lambda y\in C$ for all $\lambda\in(0,1)$. Let $\Omega$ be an arbitrary connected and nonempty subset of $\R^{n}$; a function $f:\Omega\to\R$ is said to be convex if $f((1-\lambda)x+\lambda y)\le (1-\lambda)f(x)+\lambda f(y)$. For an arbitrary function $f:\Omega\to\R$, we denote by $f^{\star}:\R\to \R\cup\{+\infty\}$ the convex-conjugate of $f$ with $f^{\star}(y)=\sup_{y\in \Omega}[\scal{x,y}-f(x)]$. The set of minimisers of a function $f$ on a open, nonempty set $C$ is denoted by $\arg\min_{x\in C}\,f(x)$ i.e. the set $\pab{x\in C\mid f(y)\ge f(x), \,\forall y\in C}$. For a differentiable, strictly convex function $\varphi:C\to\R$, we denote by $B_\varphi(x,y)$ the Bregman divergence associated to $\varphi$ between $x$ and $y$ in $C$ with $B_\varphi(x,y)=\varphi(x)-\varphi(y)-\scal{x-y,\nabla \varphi(y)}$.  \check{jun21,may13}
 %If the function $f$ is convex and differentiable on $C$ we call \emph{first-order condition} the fact that this set is equivalent to the set of points $x\in C$ such that $\nabla f(x)=0$.
 
@@ -58,31 +64,34 @@ Let $B\subset\R^{n}$ denote the Euclidean unit ball with $B=\{x\in\R^{n}\mid \|x
 %$\V_{p}[\phi]$ 			& \dred{variance of $\phi(X)$} if $X\sim p(\cdot)$  
 %
 %\end{tabular}
-\setlength{\tabcolsep}{6pt} % default
 
-\subsubsection*{Abbreviations}
-\add{add reference of primary definition, may be nice (also checks that actually used)}
+\setlength{\tabcolsep}{6pt} % default
+\subsection*{Abbreviations}
+We list below abbreviations that are used in this document by alphabetical order. 
+\add{add link to primary definition, check all are used}
 \setlength{\tabcolsep}{12pt}
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{ll}
-BIF 	& Backward Information Filter\\
-BP/LBP 	& (Loopy) Belief Propagation\\
-EP	 	& Expectation Propagation\\
-EPBP 	& Expectation Particle Belief Propagation\\
-ESS 	& Effective Sample Size\\
-FFBS 	& Forward Filtering Backward Smoothing \\
-IPP 	& Inhomogeneous Poisson Process\\
-HMM 	& Hidden Markov Model\\
-MCMC 	& Markov Chain Monte Carlo\\
-(L/G)MMC& Local/Global Moment Matching Conditions (equations \ref{eq:LMMC},~\ref{eq:GMMC})\\
-MRF 	& Markov Random Field (point \ref{subsection: mrf})\\
-NBP 	& Nonparametric Belief Propagation\\
-PBP 	& Particle Belief Propagation\\
-RMS(E) 	& Root Mean Squared (Error)\\
-SMC 	& Sequential Monte Carlo\\
-SMS 	& Sampling via Moment Sharing\\
-TFS 	& Two Filter Smoothing\\ 
-
-\end{tabular}
+\begin{longtable}{ll}
+BIF 		& Backward Information Filter\\
+BB$\alpha$	& BlackBox $\alpha$-divergence minimisation algorithm\\
+BP/LBP 		& (Loopy) Belief Propagation\\
+EP	 		& Expectation Propagation\\
+EPBP 		& Expectation Particle Belief Propagation\\
+ESS 		& Effective Sample Size\\
+FFBS 		& Forward Filtering Backward Smoothing \\
+IPP 		& Inhomogeneous Poisson Process\\
+HMM 		& Hidden Markov Model\\
+MCMC 		& Markov Chain Monte Carlo\\
+(L/G)MMC	& Local/Global Moment Matching Conditions (equations \ref{eq:LMMC},~\ref{eq:GMMC})\\
+MRF 		& Markov Random Field (point \ref{subsection: mrf})\\
+NBP 		& Nonparametric Belief Propagation\\
+PBP	 		& Particle Belief Propagation\\
+RMS(E) 		& Root Mean Squared (Error)\\
+SMC 		& Sequential Monte Carlo\\
+SMS 		& Sampling via Moment Sharing algorithm\\
+SEP 		& Stochastic EP\\
+SNEP		& Stochastic Natural gradient EP\\
+TFS 		& Two Filter Smoothing\\ 
+\end{longtable}
 \setlength{\tabcolsep}{6pt} % default
 \newpage

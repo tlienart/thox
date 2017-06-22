@@ -15,6 +15,17 @@
 * discuss why only consider marginals (see same discussion in W&J08), discuss alternatives (SMC on GM, Naesseth etc)
 * **style**: try to remove "we do this" then "we do that" which is a bit too informal. (leave that kind of comments to supervisors as well)
 
+### Conventions
+
+* use `d` for dimension of parameters
+* use `n` for dimension of points
+* use `N` for number of points
+* use `K` for number of factors
+* use `theta` for global approximation
+* use `lambda` for cavity parameters
+* use `omega` for local parameters
+* use `nu` for base measure
+
 ### Formatting
 
 * pick notation for messages (with/without arrow), use it throughout. Leaning for without. Requires a comma in HMM setting. Arrows are confusing for pre-message.
