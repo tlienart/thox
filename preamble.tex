@@ -3,11 +3,25 @@
 % DOC
 \documentclass[openright,a4paper,12pt,twoside]{report}
 \usepackage[
-	includehead,
-	hmargin={3.6cm, 2.6cm},
-	vmargin={2.5cm,2.7cm},
-	headsep=.8cm,
-	footskip=1.2cm]{geometry}
+	top = 3.6cm,
+	bottom = 3.6cm,
+	left=3.6cm,
+	right=2.6cm,
+	%includehead,
+	%hmargin={3.6cm, 2.6cm},
+	%vmargin={2.5cm,3.5cm},
+	%headsep=.8cm,
+	%footskip=.5cm
+	]{geometry}
+\setlength{\footskip}{1.5cm}
+
+% spacing between hline and footnote
+\makeatletter
+\def\footnoterule{\kern-8\p@
+  \hrule \@width 2in \kern 7.6\p@} % the \hrule is .4pt high
+\makeatother
+% force bottom of footnote
+\usepackage[bottom]{footmisc}
 
 % LINE SPACING
 \usepackage{setspace}

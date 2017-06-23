@@ -1,29 +1,62 @@
 % !TEX root = ../thesis.tex
 
-\section{Monte Carlo estimators}
-
-\subsection{Context}
-
-In the first case,\add{what first case} one is interested in computing the expected value of a test function $\varphi$ with respect to a distribution $\pi:\mathbb R^{d} \to \mathbb R_+$ i.e.: $I:=\E_\pi[\varphi(X)]$. Assuming it can't be computed analytically, a general approach is to consider a quadrature rule of the form:\add{be consistent with $n$ number of points $p$ dimensions etc.}
+\section{Monte Carlo and Sequential Monte Carlo}
+\subsection{From quadrature to sampling}
+We consider the problem of computing the expected value of a test function $\varphi$ with respect to a distribution $p\in\mathcal P(\mathcal X)$ i.e.: $I:=\E_p[\varphi(X)]$. Assuming it can't be computed analytically, a general approach is to consider a quadrature rule of the form:\add{be consistent with $n$ number of points $p$ dimensions etc.}
 %
 \eqa{
 	I\esp\approx\esp \widehat I_n &=& \sum_{i=1}^{n} w(X^{(i)}) \varphi(X^{(i)})
 }
 %
-for some points $X^{(i)}\in\mathcal X$ and corresponding weights $w(X^{(i)})\in\mathbb R_+$. In low dimensions, we can consider deterministic quadrature rules such as the Gauss-Hermite quadrature. However, as the dimensionality increases, these deterministic rules tend to perform poorly even for a large number of integration points (this is related to what Bellman called the \emph{curse of dimensionality}). In that case, it is common to fall back to Monte Carlo integration with
+for some points $X^{(i)}\in\mathcal X$ and corresponding weights $w(X^{(i)})\in\mathbb R_+$. 
+When the number of dimensions is low, we can consider deterministic quadrature rules such as the Gauss-Hermite quadrature. 
+However, as the dimensionality increases, the performances of these deterministic rules become catastrophic even for a large number of integration points.\footnote{An effect related to what Bellman called the ``curse of dimensionality'' in dynamic programming \citep{bellman57}.} 
+In such cases, a broadly studied approach is to consider Monte Carlo integration with
 %
 \eqa{	
-	X^{(i)}\esp \simiid\esp \pi(\cdot),\quad\text{and}\quad w(X^{(i)})\spe n^{-1}. 	
+	X^{(i)}\esp \simiid\esp p,\quad\text{and}\quad w(X^{(i)})\spe n^{-1}. 	
 }
 %
-The strong law of large numbers then indicates that $\widehat I_n\to I$ almost surely with approximation error scaling like $\mathcal O(n^{-1/2})$ independently of the dimensionality of the problem. This is to be compared with deterministic rules which typically have approximation error scaling like $\mathcal O(n^{-\alpha/d})$ for a fixed $\alpha>0$ depending on the quadrature rule \citep{caflisch98}.
+The strong law of large numbers then indicates that $\widehat I_n\to I$ almost surely with approximation error scaling like $\mathcal O(n^{-1/2})$ independently of the dimensionality of the problem. This is to be compared with deterministic rules which typically have approximation error scaling like $\mathcal O(n^{-\alpha/d})$ for a fixed $\alpha>0$ depending on the quadrature rule \citep{caflisch98}. The problem then becomes one of drawing iid.\ samples from $p$ which is often also an intractable problem.
 
-The problem then becomes one of drawing iid.\ samples from $\pi$ which is often also an intractable problem. In \emph{importance sampling} (IS)\margnote{IS}, samples are drawn from a \emph{proposal distribution}\margnote{proposal} $q\approx \pi$ and the quadrature weights are adjusted to reflect that:
+%%%%%%%
+\subsection{Sequential importance sampling}
+For this point, we refer to the note by \citet{doucet11} and also to \citet[chapter 3.3 and 14.3]{robert04}.
+
+In \emph{importance sampling} (IS)\margnote{IS}, samples are drawn from a \emph{proposal distribution}\margnote{proposal} $q$ that is easy to sample from (for example, a Gaussian) and is similar to $p$. 
+The quadrature weights are then adjusted to reflect that the samples are not drawn from the true distribution:
 %
 \eqa{
-	X^{(i)}\esp \simiid\esp q(\cdot), \quad\text{and}\quad w(X^{(i)})\spe {\pi(X^{(i)})\over n q(X^{(i)})}.
+	X^{(i)}\esp \simiid\esp q(\cdot), \quad\text{and}\quad w(X^{(i)})\spe {p(X^{(i)})\over n q(X^{(i)})}.
 } 
 %
-Provided the support of $q$ englobes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$ and that $\E_q[\abs{\varphi(X)}w(X)]$ is bounded, the importance sampling estimator is unbiased and consistent.\add{cite casella or doucet or something}\check{june21apr1}
+Provided the support of $q$ englobes that of $p$ i.e., $p(x)>0\Rightarrow q(x)>0$, the resulting \emph{importance sampling estimator} is consistent.\check{june21apr1}
 
+In the context of HMM, we are often interested in estimating a sequence of target distributions $\{p_{t}(x_{1:t})\}_{t=1}^{T}$ which can be decomposed as 
+%
+\eqa{
+	p_{t}(x_{1:t}) &=& p_{t}(x_{t}\st x_{1:t-1})p_{t-1}(x_{1:t-1}).\nn
+}
+%
+This lead to the development of \emph{sequential Monte Carlo} (SMC) methods. The principle is the same as that of importance sampling except that a different proposal is considered at every time $t$ taking into account the previous draw of particles and the evolution of the system:
+%
+\eqa{
+	q_{t}(x_{1:t}) &=& q_{t}(x_{t}\st x_{1:t-1})q_{t-1}(x_{1:t-1}).	\nn
+}
+%
+Following this form, new samples or \emph{particles} $X^{(i)}_t$ can be drawn from $q_{t}(x_{t}\st X^{(i)}_{1:t-1})$ and the weights corresponding to the trajectories $\{X^{(i)}_{1:t}\}$ then need to be updated by a factor $\alpha^{(i)}_{t}$ with
+%
+\eqa{
+	\alpha^{(i)}_{t} := {\pi_{t}(X^{(i)}_{1:t} )\over \pi_{t-1}(X^{(i)}_{1:t-1}) q_{t}(X^{(i)}_{t}\st X^{(i)}_{1:t-1})}.
+}
+%
+The variance of an IS estimator is directly related to the variance of the importance weights. In order to reduce the increase of variance induced by the sequential IS procedure, the proposal at time $t$ should be such that the variance of the update factors $\alpha_t$ is small. In particular, the \emph{optimal proposal} keeps it at zero with
+\eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{1:t-1}) &:=& \pi_{t}(x_{t}\st x_{1:t-1}).	\label{optimal proposal}}
+However, we can't typically sample easily from the transition density and consequently have to resort to approximating distributions.\add{check transition density introduced} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Particle filtering}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Particle smoothing}
 
