@@ -55,8 +55,39 @@ The variance of an IS estimator is directly related to the variance of the impor
 However, we can't typically sample easily from the transition density and consequently have to resort to approximating distributions.\add{check transition density introduced} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Particle filtering}
+\subsection{\dred{Particle filtering}}
+In the filtering problem\add{check introduced earlier, link} on a HMM, the target densities are $\pi_{t}(x_{1:t})=p(x_{1:t}\st y_{1:t})$ and their marginals. The incremental update factors are given by
+\eqa{ \alpha_t(x_{1:t}) &=& {p(x_{1:t}\st y_{1:t})\over p(x_{1:t-1}\st y_{1:t-1})q_t(x_t\st x_{1:t-1})} 	\nn\\
+	&=& {p(x_t,y_t\st x_{1:t-1},y_{1:t-1})p(x_{1:t-1}\st y_{1:t-1})p(y_{1:t-1})\over p(x_{1:t-1}\st y_{1:t-1})q_t(x_t\st x_{1:t-1})p(y_{1:t})}  \nn\\
+	&\propto& p(y_t\st x_t)p(x_t\st x_{t-1}) }
+Where we exploited the conditional dependence structure of a HMM. Consequently, the optimal proposal is
+\eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{t-1}) &\propto& p(y_{t}\st x_{t})p(x_{t}\st x_{t-1})	, \label{particle filter OID}}
+which we could also have obtained from applying \eqref{optimal proposal}. A skeleton of the algorithm is given below and produces a weighted set of particles $\{X^{(i)}_{1:t},w^{(i)}_{1:t}\}_{i=1}^{N}$ with corresponding empirical distribution $\hat \pi_{t}(x_{1:t})$. 
+%
+%
+\begin{algorithm}[!h]\small
+	\caption{\dblue{\emph{\small Skeleton of a basic particle filter}}}
+	\begin{algorithmic}[1]
+		\State sample $X_{1}^{(i)}\sim q_{1}(\cdot)$ %for $i=1,\dots,N$	%\Comment{\emph{Initialization}}
+		\State compute the weights $w_{1}(X^{(i)}_{1})\propto {\mu( X^{(i)}_{1})p(y_{1}\st X^{(i)}_{1})/ q_{1}(X^{(i)}_{1})}$
+%		\State resample: $\{\X^{(i)}_{1},W^{(i)}_{1}\}\rightarrow\{\overline \X^{(i)}_{1},N\inv\}$\Comment{\emph{Using some resampling scheme}}\vspace*{.2cm}
+		\For{$t=2:T$}
+			\State sample $X^{(i)}_{t}\sim q_{t}( \cdot \st X^{(i)}_{t-1})$ with $q_{t}\approx q_{t}^{\text{opt}}$
+			\State update and normalise the weights $w^{(i)}_{t}\propto\alpha^{(i)}_{t}w^{(i)}_{t-1}$
+		\EndFor
+	\end{algorithmic}
+\end{algorithm}
 
+\noi\hspace{0pt}\margnote{PF complexity}The complexity of the above algorithm is $\mathcal O(TN)$. Indeed, at each time step $t$, one needs to sample $N$ particles and compute their corresponding weights which has linear complexity in the number of particles.\\
+
+\noi\textbf{Remark}: it is often difficult to sample directly from the optimal proposal. In the context of filtering, a frequently used alternative is the \margnote{bootstrap prop.}\emph{bootstrap proposal} with 
+\eqa{q^{\text{bs}}(x_{t}\st x_{t-1})&:=&p(x_{t}\st x_{t-1}),}
+which is often easier to sample from. In that case, the update factor simply reduces to $\alpha^{(i)}_t \propto p(y_t\st X^{(i)}_t)$. Since the likelihood and the transition density may not be aligned, those factors can vary a lot with, as a consequence, an increased variance of the resulting estimator.\\
+
+
+Another observation is that, in the above algorithm, we have omitted the \emph{resampling}\margnote{resampling} step whereby particles can be resampled with replacement based on their weights. In practice, this alleviates the problem of variance growth over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. Although this step is a key aspect of particle filters, it is not an aspect that plays an important role in the issues we consider in this document; in the sequel we will assume that a standard multinomial resampling is applied. \\
+
+For a more extensive review of particle filtering we refer to \cite{doucet11} and references therein. In the rest of the document, we will assume that a good sequence of empirical densities approximating the filtering densities has been built and will focus on the modification of that sequence leading to estimators of the smoothing densities.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Particle smoothing}
 
