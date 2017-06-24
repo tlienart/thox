@@ -24,12 +24,12 @@ The strong law of large numbers then indicates that $\widehat I_n\to I$ almost s
 	\hat \pi(x) &:=& n\inv\sum_{i=1}^{N} \delta_{X^{(i)}}(x),
 }
 %
-and $\hat I_{n}$ then amounts to taking the expected value of $\varphi(X)$ with respect to $\hat\pi$.
+and computing $\hat I_{n}$ amounts to taking the expected value of $\varphi(X)$ with respect to $\hat\pi$.
 
 %%%%%%%
 \subsection{Sequential importance sampling}
 %For this point, we refer to the note by \citet{doucet11} and also to \citet[chapter 3.3 and 14.3]{robert04}.
-In \emph{importance sampling} (IS)\margnote{IS}, samples are drawn from a \emph{proposal distribution}\margnote{proposal} $q$ that is easy to sample from (for example, a Gaussian) and is similar to the target distribution $\pi$. 
+In \emph{importance sampling} (IS), samples are drawn from a \emph{proposal distribution} $q$ that is easy to sample from (for example, a Gaussian) and is similar to the target distribution $\pi$. 
 The quadrature weights are then adjusted to reflect that the samples are not drawn from the true distribution:
 %
 \eqa{
@@ -61,14 +61,14 @@ The variance of an IS estimator is directly related to the variance of the assoc
 Note that "optimality" here is understood in terms of the variance of the estimator. Additionally, since we can't typically sample easily from the optimal proposal, we have to resort to approximating distributions.\check{jun24}\add{check transition density introduced} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\dred{Particle filtering}}
+\subsection{Particle filtering}
 In the filtering problem\add{check introduced earlier, link} on a HMM, the target densities are $\pi_{t}(x_{1:t})=p(x_{1:t}\st y_{1:t})$ and their marginals. The incremental update factors are given by
 \eqa{ \alpha_t(x_{1:t}) &=& {p(x_{1:t}\st y_{1:t})\over p(x_{1:t-1}\st y_{1:t-1})q_t(x_t\st x_{1:t-1})} 	\nn\\
 	&=& {p(x_t,y_t\st x_{1:t-1},y_{1:t-1})p(x_{1:t-1}\st y_{1:t-1})p(y_{1:t-1})\over p(x_{1:t-1}\st y_{1:t-1})q_t(x_t\st x_{1:t-1})p(y_{1:t})}  \nn\\
-	&\propto& {p(y_t\st x_t)p(x_t\st x_{t-1}) \over q_t(x_t\st x_{1:t-1})}}
-Where we exploited the conditional dependence structure of a HMM. Consequently, the optimal proposal is
+	&\propto& {p(y_t\st x_t)p(x_t\st x_{t-1}) \over q_t(x_t\st x_{1:t-1})},}
+where we exploited the conditional dependence structure of a HMM. Consequently, the optimal proposal is
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{t-1}) &\propto& p(y_{t}\st x_{t})p(x_{t}\st x_{t-1})	, \label{particle filter OID}}
-which we could also have obtained from applying \eqref{optimal proposal}. A skeleton of a particle filter algorithm is given below.\add{in code: $\mu$ is defined where?}
+which could also have obtained from applying \eqref{optimal proposal}. A skeleton of a particle filter algorithm is given below.\check{jun24}\add{in code: $\mu$ is defined where?}
 %
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:particle-filter}\dblue{\emph{\small Skeleton of a particle filter algorithm}}}
@@ -85,52 +85,52 @@ which we could also have obtained from applying \eqref{optimal proposal}. A skel
 \end{algorithm}
 %
 
-The complexity of the above algorithm is $\mathcal O(TN)$. Indeed, at each time step $t$,  the algorithm samples $N$ particles and computes their corresponding weights which has linear complexity in the number of particles.
+The complexity of the above algorithm is $\mathcal O(TN)$. Indeed, at each time step $t$,  the algorithm samples $N$ particles and computes their corresponding weights which has linear complexity in the number of particles.\check{jun24}
 
-Since it is often difficult to sample directly from the optimal proposal. In the context of filtering, a frequently used alternative is the \margnote{bootstrap prop.}\emph{bootstrap proposal} \citep{doucet11} with 
+Since it is often difficult to sample directly from the optimal proposal. In the context of filtering, an alternative choice is the \emph{bootstrap proposal} \citep{doucet11}: 
 \eqa{q^{\text{bs}}(x_{t}\st x_{t-1})&:=&p(x_{t}\st x_{t-1}),}
-which is often easier to sample from. In that case, the update factor simply reduces to $\alpha^{(i)}_t \propto p(y_t\st X^{(i)}_t)$. Since the likelihood and the transition density may not be well aligned, those factors can vary a lot with, as a consequence, an increased variance of the resulting estimator.
+which is often easier to sample from. In that case, the update factor simply reduces to $\alpha^{(i)}_t \propto p(y_t\st X^{(i)}_t)$. Since the likelihood and the transition density may not be well aligned, those update factors can vary a lot with resulting in an increase in the variance of the resulting estimator.\check{jun24}
 
-Another important point to note is that we have omitted the \emph{resampling step} in the algorithm \ref{alg:particle-filter}. That step resamples particles with replacement based on their weights. In practice, this alleviates the problem of variance growth over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. Although this step is a key aspect of particle filters, it is not an aspect that plays an important role in the issues we consider in this document; in the sequel we will assume that a standard multinomial resampling is applied.\addref
+Another important point to note is that we have omitted the \emph{resampling step} in the algorithm \ref{alg:particle-filter}. That step resamples particles with replacement based on their weights. In practice, this alleviates the problem of variance growth over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. Although this step is a key aspect of particle filters, it is not an aspect that plays an important role in the issues we consider in this document; in the sequel we will assume that a standard multinomial resampling is applied \citep{doucet11}.
 
- In the rest of this part, we will assume that a good sequence of empirical densities\add{check introduced} approximating the filtering densities has been built and will focus on the modification of that sequence leading to estimators of the smoothing densities.
+ In what follows, we will assume that a good sequence of empirical densities approximating the filtering distributions has been built. Rather, we will focus on how to modify that sequence in order to obtain good estimators for the smoothing distribution.\check{jun24}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Particle smoothing}
-In the smoothing problem on a HMM, the target densities $p(x_t\st y_{1:T})$ can be factorised in distinct ways which can lead to different algorithms. In a first approach, writing 
-\eqa{p(x_t\st y_{1:T})&=&\int p(x_t,x_{t+1}\st y_{1:T})\,\mathrm{d}x_{t+1},\nn} we get, using the factorisation structure of the HMM,
+In the smoothing problem on a HMM, the target densities $p(x_t\st y_{1:T})$ can be factorised in mainly two distinct ways which lead to two different algorithms. In the first approach, we write 
+\eqa{p(x_t\st y_{1:T})&=&\int p(x_t,x_{t+1}\st y_{1:T})\,\mathrm{d}x_{t+1}.\nn} Using the factorisation structure of the HMM, this can be further developed into
 \eqa{	p(x_t\st y_{1:T}) &=& \int p(x_t\st x_{t+1},y_{1:t})p(x_{t+1}\st y_{1:T})\,\mathrm{d}x_{t+1}	\nn\\&=& p(x_t\st y_{1:t}) \int {p(x_{t+1}\st x_t)\over p(x_{t+1}\st y_{1:t})}p(x_{t+1}\st y_{1:T}) \,\mathrm{d}x_{t+1}.\label{eq FFBS}}
-This approach leads to the \emph{Forward Filtering, Backward Smoothing} (FFBS)\margnote{FFBS} algorithm.\addref Another approach starts with writing 
+Exploiting the relation \eqref{eq FFBS} leads to the \emph{Forward Filtering, Backward Smoothing} (FFBS) algorithm \citep{hurzeler98, doucet00}. Another approach starts with writing \check{jun24}
 \eqa{p(x_t\st y_{1:T})&=&p(x_t,y_{1:t-1},y_{t:T})/p(y_{1:T})\nn} 
-and further
+and further, exploiting the conditional dependences of the HMM, we have
 \eqa{	p(x_t\st y_{1:T}) &\propto& p(y_{t+1:T}\st x_t,x_{t+1},y_t)p(y_t\st x_t,x_{t+1})
 \nn\\&\propto& p(x_t\st y_{1:t-1})p(y_{t:T}\st x_t),	\label{eq TFS}}
-which leads to the \emph{Two Filter Smoothing} (TFS)\margnote{TFS} algorithm \citep{kitagawa96}.
+which leads to the \emph{Two Filter Smoothing} (TFS) algorithm \citep{kitagawa96}.\check{jun24}
 
 \subsubsection{Forward filtering, backward smoothing}
-If we consider the FFBS equation \eqref{eq FFBS} and replace the filtering distribution by its particle approximation, we get:
+Replacing the filtering distribution by its particle approximation in equation \eqref{eq FFBS} gives:
 \eqa{		
 	\hat{p}(x_{t}\st y_{1:T}) &=& \hat{p}(x_{t}\st y_{1:t})\int {p(x_{t+1}\st x_{t})\over \int p(x_{t+1}\st x_{t})\hat p(x_{t}\st y_{1:t})  \dx_{t}}\hat p(x_{t+1}\st y_{1:t+1})\dx_{t+1}\nn \\
 			&= &	\sum_{i}^{N}w^{(i)}_{t\st T}\delta_{X^{(i)}_{t}}(x_{t}),	}
 where the smoothing weights are given recursively by
 \eqa{		w^{(i)}_{t\st T} &:=& \sum_{j=1}^{N}{w^{(j)}_{t+1\st T}\pac{w^{(i)}_{t}p(X^{(j)}_{t+1}\st X^{(i)}_{t})\over \sum_{k=1}^{N}w^{(k)}_{t}p(X^{(j)}_{t+1}\st X^{(k)}_{t})}}. \label{eq FFBS weights}	}
-Hence, in the FFBS algorithm, the particles from the particle filter are kept and their weights are updated following \eqref{eq FFBS weights}. 
+This is what the Forward Filtering Backward Smoothing (FFBS) algorithm does: the particles from the particle filter are kept and their weights are updated following \eqref{eq FFBS weights}. 
 
-The computation of the smoothing weights has complexity $\mathcal O(TN^{2})$ since at each time step we need to consider the matrix of all pairwise interactions between the particles at two subsequent time steps: $[p(X^{(j)}_{t+1}\st X^{(i)}_{t})]_{i,j=1}^{N}$.
+The computation of the smoothing weights has complexity $\mathcal O(TN^{2})$ since at each time step we need to consider the matrix of all pairwise interactions between the particles at two subsequent time steps: $[p(X^{(j)}_{t+1}\st X^{(i)}_{t})]_{i,j=1}^{N}$.\check{jun24}
 
 \subsubsection{\label{introTFS}Two filter smoothing}
-If we consider the equation \eqref{eq TFS}, we can approximate the predictive density factor using a particle filter:%\foot{Recall that $p(x_t\st y_{1:t-1})\propto\int_{x_{t-1}}p(x_{t}\st x_{t-1})p(x_{t-1}\st y_{1:t-1})$.}
+Starting from the equation \eqref{eq TFS}, we can approximate the predictive density (PD) factor using a particle filter:%\foot{Recall that $p(x_t\st y_{1:t-1})\propto\int_{x_{t-1}}p(x_{t}\st x_{t-1})p(x_{t-1}\st y_{1:t-1})$.}
 %
 \eqa{
 	\widehat\pd_t(x_t) \esp:=\esp	\hat{p}(x_{t}\st y_{1:t-1}) &=& \sum_{i=1}^{N} w^{(i)}_{t-1}p(x_{t}\st X^{(i)}_{t-1}).	
 	}
 %
-The second factor in \eqref{eq TFS}, the \emph{backward information filter} $\bif_t(x_t):=p(y_{t:T}\st x_{t})$ is \emph{not} necessarily proportional to a distribution in $x_{t}$ and can thus not be directly targeted in a SMC context as it might not be normalisable.\footnote{I.e., we might have $\int p(y_{t:T}\st x_{t})\dx_{t}=+\infty$.} However, one can define an auxiliary quantity by pre-multiplying it by an artificial \emph{normalisation density} $\gamma_{t}(x_{t})$ such that the product
+The non-standard notation $\pd_{t}$ as well as the notations introduced below will make the discussion of the generalised TFS simpler and less cluttered. The second factor in \eqref{eq TFS} is the \emph{backward information filter} $\bif_t(x_t):=p(y_{t:T}\st x_{t})$. It is not necessarily proportional to a distribution in $x_{t}$ and can thus not be directly targeted in a SMC context. However, one can define an auxiliary quantity by pre-multiplying it by an artificial \emph{normalisation density} $\gamma_{t}(x_{t})$ such that the product
 %
 \eqa{		
 	\tbif_t(x_t) &:=& Z_{t}\inv{\gamma_{t}(x_{t}) p(y_{t:T}\st x_t)},		\label{def normalised BIF}
 }
 %
-is a distribution in $x_{t}$ (with $Z_{t}$ a normalisation constant) and can thus be targeted in the usual way. \margnote{support condition}Any distribution can be chosen as long as the support of $\gamma_{t}$ covers that of the backward information filter \citep{briers10}, i.e.:
+is a distribution in $x_{t}$ (with $Z_{t}$ a normalisation constant) and can thus be targeted in the usual way \citep{briers10}.\check{jun24} Any distribution can be chosen as long as the support of $\gamma_{t}$ covers that of the backward information filter, i.e.:
 %
 \eqa{	
 	\bif_t(x_t) &>&0 \quad\Longrightarrow\quad \gamma_{t}(x_{t})\esp>\esp 0. \label{eq: tech condition normalisation density}	
