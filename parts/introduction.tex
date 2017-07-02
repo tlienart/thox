@@ -93,19 +93,19 @@ Chain graphs form the underlying structure of \emph{Hidden Markov Models} (HMM)\
 
 HMMs are used in a broad range of applications from modelling time series data to speech processing.\addref In HMMs, the node potentials correspond to the likelihood of the corresponding observation and the edge potentials correspond to the \emph{transition density}:\addref
 \eqa{	\psi_t (x_t) &=& p(y_t\st x_t), \quad\text{and}\quad \psi_{t-1,t}(x_{t-1},x_t) \spe p(x_t\st x_{t-1}).	\nn}
-A prior $p_{0}(x_{1})$ is assumed to be given for the first node so that $\psi_1(x_1) = p_{0}(x_1)p(y_1\st x_1)$. In this case, obtaining or approximating the singleton marginals is known as a \emph{smoothing problem}\margnote{smoothing}. The marginals or \emph{smoothing densities} can be written $p(x_t\st y_{1:T})$ to make explicit the dependence on all available observations.
+A prior $\pi_{0}(x_{1})$ is assumed to be given for the first node so that $p(x_1\st y_{1}) \propto \pi_{0}(x_1)p(y_1\st x_1)$. In this case,\add{clarify which case} obtaining or approximating the singleton marginals is known as a \emph{smoothing problem}\margnote{smoothing}. The marginals or \emph{smoothing densities} can be written $p(x_t\st y_{1:T})$ to make explicit the dependence on all available observations.
 
-A particular case is the \emph{filtering problem}\margnote{filtering} where one is only interested in building the last singleton marginal or, to put the problem in the same framework as before, to build marginals taking only into account the observations available until the point considered. The densities of interest can therefore be written $p(x_t\st y_{1:t})$.\check{june22}
+A particular case is the \emph{filtering problem}\margnote{filtering} where one is only interested in building the last singleton marginal or, to put the problem in the same framework as before, to build marginals taking only into account the observations available until the point considered. The densities of interest can therefore be written $p(x_t\st y_{1:t})$.\add{discuss also smoothing problem and discuss how it's a marginal of the general thing.}\add{discuss also prediction density, discuss Chapman Kolmogorov}\check{june22}
 %This is particularly relevant for applications such as time series analysis.\\
 
 The \emph{linear-Gaussian} case is a particular instance of HMM, usually expressed as:
 \eqa{	\syst{
-			p_{0}(x_1) 				&=& \mathcal N(x_1; \mu_0, Q_0)	 	\\
+			\pi_{0}(x_1) 				&=& \mathcal N(x_1; \mu_0, Q_0)	 	\\
 			p(x_t\st x_{t-1}) 	&=& \mathcal N(x_t; A_t x_{t-1}+a_t, Q_t)		\\
 			p(y_t\st x_t) 		&=& \mathcal N(y_t; B_t x_t+b_t, R_t)
 		}
 	\nn}
-where $\mu_0$ as well as the $Q_i$, $R_i$, $A_i$, $a_i$, $B_i$ and the $b_i$ are deterministic. In such a case, an analytical expression for both the filtering and the smoothing densities can be obtained through the well-known \emph{Kalman filter} and \emph{smoother} (see for example \citet{anderson79}). 
+where $\mu_0$ as well as the $Q_i$, $R_i$, $A_i$, $a_i$, $B_i$ and the $b_i$ are deterministic. In such a case, an analytical expression for both the filtering and the smoothing densities can be obtained through the well-known \emph{Kalman filter} and \emph{smoother} \citep{anderson79}. 
 
 In the general case however, where the transition is nonlinear and/or non-Gaussian, the marginals are typically intractable. Approximation algorithms such as \emph{sequential Monte Carlo} (SMC)\margnote{SMC} methods have been developed in order to generate approximate samples from these marginals and consequently be able to form Monte Carlo estimators. \addref\add{link to section} 
 %We will show in this document a novel method to exploit a variational method known as \emph{expectation propagation} to help the performances of SMC smoothing algorithms. \dred{ADD SECTION NUMBER}

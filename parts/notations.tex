@@ -6,14 +6,14 @@ We list here notations used throughout the document that are considered to be co
 
 \subsection*{Vectors, matrices and functions} 
 For a vector $x\in\R^{d}$ we write $\norm{x}{p}$ the $p$-norm of $x$ with $\norm{x}{p}^{p}=\sum_{i=1:d}\abs{x_{i}}^{p}$ for $p\in[1,\infty)$. 
-For $x,y\in\R^{d}$, we write $\scal{x,y}=\sum_{i=1:n}x_{i}y_{i}$ the inner product of $x$ and $y$. 
+For $x,y\in\R^{d}$, we write $\scal{x,y}=\sum_{i=1:d}x_{i}y_{i}$ the inner product of $x$ and $y$. For a nonnegative vector $x_u$ we write $x_u\propto x$ if there is a normalisation constant $Z_x$ such that $x=Z_x\inv x_u$ has components summing to one.
 We denote the transpose of a matrix $A\in\R^{d\times d}$ by $A\transp$. $A$ is said to be semi positive definite if $\scal{x,Ax}\ge 0$ for all $x\in\R^{d}$ and positive definite if the inequality holds strictly for all $x\neq 0$. We denote by $\mathbb S_+^{d}\subset \mathbb R^{d\times d}$ the set of symmetric positive definite matrices and by $\mathbb S_-^{d}$ the set of matrices $B$ such that $-B\in\mathbb S_+^{d}$.
-For a real-valued measurable function $f$ on a set $\mathcal X$, we write $\|f\|_{p}^{p}=\int_{\mathcal X} |f(x)|^{p}\dx$ the $p$-norm of $f$ for $p\in[1,\infty)$. 
-We write $L^{1}(\mathcal X)$ the set of functions such that $\|f\|_{1}<\infty$ and $\mathcal P(\mathcal X) \subset L^{1}(\mathcal X)$ denotes the restriction to nonnegative functions integrating to one (probability density functions). 
-For a real-valued, differentiable function $f$, we write $\nabla f$ its gradient and $\nabla^{2} f$ its Hessian provided $f$ is twice differentiable.\check{jun21,may10}
+For a real-valued measurable function $f$ on a set $\mathcal X\subseteq \mathbb R^{d}$, we write $\int f(x)\mathrm d{x}$ to denote the integral of $f$ on the whole of $\mathcal X$. We write $\|f\|_{p}^{p}=\int |f(x)|^{p}\dx$ the $p$-norm of $f$ for $p\in[1,\infty)$. 
+We write $L^{1}(\mathcal X)$ the set of functions such that $\|f\|_{1}<\infty$ and $\mathcal P(\mathcal X) \subset L^{1}(\mathcal X)$ denotes the restriction to nonnegative functions integrating to one (probability density functions). For a nonnegative function $g_u\in  L^{1}(\mathcal X)$ we write $g_u\propto g$ to indicate that there is a normalisation constant $Z_g$ such that $g=Z_g\inv g_u$ with $g\in\mathcal P(\mathcal X)$.  
+For a real-valued, differentiable function $f$ on $\mathcal X$, we write $\nabla f$ its gradient and $\nabla^{2} f$ its Hessian provided $f$ is twice differentiable. \check{june30, jun21,may10}
 %
 \subsection*{Probabilities and expected values}
-We consider continuous sample spaces $\mathcal X\subseteq \R^{n}$ and, by default, we consider the associated Borel $\sigma$-algebra. 
+We consider continuous sample spaces $\mathcal X\subseteq \R^{d}$ and, by default, we consider the associated Borel $\sigma$-algebra. 
 Correspondingly, we use the shorthand $(\mathcal X,\P)$ to denote a probability space with $\P$ the probability measure. 
 We consider probability measures that admit a probability density function $p$ with respect to a base measure $\nu$ with therefore $\P(x\in A)=\int_{A}p(x)\nudx$ for any open subset $A\subset \mathcal X$. 
 In particular, $\mathcal N(\cdot; \mu,\Sigma)$ denotes the multivariate normal distribution function with mean $\mu\in \R^{d}$ and covariance matrix $\Sigma\in\mathbb S^{d}_+$ and $\delta_a(\cdot)$ denotes the Dirac-delta distribution with point-mass at $a$. 

@@ -11,7 +11,7 @@
 \newif\ifsnep
 
 \toctrue    \tocfalse
-\introtrue  \introfalse
+\introtrue  %\introfalse
 \bgstrue   % \bgsfalse
 \tfstrue   % \tfsfalse
 \lbpstrue  % \lbpsfalse
@@ -122,7 +122,7 @@
 \ifbgs\input{parts/bg_sampling}\fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Two Filter Smoothing}
+\chapter{Backward Information Smoothing}
 
 \iftfs\input{parts/twofilter}\fi
 
@@ -167,6 +167,7 @@
 \renewcommand{\bibname}{References}
 \addcontentsline{toc}{chapter}{References}
 \bibliographystyle{myabbrvnat}
+\singlespacing
 \begin{footnotesize}
 \bibliography{texReferences}
 \end{footnotesize}

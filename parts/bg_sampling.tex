@@ -33,18 +33,31 @@ In \emph{importance sampling} (IS), samples are drawn from a \emph{proposal dist
 The quadrature weights are then adjusted to reflect that the samples are not drawn from the true distribution:
 %
 \eqa{
-	X^{(i)}\esp \simiid\esp q(\cdot), \quad\text{and}\quad w(X^{(i)})\spe {\pi(X^{(i)})\over n q(X^{(i)})}.
+	X^{(i)}\esp \simiid\esp q(\cdot), \quad\text{and}\quad w(X^{(i)})\esp\propto\esp {\pi(X^{(i)})\over q(X^{(i)})}.\label{eq:impsampling}
 } 
 %
-Provided the support of $q$ includes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$, the resulting \emph{importance sampling estimator} is consistent \citep[chapter 3.3]{robert04}.\check{june21apr1}
+Provided the support of $q$ includes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$, the resulting \emph{importance sampling estimator} is consistent. Further, the estimator of the expected value of a specific test function $\varphi$ is finite provided $\E_{\pi}[\varphi(X)^{2}w(x)]<\infty$ \citep[chapter 3.3]{robert04}. Note that \eqref{eq:impsampling} also defines an empirical density $\hat\pi$ with \add{Introduce ESS to discuss the quality of the variance of the thing.}
+%
+\eqa{
+	\hat\pi(x) &=& \sum_{i=1}^{N} w(X^{(i)})\delta_{X^{(i)}}(x)
+}
+%
+with the $w(X^{(i)})$ summing to one. One way to assess the quality of the importance sampling is the \emph{effective sample size} (ESS)\addref. Writing $\V[\hat I_{n}^{\text{MC}}]=\sigma^{2}/n$ the variance of the Monte Carlo estimators with $n$ samples, we can write the variance of the importance sampling estimator as $\sigma^{2}/\text{ESS}$ and compare the ESS to $n$. The ESS is usually computed as follows \citep{kong94}:
+%
+\eqa{
+	\text{ESS} &=& \pat{\sum_{i=1}^{n} w(X^{(i)})^{2}}\inv.
+}
+%
+It is bounded from below by $1$ -- the degenerate case where a single particle is carrying all the weight -- and from above by $n$ -- the ideal case where the samples are comparable to ideal Monte Carlo samples.
 
-In the context of HMM in particular, we are usually interested in estimating a sequence of target distributions $\{\pi_{t}(x_{1:t})\}_{t=1}^{T}$ which admit the following factorisation structure:
+
+In the context of HMM, we are usually interested in estimating a sequence of target distributions $\{\pi_{t}(x_{1:t})\}_{t=1}^{T}$ which admit the following factorisation structure:
 %
 \eqa{
 	\pi_{t}(x_{1:t}) &=& \pi_{t}(x_{t}\st x_{1:t-1})\pi_{t-1}(x_{1:t-1}).\nn
 }
 %
-This lead to the development of \emph{sequential Monte Carlo} (SMC) methods \citep[chapter 14.3]{robert04}. The principle is the same as that of importance sampling except that a different proposal is considered at every time $t$ taking into account the previous draw of particles and the evolution of the system:
+This lead to the development of \emph{sequential Monte Carlo} (SMC) methods \citep[chapter 14.3]{robert04}. The principle is the same as that of importance sampling except that a different proposal is considered at every step $t$ taking into account the previous draw of particles and the evolution of the system:
 %
 \eqa{
 	q_{t}(x_{1:t}) &=& q_{t}(x_{t}\st x_{1:t-1})q_{t-1}(x_{1:t-1}).	\nn
@@ -56,7 +69,7 @@ Following this form, new samples or \emph{particles} $X^{(i)}_t$ can be drawn fr
 	\alpha^{(i)}_{t} := {\pi_{t}(X^{(i)}_{1:t} )\over \pi_{t-1}(X^{(i)}_{1:t-1}) q_{t}(X^{(i)}_{t}\st X^{(i)}_{1:t-1})}.
 }
 %
-The variance of an IS estimator is directly related to the variance of the associated importance weights. In order to counter the increase of variance induced by the sequential IS procedure, the proposal at time $t$ should be such that the variance of the update factors $\alpha_t$ is as small as possible. In particular, the \emph{optimal proposal} \citep{doucet11} keeps it at zero with
+The variance of an IS estimator is directly related to the variance of the associated importance weights. In order to counter the increase of variance induced by the sequential IS procedure, the proposal at step $t$ should be such that the variance of the update factors $\alpha_t$ is as small as possible. In particular, the \emph{optimal proposal} \citep{doucet11} keeps it at zero with
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{1:t-1}) &:=& \pi_{t}(x_{t}\st x_{1:t-1}).	\label{optimal proposal}}
 Note that "optimality" here is understood in terms of the variance of the estimator. Additionally, since we can't typically sample easily from the optimal proposal, we have to resort to approximating distributions.\check{jun24}\add{check transition density introduced} 
 
@@ -68,13 +81,13 @@ In the filtering problem\add{check introduced earlier, link} on a HMM, the targe
 	&\propto& {p(y_t\st x_t)p(x_t\st x_{t-1}) \over q_t(x_t\st x_{1:t-1})},}
 where we exploited the conditional dependence structure of a HMM. Consequently, the optimal proposal is
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{t-1}) &\propto& p(y_{t}\st x_{t})p(x_{t}\st x_{t-1})	, \label{particle filter OID}}
-which could also have obtained from applying \eqref{optimal proposal}. A skeleton of a particle filter algorithm is given below.\check{jun24}\add{in code: $\mu$ is defined where?}
+which could also have obtained from applying \eqref{optimal proposal}.\add{make a reference to MRF, this is edge potential x node potential} A skeleton of a particle filter algorithm is given below.\check{jun24}
 %
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:particle-filter}\dblue{\emph{\small Skeleton of a particle filter algorithm}}}
 	\begin{algorithmic}[1]
 		\State sample $X_{1}^{(i)}\simiid q_{1}$ for $i=1,\dots,N$	%\Comment{\emph{Initialization}}
-		\State compute and normalise the weights $w_{1}(X^{(i)}_{1})\propto {\mu( X^{(i)}_{1})p(y_{1}\st X^{(i)}_{1})/ q_{1}(X^{(i)}_{1})}$
+		\State compute and normalise the weights $w_{1}(X^{(i)}_{1})\propto {\pi_{0}( X^{(i)}_{1})p(y_{1}\st X^{(i)}_{1})/ q_{1}(X^{(i)}_{1})}$
 %		\State resample: $\{\X^{(i)}_{1},W^{(i)}_{1}\}\rightarrow\{\overline \X^{(i)}_{1},N\inv\}$\Comment{\emph{Using some resampling scheme}}\vspace*{.2cm}
 		\For{$t=2:T$}
 			\State sample $X^{(i)}_{t}\sim q_{t}( \cdot \st X^{(i)}_{t-1})$ with $q_{t}\approx q_{t}^{\text{opt}}$
@@ -85,13 +98,31 @@ which could also have obtained from applying \eqref{optimal proposal}. A skeleto
 \end{algorithm}
 %
 
-The complexity of the above algorithm is $\mathcal O(TN)$. Indeed, at each time step $t$,  the algorithm samples $N$ particles and computes their corresponding weights which has linear complexity in the number of particles.\check{jun24}
+The complexity of algorithm \ref{alg:particle-filter} is $\mathcal O(TN)$. Indeed, at each step $t$,  the algorithm samples $N$ particles and computes their corresponding weights which has linear complexity in the number of particles.\check{jun24}
 
-Since it is often difficult to sample directly from the optimal proposal. In the context of filtering, an alternative choice is the \emph{bootstrap proposal} \citep{doucet11}: 
+Sampling directly from the optimal proposal is often an intractable problem by itself. In the context of filtering, an alternative choice is the \emph{bootstrap proposal} \citep{doucet11} with
 \eqa{q^{\text{bs}}(x_{t}\st x_{t-1})&:=&p(x_{t}\st x_{t-1}),}
-which is often easier to sample from. In that case, the update factor simply reduces to $\alpha^{(i)}_t \propto p(y_t\st X^{(i)}_t)$. Since the likelihood and the transition density may not be well aligned, those update factors can vary a lot with resulting in an increase in the variance of the resulting estimator.\check{jun24}
+which is often easier to sample from. In that case, the update factor simply reduces to $\alpha^{(i)}_t \propto p(y_t\st X^{(i)}_t)$. However, since the likelihood and the transition density may not be well aligned, those update factors can vary a lot incurring an increase in the variance of the resulting estimator.\check{jun29}
 
-Another important point to note is that we have omitted the \emph{resampling step} in the algorithm \ref{alg:particle-filter}. That step resamples particles with replacement based on their weights. In practice, this alleviates the problem of variance growth over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. Although this step is a key aspect of particle filters, it is not an aspect that plays an important role in the issues we consider in this document; in the sequel we will assume that a standard multinomial resampling is applied \citep{doucet11}.
+We have omitted the \emph{resampling step} in algorithm \ref{alg:particle-filter}. That step resamples particles with replacement based on their weights \citep{delmoral06}.\add{If the ESS below a threshold, needs to introduce ESS then} In practice, this alleviates the problem of variance growth over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. Although this step is a key aspect of particle filters, it is not an aspect that plays an important role in the issues we consider in this document; in the sequel we will therefore assume that a standard multinomial resampling is applied \citep{doucet11}.
+
+\subsection{\label{bg:particle-smoothing}Particle smoothing}
+
+In the smoothing problem on a HMM, the target densities are $p(x_t\st y_{1:T})$. These densities can be expressed as the marginals of joint densities over subsequent states: 
+\eqa{p(x_t\st y_{1:T})&=&\int p(x_t,x_{t+1}\st y_{1:T})\,\mathrm{d}x_{t+1}.\nn} Exploiting the conditional dependence structure of the HMM, the integrand can be factorised leading to
+\eqa{	p(x_t\st y_{1:T}) &=& \int p(x_t\st x_{t+1},y_{1:t})p(x_{t+1}\st y_{1:T})\,\mathrm{d}x_{t+1}	\nn\\&=& p(x_t\st y_{1:t}) \int {p(x_{t+1}\st x_t)\over p(x_{t+1}\st y_{1:t})}p(x_{t+1}\st y_{1:T}) \,\mathrm{d}x_{t+1}.\label{eq FFBS}}
+This relation leads to the \emph{forward filtering, backward smoothing} (FFBS) algorithm \citep{hurzeler98, doucet00}.
+Plugging the particle approximation to the filtering distribution in equation \eqref{eq FFBS} gives:
+\eqa{		
+	\hat{p}(x_{t}\st y_{1:T}) &=& \hat{p}(x_{t}\st y_{1:t})\int {p(x_{t+1}\st x_{t})\over \int p(x_{t+1}\st x_{t})\hat p(x_{t}\st y_{1:t})  \dx_{t}}\hat p(x_{t+1}\st y_{1:t+1})\dx_{t+1}\nn \\
+			&= &	\sum_{i}^{N}w^{(i)}_{t\st T}\delta_{X^{(i)}_{t}}(x_{t}),	}
+where the smoothing weights are given recursively by
+\eqa{		w^{(i)}_{t\st T} &\propto& w^{(i)}_{t}\sum_{j=1}^{N}{w^{(j)}_{t+1\st T}\pac{p(X^{(j)}_{t+1}\st X^{(i)}_{t})\over \sum_{k=1}^{N}w^{(k)}_{t}p(X^{(j)}_{t+1}\st X^{(k)}_{t})}}. \label{eq FFBS weights}	}
+In essence, the FFBS algorithm simply recycles a particle filter updating its weights according to equation \eqref{eq FFBS weights}. 
+
+The computation of the updated smoothing weights has complexity $\mathcal O(TN^{2})$ since, at each step, we need to consider the matrix of all pairwise interactions between the particles at two subsequent steps: $[p(X^{(j)}_{t+1}\st X^{(i)}_{t})]_{i,j=1}^{N}$. Since the FFBS algorithm recycles the particles from a particle filter, the performances of the resulting estimators can suffer if the support of the filtering distribution at step $t$ is significantly distinct from that of the smoothing distribution at step $t$.\add{algorithm representing the FFBS?}\check{jun29,jun24}
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

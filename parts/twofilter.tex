@@ -1,80 +1,258 @@
 % !TEX root = ../thesis.tex
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Particle Smoothing}
+\section{Two Filter Smoothing}
+\add{Clarify where this comes from (marginal on HMM)}In this chapter, we focus on the problem of approximating the smoothing distributions for a Hidden Markov Model (HMM).\add{specify HMM more specifically, in particular state space} 
+We assume that a sequence of empirical densities approximating the filtering distributions has already been obtained.
+We had seen at point \ref{bg:particle-smoothing} that the \emph{forward filtering backward smoothing} algorithm (FFBS) recycles a particle filter and simply updates its weights. 
+The issue with this approach is that no particles are resampled in the backward step. As we mentioned\add{link} this can impact the performances of the estimators if the support of the filtering distributions and that of the smoothing distributions don't overlap well.\add{maybe show this in FFBS case}
 
-In this chapter, we focus on the problem of approximating the smoothing distributions for a Hidden Markov Model (HMM). We will assume that a sequence of empirical densities approximating the filtering distributions has already been obtained.
-
-In the smoothing problem on a HMM, the target densities $p(x_t\st y_{1:T})$ can be factorised in mainly two distinct ways which lead to two different algorithms. In the first approach, one can write 
-\eqa{p(x_t\st y_{1:T})&=&\int p(x_t,x_{t+1}\st y_{1:T})\,\mathrm{d}x_{t+1},\nn} which can be further developed into
-\eqa{	p(x_t\st y_{1:T}) &=& \int p(x_t\st x_{t+1},y_{1:t})p(x_{t+1}\st y_{1:T})\,\mathrm{d}x_{t+1}	\nn\\&=& p(x_t\st y_{1:t}) \int {p(x_{t+1}\st x_t)\over p(x_{t+1}\st y_{1:t})}p(x_{t+1}\st y_{1:T}) \,\mathrm{d}x_{t+1},\label{eq FFBS}}
-by exploiting the factorisation structure of the HMM. Exploiting the relation \eqref{eq FFBS} leads to the \emph{Forward Filtering, Backward Smoothing} (FFBS) algorithm \citep{hurzeler98, doucet00}. Another approach starts with writing \check{jun24}
-\eqa{p(x_t\st y_{1:T})&=&p(x_t,y_{1:t-1},y_{t:T})/p(y_{1:T}),\nn} 
-exploiting the conditional dependences of the HMM, we get
-\eqa{	p(x_t\st y_{1:T}) &\propto& p(y_{t+1:T}\st x_t,x_{t+1},y_t)p(y_t\st x_t,x_{t+1})
-\nn\\&\propto& p(x_t\st y_{1:t-1})p(y_{t:T}\st x_t),	\label{eq TFS}}
-which leads to the \emph{Two Filter Smoothing} (TFS) algorithm \citep{kitagawa96}.\check{jun24}
-
-\subsection{Forward filtering, backward smoothing}
-Replacing the filtering distribution by its particle approximation in equation \eqref{eq FFBS} gives:
-\eqa{		
-	\hat{p}(x_{t}\st y_{1:T}) &=& \hat{p}(x_{t}\st y_{1:t})\int {p(x_{t+1}\st x_{t})\over \int p(x_{t+1}\st x_{t})\hat p(x_{t}\st y_{1:t})  \dx_{t}}\hat p(x_{t+1}\st y_{1:t+1})\dx_{t+1}\nn \\
-			&= &	\sum_{i}^{N}w^{(i)}_{t\st T}\delta_{X^{(i)}_{t}}(x_{t}),	}
-where the smoothing weights are given recursively by
-\eqa{		w^{(i)}_{t\st T} &:=& \sum_{j=1}^{N}{w^{(j)}_{t+1\st T}\pac{w^{(i)}_{t}p(X^{(j)}_{t+1}\st X^{(i)}_{t})\over \sum_{k=1}^{N}w^{(k)}_{t}p(X^{(j)}_{t+1}\st X^{(k)}_{t})}}. \label{eq FFBS weights}	}
-In essence, the FFBS algorithm keeps the particles from a particle filter and computes new weights according to \eqref{eq FFBS weights}. 
-
-The computation of those smoothing weights has complexity $\mathcal O(TN^{2})$ since at each time step we need to consider the matrix of all pairwise interactions between the particles at two subsequent time steps: $[p(X^{(j)}_{t+1}\st X^{(i)}_{t})]_{i,j=1}^{N}$. Since the FFBS algorithm recycles the particles from a particle filter, the performances of the resulting estimator can suffer if the support of the filtering distribution at step $t$ is significantly distinct from that of the smoothing distribution at step $t$.\check{jun24}
-
-\subsection{\label{introTFS}Two filter smoothing}
-Starting from the equation \eqref{eq TFS}, we can approximate the predictive density (PD) factor using a particle filter:%\foot{Recall that $p(x_t\st y_{1:t-1})\propto\int_{x_{t-1}}p(x_{t}\st x_{t-1})p(x_{t-1}\st y_{1:t-1})$.}
+\subsection{Two filter formula}
+An alternative to the FFBS approach is to exploit the \emph{two filter formula}. 
+To derive it, note that the smoothing distribution can be written in the following way using Bayes' formula:
 %
 \eqa{
-	\widehat\pd_t(x_t) \esp:=\esp	\hat{p}(x_{t}\st y_{1:t-1}) &=& \sum_{i=1}^{N} w^{(i)}_{t-1}p(x_{t}\st X^{(i)}_{t-1}).	
-\label{eq PDhat}	}
+	p(x_t\st y_{1:T})&=& {p(x_t,y_{1:t-1},y_{t:T})\over p(y_{1:T})}.\nn
+	}
+% 
+Then, exploiting the conditional dependences of the HMM, we get
 %
-The non-standard notation $\pd_{t}$ as well as the notations introduced below will make the discussion of the generalised TFS simpler and less cluttered. The second factor in \eqref{eq TFS} is the \emph{backward information filter} $\bif_t(x_t):=p(y_{t:T}\st x_{t})$. It is not necessarily proportional to a distribution in $x_{t}$ and can thus not be directly targeted in a SMC context. However, one can define an auxiliary quantity by pre-multiplying the backward information filter by an artificial \emph{normalisation density} $\gamma_{t}(x_{t})$ such that the product
-%
-\eqa{		
-	\tbif_t(x_t) &:=& Z_{t}\inv{\gamma_{t}(x_{t}) p(y_{t:T}\st x_t)},		\label{def normalised BIF}
+\eqa{
+	p(x_t\st y_{1:T}) 	
+		&\propto& p(y_{t+1:T}\st x_t,x_{t+1},y_t)p(y_t\st x_t,x_{t+1})
+\nn\\
+		&\propto& p(x_t\st y_{1:t-1})p(y_{t:T}\st x_t).	\label{eq:TFS}
 }
 %
-is a distribution in $x_{t}$ (with $Z_{t}$ a normalisation constant) and can thus be targeted in the SMS framework \citep{briers10}.\check{jun24} Any distribution $\gamma_{t}$ can be chosen as long as its support covers that of the backward information filter, i.e.:
+This last factorised form is the two filter formula which leads to the \emph{two filter smoothing} (TFS) algorithm \citep{bresler86, kitagawa96}. 
+The first term in \eqref{eq:TFS} is the prediction density (PD), 
+the second term $p(y_{t:T}\st x_{t})$ is called the \emph{backward information filter} (BIF). To simplify developments we introduce the following non-standard notations for the predictive density and the backward information filter:
+%
+\eqa{
+	\pd_{t}(x_{t}) \esp:=\esp p(x_{t}\st y_{1:t-1}), \quad\text{and}  \quad \bif_{t}(x_{t}) \esp:=\esp p(y_{t:T}\st x_{t}).
+}
+%
+The prediction density is obtained by integrating the filtering density multiplied by the transition density:\add{add reference to MRF part where introduced}
+%
+\eqa{
+	\pd_{t}(x_{t}) &=& \int p(x_{t}\st x_{t-1})p(x_{t-1}\st y_{1:t-1})\dx_{t-1}.\label{eq:pred-dens}
+}
+%
+A particle approximation to the prediction density can therefore be obtained by plugging in a particle representation of the filtering density in \eqref{eq:pred-dens}. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Targeting the backward information filter}
+The backward information filter cannot be directly targeted in a SMC framework in general as it may not be proportional to a distribution in $x_{t}$. 
+In \citet{briers10}, the authors therefore suggest to introduce a sequence of artificial \emph{normalisation densities} $\{\gamma_{t}\}_{t=1}^{T}\in\mathcal P(\mathcal X)$ such that, for each step $t$, the product of $\gamma_{t}$ and $\bif_{t}$ is normalisable. 
+In other words, the normalising distribution $\gamma_{t}$ allows to define a \emph{normalised backward information filter} in $\mathcal P(\mathcal X)$ with
+%
+\eqa{
+	\tbif_{t}(x_{t}) &:=& Z\inv_{t}\gamma_{t}(x_{t})\bif_{t}(x_{t})
+}
+%
+for some normalisation constant $Z\inv_{t}$.
+Any $\gamma_{t}\in\mathcal P(\mathcal X)$\add{make sure it's clear that every node is on same space $\mathcal X$} can be chosen as long as it verifies the \emph{support condition} i.e.: as long as its support covers that of the backward information filter:
 %
 \eqa{	
 	\bif_t(x_t) &>&0 \quad\Longrightarrow\quad \gamma_{t}(x_{t})\esp>\esp 0. \label{eq: tech condition normalisation density}	
 }
-We will refer to these densities as \emph{normalisation densities}. Since the $\tbif_{t}$ are distributions, they can be targeted in the SMC framework. Let us denote by $\widehat\tbif_{t}$ a particle representation of the normalised BIF associated with weights $\tilde w_{t+1}^{(j)}$ and particles $\tilde X^{(j)}_{t+1}$, i.e.:
+%
+In order to target the sequence of normalised BIF in a SMC framework, we must show that it verifies a factorisation structure similar to that of the filtering distribution. For this, we start by noting that
+%
+\eqa{		
+	p(y_{t:T}\st x_{t},x_{t+1}) 
+		&=& p(y_{t+1:T}\st x_{t},x_{t+1},y_{t})p(y_{t}\st x_{t},x_{t+1})\nn\\
+		&=& p(y_{t}\st x_{t}) \bif_{t+1}(x_{t+1}). \label{back rec 1}	
+}
+%
+On the other hand, we also have that
+%
+\eqa{		
+	p(y_{t:T}\st x_{t},x_{t+1}) 	
+		&=& {p(y_{t:T},x_{t},x_{t+1})\over p(x_{t+1}\st x_{t})p(x_{t})}\nn\\
+		&=&{p(x_{t+1}\st x_{t},y_{t+1:T})\text{BIF}_{t}(x_{t})\over p(x_{t+1}\st x_{t})},	\label{back rec 2}
+}
+%
+where we have used the conditional independence structure of the HMM. 
+Combining \eqref{back rec 1} and \eqref{back rec 2} then leads to
+%
+\eqa{	
+	\bif_{t}(x_{t}) p(x_{t+1}\st x_{t},y_{t+1:T}) &=& p(y_{t}\st x_{t})p(x_{t+1}\st x_{t})\bif_{t+1}(x_{t+1}). 	\label{eq:tfs-bif2}
+}
+%
+If we now introduce the normalisation densities $\gamma_{t}$ and $\gamma_{t+1}$ and the corresponding normalisation constants $Z_{t}$ and $Z_{t+1}$ in \eqref{eq:tfs-bif2} we get
+%
+\eqa{	 
+	\tbif_{t}(x_{t})p(x_{t+1}\st x_{t},y_{t+1:T}) &=& 
+		{Z_{t+1}\gamma_{t}(x_{t})\over Z_{t}\gamma_{t+1}(x_{t+1})}p(y_{t}\st x_{t})p(x_{t+1}\st x_{t})\tbif_{t+1}(x_{t+1}).		\nn
+}
+%
+By construction of the normalisation densities, we can integrate the previous expression over $x_{t+1}$ to obtain
+%
+\eqa{		
+	\tbif_{t}(x_{t}) &\propto& {\gamma_{t}(x_{t})}p(y_{t}\st x_{t})\int p(x_{t+1}\st x_{t}){\tbif_{t+1}(x_{t+1})\over \gamma_{t+1}(x_{t+1})}\dx_{t+1}.	\nn
+}
+%
+Noting that $\bif_{T}(x_{T})=p(y_{T}\st x_{T})$ and iterating brings
+%
+\eqa{		
+	\tbif_{t}(x_{t}) &=& \int {\gamma_{t}(x_{t})}\prod_{\ell=t}^{T-1}p(x_{\ell+1}\st x_{\ell})\prod_{k=t}^{T}p(y_{k}\st x_{k})\dx_{t+1:T}.	\nn
+}
+%
+We can thus define a joint distribution $\tbif_{t}(x_{t:T})$ as the integrand of the above expression with the following sequential structure:
+\eqa{		\tbif_{t}(x_{t:T}) &\propto& {\gamma_{t}(x_{t})p(x_{t+1}\st x_{t})p(y_{t}\st x_{t})\over \gamma_{t+1}(x_{t+1})}\tbif_{t+1}(x_{t+1:T}),	\label{recursion joint BIF}}
+which lends itself well to the SMC framework with the optimal proposal:
+%
+\eqa{
+	q^{\text{opt}}_{t}(x_{t}\st x_{t+1},y_{t}) &\propto& {\gamma_{t}(x_{t})p(x_{t+1}\st x_{t})p(y_{t}\st x_{t})\over \gamma_{t+1}(x_{t+1})}.
+}
+%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\label{introTFS}Two filter smoothing algorithm}
+Plugging a particle representation of the filtering distribution in \eqref{eq:pred-dens}, the prediction density can be approximated by
+%
+\eqa{
+	\widehat\pd_t(x_t)  &=& \sum_{i=1}^{N} w^{(i)}_{t-1}p(x_{t}\st X^{(i)}_{t-1}).	
+\label{eq PDhat}	
+}
+%
+Correspondingly, we can consider a particle representation of the normalised BIF obtained by following a backward particle filter on \eqref{recursion joint BIF}. 
+%The non-standard notation $\pd_{t}$ as well as the notations introduced below for the backward information filter will make the discussion of the TFS algorithm simpler and less cluttered. The backward information filter $\bif_t(x_t):=p(y_{t:T}\st x_{t})$ is not necessarily proportional to a distribution in $x_{t}$ and can thus not be directly targeted in a SMC context. However, one can define an auxiliary quantity by pre-multiplying the backward information filter by an artificial \emph{normalisation density} $\gamma_{t}(x_{t})$ such that the product
+%%
+%\eqa{		
+%	\tbif_t(x_t) &:=& Z_{t}\inv{\gamma_{t}(x_{t}) p(y_{t:T}\st x_t)},		\label{def normalised BIF}
+%}
+%%
+%is a distribution in $x_{t}$ (with $Z_{t}$ a normalisation constant) and can thus be targeted in the SMC framework \citep{briers10}.\check{jun24} 
+%We will refer to these densities as \emph{normalisation densities}. The $\tbif_{t}$ are distributions and can be targeted in a SMC framework. 
+Let us denote these by $\widehat\tbif_{t}$ with weights $\tilde w_{t+1}^{(j)}$ and particles $\tilde X^{(j)}_{t+1}$, i.e.:
 %
 \eqa{		
 	\widehat\tbif_t(x_t) &=& \sum_{j=1}^{N} \tilde w^{(j)}_{t+1} \delta_{\tilde X^{(j)}_{t+1}}(x_{t}).
 	} 
 %
-By dividing it by $\gamma_{t}$, one can then recover an approximation to the original BIF.:
+By dividing these by the corresponding normalisation density $\gamma_{t}$, we can obtain approximations to the original BIF:
 %
 \eqa{		
 	\widehat\bif_t(x_t) &=& { \widehat\tbif_t(x_t)/  \gamma_{t}(x_{t})}.	\nn
 }
 %
-It is useful to note that although the choice of normalisation densities is only constrained by the support condition \eqref{eq: tech condition normalisation density}, the quality of the resulting estimators will depend significantly on it \citep{fearnhead10, taghavi12}.\check{jun25}
-
-After having constructed an estimator for the normalised BIF, an estimator of the smoothing density can be obtained by computing
+Combining both the estimators of the prediction density and the backward information filter at step $t$, we can obtain a particle representation of the smoothing distribution with
 %
 \eqa{		
 	\hat{p}(x_{t}\st y_{1:T}) &=& \zeta_{t}\inv\widehat\pd_t(x_t)\widehat\bif_t(x_t)	, \label{first smoothing estimator}	
 	}
 %
-where $\zeta_{t}$ is a normalisation constant. Note that if both the predictive density and the normalised BIF have been approximated using $N$ particles, the above estimator is a mixture of $N^{2}$ components and a further resampling step can be applied to reduce it to a mixture of $N$ components. 
+where $\zeta_{t}$ is a normalisation constant. 
+Note that since both the predictive density and the normalised BIF have been approximated using $N$ particles, the above estimator is a mixture of $N^{2}$ components and a further resampling step can be applied to reduce it to a mixture of only $N$ components. 
+
 %Another comment that we can make at this point is that the form of the estimator in \eqref{first smoothing estimator} suggests taking as normalisation densities the estimator of the prediction densities. \\
 
-It is useful to stress that the TFS algorithm samples new particles in its backward step which can increase the overall exploration of the state-space, an advantage over the FFBS algorithm which does not. \check{jun25}
 %We will show explicitly how to implement the two filter smoothing algorithm with a near-ideal normalisation density in \hyperref[sec:TFS]{section \ref*{sec:TFS}}. 
 
 
-\dred{Bring here the section in background}
+\todofr{
+\begin{itemize}
+	\item Add here the algorithm
+	\item add short discussion (complexity, choice of normalisation)
+\end{itemize}
+}
 
+
+%%%%%%%%%%%%%%%%%%%%%
 \section{Backward Information Smoothing}
+\todofr{explain what goes on here, clarify that work of Taghevi although obtained independently (or something of the sorts and get Arnaud to tell you how to best present the thing)}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choice of normalisation densities}
+The choice of normalisation densities in the TFS algorithm is, in theory, only constrained by the support condition \eqref{eq: tech condition normalisation density}. However, the quality of the corresponding estimators for a finite sample size depends significantly on it. \add{explain Fearnhead / Briers choice and explain why it's not ideal}
+Combining \eqref{eq:TFS} and \eqref{recursion joint BIF}, we get
+%
+\eqa{
+	p(x_{t}\st y_{t:T}) &\propto& {\pd_{t}(x_{t})\over \gamma_{t}(x_{t})} \int \tbif_{t}(x_{t:T}) \dx_{t+1:T}\nn
+}
+%
+so that we can write
+%
+\eqa{		
+	p(x_{t:T}\st y_{1:T}) &\propto& {\pd_{t}(x_{t})\tbif_{t}(x_{t:T})\over \gamma_{t}(x_{t})}	\label{normalised BIF and partial joint}.
+}
+%
+This expression suggests picking $\gamma_{1}$ to be the prior distribution on the first state $\pi_{0}(x_{1})$ since that leads directly to 
+%
+\eqa{		
+	p(x_{1:T}\st y_{1:T}) &=& \tbif_{1}(x_{1:T}).	\label{full joint and first bif}
+	}
+%
+The last two equations \eqref{normalised BIF and partial joint} and \eqref{full joint and first bif} are crucial for the rest of the analysis. \margnote{Choosing $\gamma_{t}$}The first one suggests that if we pick $\gamma_{t}$ to be close to the predictive density then, then each term $\tbif_{t}(x_{t:T})$ forms an estimator for the partial joint smoothing densities $p(x_{t:T}\st y_{1:T})$; the second one indicates that upon selecting $\gamma_{1}$ to be the prior for the initial state, we end up targeting exactly the joint distribution of interest, no matter which admissible sequence $\{\gamma_{t}\}_{t=2}^{T}$ we picked earlier. \\
+This suggests to build a good estimator of the prediction density, based partly or entirely on a particle estimator of the filtering density; use it as normalisation density and target the corresponding normalised BIF recursively. 
+We explored this idea and showed that it significantly outperforms the default choice used in \citep{briers10, fearnhead10}. It came to our knowledge that this choice had in fact also been studied independently and earlier than this work by \citet{taghavi12}. 
+
+Upon selecting $\gamma_{t}$ to be the approximation of the predictive density \eqref{eq PDhat} based entirely on a a particle estimator of the filtering density, we get what Taghavi calls the \emph{backward informations smoothing} (BIS) algorithm. \add{discuss with Arnaud: verifies support condition? -> yes if the support of $p(x_{t}\st x_{t-1})$ is the whole of $\mathcal X$}
+The optimal importance function for targeting the corresponding normalised BIF is obtained by considering \eqref{recursion joint BIF} with this specific choice of normalising density:\check{jul2}\add{explain Xtilde}
+\eqa{		\tilde q^{\text{opt}}_{t}(x_{t}\st \tilde X^{(j)}_{t+1}, y_{t}) &\propto & {\hpd_{t}(x_{t})\over \hpd_{t+1}(\tilde X^{(j)}_{t+1})} p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t}),}
+where the $\{\tilde X_{t+1}^{(j)}\}_{j=1}^{N}$ are the particles from the previous smoothing step. 
+
+%
+\begin{algorithm}[!h]\small
+	\caption{\label{alg:bisquad}\dblue{\emph{\small Skeleton of a backward information smoother}}}
+	\begin{algorithmic}[1]
+		\State run a PF targeting $\{p(x_{t}\st y_{1:t})\}_{t=1}^{T}$ with $N$ particles $\{X^{(i)}_{t}, w^{(i)}_{t}\}_{t,i=1}^{T,N}$
+		\For{$t=T-1:1$}
+		\EndFor
+%		\State sample $X_{1}^{(i)}\simiid q_{1}$ for $i=1,\dots,N$	%\Comment{\emph{Initialization}}
+%		\State compute and normalise the weights $w_{1}(X^{(i)}_{1})\propto {\pi_{0}( X^{(i)}_{1})p(y_{1}\st X^{(i)}_{1})/ q_{1}(X^{(i)}_{1})}$
+%%		\State resample: $\{\X^{(i)}_{1},W^{(i)}_{1}\}\rightarrow\{\overline \X^{(i)}_{1},N\inv\}$\Comment{\emph{Using some resampling scheme}}\vspace*{.2cm}
+%		\For{$t=2:T$}
+%			\State sample $X^{(i)}_{t}\sim q_{t}( \cdot \st X^{(i)}_{t-1})$ with $q_{t}\approx q_{t}^{\text{opt}}$
+%			\State update and normalise the weights $w^{(i)}_{t}\propto\alpha^{(i)}_{t}w^{(i)}_{t-1}$
+%		\EndFor\\
+%		\Return weighted set of particles $\{X^{(i)}_{1:T},w^{(i)}_{1:T}\}_{i=1}^{N}$
+	\end{algorithmic}
+\end{algorithm}
+%
+
+For each $j$, this requires sampling a particle from $\hpd_{t}(x_{t})p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t})$ which is a mixture of $N$ terms. Additionally, getting the corresponding weight requires computing a sum of $N$ terms $\hpd_{t+1}(\tilde X_{t+1}^{(j)})$. The complexity of the BIS algorithm is therefore inherently quadratic in the number of particles as the FFBS algorithm.
+
+As it is not trivial in general to sample from $p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t})$, let alone when it is combined with $\hpd_{t}(x_{t})$, a possibility akin to the bootstrap proposal for the particle filter is to simply sample from $\hpd_{t}(x_{t})$. The disadvantage is that that choice doesn't take into account the information available ($\tilde X^{(j)}_{t}$ and $y_{t}$). 
+
+\todofr{Discuss the algorithm + complexity}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{From quadratic to linear complexity}
+This importance function is difficult to work with since it contains a ratio of mixtures of $N$ terms. In other words, for each parent particle $\tilde X^{(j)}_{t+1}$, we have to consider sampling from a (different) mixture of $N$ terms with thus an intrinsic quadratic computational complexity. 
+
+
+Another way of writing the sampling step in the BIS is to consider sampling $N$ weighted particles from a mixture of $N^{2}$ terms:
+\eqa{			\syst{\tilde X^{(i)}_{t} &\sim& \tilde q_{t}(x_{t}\st X^{(i)}_{t-1},\tilde X^{(j)}_{t+1},y_{t}) 		\\
+(\tilde w^{(k)}_{t})\inv &\propto & \sum_{i=1}^{N}w_{t}^{(i)}p(\tilde X^{(j)}_{t+1}\st X^{(i)}_{t})},\quad\text{where}\qquad\\
+q_{t}(x_{t}\st X^{(i)}_{t-1},\tilde X^{(j)}_{t+1},y_{t}) \esp \propto \esp \sum_{i,j=1}^{N} w_{t-1}^{(i)}\tilde w^{(j)}_{t+1}p(x_{t}\st X^{(i)}_{t-1})p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t}).}
+The form of the sampling step is then precisely that which was studied in \cite{briers05} and suggests using the idea of sampling the labels of the forward and the backward parts (denoted respectively by $i$ and $j$) independently as was implemented in \citet{fearnhead10}. This is also the approach followed by \citet{taghavi12} and leads to the \hyperref[ALG bis taghavi]{algorithm \ref*{ALG bis taghavi}} below with linear complexity in the number of particles $N$.
+\begin{algorithm}[!h]\small
+	\caption{\label{ALG bis taghavi}\dblue{\emph{\small Skeleton of a BIS with linear complexity}}}
+	\begin{algorithmic}[1]
+		\State run a particle filter targeting $\{p(x_{t}\st y_{1:t})\}_{t=1}^{T}$ with $N$ particles
+		\State set $\{\tilde X^{(j)}_{T},\tilde w^{(j)}_{T}\}_{j=1}^{N}\leftarrow \{X^{(i)}_{T},w^{(i)}_{T}\}_{i=1}^{N}$
+		\For{$t=T-1:2$}
+			\For{$k=1:N$}
+	    			\State sample the indices $I^{\star}_{k} \sim \mathcal M(\beta^{(i)}_{t})$ and $J^{\star}_{k}\sim \mathcal M(\beta^{(j)}_{t+1})$
+				\State sample the particles $$\tilde X^{(k)}_{t}\sim \tilde q_{t}^{\text{opt}, I^{\star}_{k}, J^{\star}_{k}}(x_{t}) \propto p(x_{t}\st X^{(I^{\star}_{k})}_{t-1})p(\tilde X^{(J^{\star}_{k})}_{t+1}\st x_{t})p(y_{t}\st x_{t})$$
+			\EndFor
+		\EndFor
+	\State sample $\tilde X^{(j)}_{1}\sim q_{1}(x_{1})\propto p(x_{1})p(\tilde X^{(j)}_{2}\st x_{1})p(y_{1}\st x_{1})/\gamma_{t+1}(\tilde X^{(j)}_{2})$ for $j=1:N$.
+	\end{algorithmic}
+\end{algorithm}
+
+In the above algorithm, we assume that we can sample exactly from the $(i^{\star}_{k},j^{\star}_{k})$ mixture component. In practice however, one could use importance sampling for that step which would then require a weighing step and consequently a resampling step to alleviate the problem of variance growth that might arise from it.
+\subsubsection{Comments}
+The main improvement of this algorithm over the one presented in \cite{fearnhead10} is the choice of the normalisation density. Improvements can be observed in practice, especially when the ratio of the variance of the transition density to that of the observation density is large (cf. \hyperref[numerical experiments]{point \ref*{numerical experiments}}).\\
+
+Another comment that can be made is that we showed in the previous section that although it was desirable to have $\gamma_{t}\approx \pd_{t}$, it was not necessary as long as $\gamma_{1}=p_{1}$. As shown in \citet{taghavi12}, one could approximate the prediction densities with a mixture of $K$ Gaussians with $K\ll N$ and then consider the full mixture on $KN$ terms instead of a mixture on $N^{2}$ terms. In \citet{taghavi12}, it is shown that mixtures of one or two Gaussians can already provide a good enough approximation to the prediction density in HMM with a simple dynamic. For high-dimensional systems with highly non-Gaussian dynamics however, adjusting a good mixture of a few Gaussians might be expensive and the resulting approximation might be poor.
+
 
 \section{Comparisons}
 
 \section{Discussion}
+Note also that the TFS algorithm samples new particles in its backward step which can increase the overall exploration of the state-space, an advantage over the FFBS algorithm which does not. \check{jul1,jun25}
