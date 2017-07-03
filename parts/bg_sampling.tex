@@ -42,7 +42,7 @@ Provided the support of $q$ includes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(
 	\hat\pi(x) &=& \sum_{i=1}^{N} w(X^{(i)})\delta_{X^{(i)}}(x)
 }
 %
-with the $w(X^{(i)})$ summing to one. One way to assess the quality of the importance sampling is the \emph{effective sample size} (ESS)\addref. Writing $\V[\hat I_{n}^{\text{MC}}]=\sigma^{2}/n$ the variance of the Monte Carlo estimators with $n$ samples, we can write the variance of the importance sampling estimator as $\sigma^{2}/\text{ESS}$ and compare the ESS to $n$. The ESS is usually computed as follows \citep{kong94}:
+with the $w(X^{(i)})$ summing to one. One way to assess the quality of the importance sampling is the \emph{effective sample size} (ESS)\addref. If we write $\sigma^{2}/n$ the variance of the Monte Carlo estimators with $n$ samples, we can write the variance of the importance sampling estimator as $\sigma^{2}/\text{ESS}$ and compare the ESS to $n$. The ESS is usually computed as follows \citep{kong94}:
 %
 \eqa{
 	\text{ESS} &=& \pat{\sum_{i=1}^{n} w(X^{(i)})^{2}}\inv.
