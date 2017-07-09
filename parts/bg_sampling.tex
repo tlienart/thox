@@ -26,8 +26,10 @@ The strong law of large numbers then indicates that $\widehat I_n\to I$ almost s
 %
 and computing $\hat I_{n}$ amounts to taking the expected value of $\varphi(X)$ with respect to $\hat\pi$.
 
-%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Sequential importance sampling}
+%%%%%%%%%%%%%%%%%%%
+\subsubsection{Importance sampling}
 %For this point, we refer to the note by \citet{doucet11} and also to \citet[chapter 3.3 and 14.3]{robert04}.
 In \emph{importance sampling} (IS), samples are drawn from a \emph{proposal distribution} $q$ that is easy to sample from (e.g.: a Gaussian) and is similar to the target distribution $\pi$. 
 The quadrature weights are then adjusted to reflect that the samples are not drawn from the true distribution:
@@ -42,15 +44,26 @@ Provided the support of $q$ includes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(
 	\hat\pi(x) &=& \sum_{i=1}^{N} w(X^{(i)})\delta_{X^{(i)}}(x)
 }
 %
-with the $w(X^{(i)})$ summing to one. One way to assess the quality of the importance sampling is the \emph{effective sample size} (ESS)\addref. If we write $\sigma^{2}/n$ the variance of the Monte Carlo estimators with $n$ samples, we can write the variance of the importance sampling estimator as $\sigma^{2}/\text{ESS}$ and compare the ESS to $n$. The ESS is usually computed as follows \citep{kong94}:
+with the $w(X^{(i)})$ summing to one. 
+
+%%%%%%%%%%%%%%%%%%%
+\subsubsection{Effective sample size}
+One way to assess the quality of an importance sampling estimator is to consider the ratio of the variance of the corresponding Monte Carlo estimator and the variance of the IS estimator. The general ratio is hard to handle and depends upon the test function with respect to which the expected value is computed. \citet{kong92} suggested considering the following proxy known as the \emph{effective sample size}:
 %
 \eqa{
-	\text{ESS} &=& \pat{\sum_{i=1}^{n} w(X^{(i)})^{2}}\inv.
+	\text{ESS} &=& {n\over 1+\V_{q}(W)},
 }
 %
-It is bounded from below by $1$ -- the degenerate case where a single particle is carrying all the weight -- and from above by $n$ -- the ideal case where the samples are comparable to ideal Monte Carlo samples.
+where $\V_{q}(W)$ is the variance of the importance sampling ratio. Using the sample variance of the normalised weights and simplifying the expression a bit, the proxy that is usually considered for the ESS nowadays is
+%
+\eqa{
+	\text{ESS} &=& \pat{\sum_{i=1}^{n}w(X^{(i)})^{2}}^{-1}\label{eq:ESS}
+}
+%
+This metric is bounded from below by $1$ -- the degenerate case where a single particle is carrying all the weight -- and from above by $n$ -- the ideal case where the samples are comparable to ideal Monte Carlo samples.
 
-
+%%%%%%%%%%%%%%%%%%%
+\subsubsection{Hidden Markov models}
 In the context of HMM, we are usually interested in estimating a sequence of target distributions $\{\pi_{t}(x_{1:t})\}_{t=1}^{T}$ which admit the following factorisation structure:
 %
 \eqa{
@@ -90,7 +103,7 @@ which could also have obtained from applying \eqref{optimal proposal}.\add{make 
 		\State compute and normalise the weights $w_{1}(X^{(i)}_{1})\propto {\pi_{0}( X^{(i)}_{1})p(y_{1}\st X^{(i)}_{1})/ q_{1}(X^{(i)}_{1})}$
 %		\State resample: $\{\X^{(i)}_{1},W^{(i)}_{1}\}\rightarrow\{\overline \X^{(i)}_{1},N\inv\}$\Comment{\emph{Using some resampling scheme}}\vspace*{.2cm}
 		\For{$t=2:T$}
-			\State sample $X^{(i)}_{t}\sim q_{t}( \cdot \st X^{(i)}_{t-1})$ with $q_{t}\approx q_{t}^{\text{opt}}$
+			\State sample $X^{(i)}_{t}\simiid q_{t}( \cdot \st X^{(i)}_{t-1}, y_{t})$ with $q_{t}\approx q_{t}^{\text{opt}}$ for $i=1,\dots,N$
 			\State update and normalise the weights $w^{(i)}_{t}\propto\alpha^{(i)}_{t}w^{(i)}_{t-1}$
 		\EndFor\\
 		\Return weighted set of particles $\{X^{(i)}_{1:T},w^{(i)}_{1:T}\}_{i=1}^{N}$
