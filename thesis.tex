@@ -11,13 +11,13 @@
 \newif\ifsnep
 
 \toctrue    \tocfalse
-\introtrue  %\introfalse
-\bgstrue   % \bgsfalse
-\tfstrue   % \tfsfalse
-\lbpstrue  % \lbpsfalse
-\bgmtrue    \bgmfalse
-\sneptrue   \snepfalse
-\pbptrue    \pbpfalse
+\introtrue  \introfalse
+\bgstrue    \bgsfalse
+\tfstrue    \tfsfalse
+\lbpstrue   \lbpsfalse
+\bgmtrue %  \bgmfalse
+\sneptrue  \snepfalse
+\pbptrue   % \pbpfalse
 
 \newcommand{\itsepa}{\itsep0} % adjust all itseps in one shot
 
@@ -141,12 +141,13 @@
 
 \ifbgm\input{parts/bg_messpass}\fi
 
+\chapter[EP for Distributed Bayesian Inference]{Expectation Propagation for\\ Distributed Bayesian Inference}
+\ifsnep\input{parts/snep}\fi
+
 \chapter[EPBP]{Expectation Propagation for\\ Particle Belief Propagation}
 
 \ifpbp\input{parts/pbp}\fi
 
-\chapter[EP for Distributed Bayesian Inference]{Expectation Propagation for\\ Distributed Bayesian Inference}
-\ifsnep\input{parts/snep}\fi
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
@@ -155,10 +156,13 @@
 
 %%%%%%%%%%%
 
-\appendix{}
-\addcontentsline{toc}{part}{Appendix}
-
+\begin{appendices}
+\chapter{Appendix to part 1}
 \input{parts/appendix}
+
+\chapter{Appendix to part 2}
+\end{appendices}
+
 
 
 % BIBLIOGRAPHY

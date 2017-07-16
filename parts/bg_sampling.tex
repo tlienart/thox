@@ -3,64 +3,63 @@
 \section{Monte Carlo and Sequential Monte Carlo}
 \subsection{From quadrature to sampling}
 % KEEP pi (later p is filtering/smoothing)
-We consider the problem of computing the expected value of a test function $\varphi$ with respect to a distribution $\pi\in\mathcal P(\mathcal X)$ i.e.: $I:=\E_\pi[\varphi(X)]$. Assuming it can't be computed analytically, a general approach is to consider a quadrature rule of the form:\add{be consistent with $n$ number of points $d$ dimensions etc.}
+We consider the problem of computing the expected value of a test function $\varphi$ with respect to a distribution $\pi\in\mathcal P(\mathcal X)$ i.e.: $I:=\E_\pi[\varphi(X)]$. Assuming it can't be computed analytically, a general approach is to consider a quadrature rule of the form:
 %
 \eqa{
-	I\esp\approx\esp \widehat I_n &=& \sum_{i=1}^{n} w(X^{(i)}) \varphi(X^{(i)})
+	I\esp\approx\esp \widehat I_N &=& \sum_{i=1}^{N} w(X^{(i)}) \varphi(X^{(i)})
 }
 %
 for some fixed points $X^{(i)}\in\mathcal X$ and corresponding weights $w(X^{(i)})\in\mathbb R_+$. 
-When the number of dimensions is low, we can consider deterministic quadrature rules such as the Gauss-Hermite quadrature.\addref 
-However, as the dimensionality increases, the performance of these deterministic rules becomes catastrophic even for a large number of integration points (a well-known effect related to what Bellman called the \emph{curse of dimensionality} in dynamic programming \citep{bellman57}). 
+When the number of dimensions is low, we can consider deterministic quadrature rules such as the Gauss-Hermite quadrature \citep{davis75}. However, as the dimensionality increases, the performance of these deterministic rules becomes catastrophic even for a large number of integration points (a well-known effect related to what Bellman called the \emph{curse of dimensionality} in dynamic programming \citep{bellman57,bengtsson08}). 
 In such cases, a broadly studied approach is the Monte Carlo integration with
 %
 \eqa{	
-	X^{(i)}\esp \simiid\esp \pi,\quad\text{and}\quad w(X^{(i)})\spe n^{-1}. 	
+	X^{(i)}\esp \simiid\esp \pi,\quad\text{and}\quad w(X^{(i)})\spe N\inv. 	
 \label{eq:mcsampling}}
 %
-The strong law of large numbers then indicates that $\widehat I_n\to I$ almost surely with approximation error scaling like $\mathcal O(n^{-1/2})$ independently of the dimensionality of the problem. This is to be compared with deterministic rules which typically have approximation error scaling like $\mathcal O(n^{-\alpha/d})$ for a fixed $\alpha>0$ depending on the quadrature rule \citep{caflisch98}. The problem then becomes one of drawing iid.\ samples from $\pi$ which is often also an intractable problem. Finally, note that \eqref{eq:mcsampling} in fact defines an \emph{empirical density} $\hat \pi$ with
+The strong law of large numbers then indicates that $\widehat I_N\to I$ almost surely with approximation error scaling like $\mathcal O(N^{-1/2})$ independently of the dimensionality of the problem. This is to be compared with deterministic rules which typically have approximation error scaling like $\mathcal O(N^{-\alpha/d})$ for a fixed $\alpha>0$ depending on the quadrature rule \citep{caflisch98}. The problem then becomes one of drawing iid.\ samples from $\pi$ which is often also an intractable problem. Note that \eqref{eq:mcsampling} in fact defines an \emph{empirical density} $\hat \pi$ with
 %
 \eqa{
-	\hat \pi(x) &:=& n\inv\sum_{i=1}^{N} \delta_{X^{(i)}}(x),
+	\hat \pi(x) &:=& N\inv\sum_{i=1}^{N} \delta_{X^{(i)}}(x),
 }
 %
-and computing $\hat I_{n}$ amounts to taking the expected value of $\varphi(X)$ with respect to $\hat\pi$.
+and computing $\hat I_{N}$ amounts to taking the expected value of $\varphi(X)$ with respect to $\hat\pi$.\check{paragraph jul16}
 
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{Sequential importance sampling}
 %%%%%%%%%%%%%%%%%%%
 \subsubsection{Importance sampling}
 %For this point, we refer to the note by \citet{doucet11} and also to \citet[chapter 3.3 and 14.3]{robert04}.
-In \emph{importance sampling} (IS), samples are drawn from a \emph{proposal distribution} $q$ that is easy to sample from (e.g.: a Gaussian) and is similar to the target distribution $\pi$. 
+In \emph{importance sampling} (IS), samples are drawn from a \emph{proposal distribution} $q\in\mathcal P(\mathcal X)$ that is easy to sample from (e.g.: a Gaussian) and is similar to the target distribution $\pi$. 
 The quadrature weights are then adjusted to reflect that the samples are not drawn from the true distribution:
 %
 \eqa{
 	X^{(i)}\esp \simiid\esp q(\cdot), \quad\text{and}\quad w(X^{(i)})\esp\propto\esp {\pi(X^{(i)})\over q(X^{(i)})}.\label{eq:impsampling}
 } 
 %
-Provided the support of $q$ includes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$, the resulting \emph{importance sampling estimator} is consistent. Further, the estimator of the expected value of a specific test function $\varphi$ is finite provided $\E_{\pi}[\varphi(X)^{2}w(x)]<\infty$ \citep[chapter 3.3]{robert04}. Note that \eqref{eq:impsampling} also defines an empirical density $\hat\pi$ with \add{Introduce ESS to discuss the quality of the variance of the thing.}
+Provided the support of $q$ includes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$, the resulting \emph{importance sampling estimator} is consistent. Further, the estimator of the expected value of a specific test function $\varphi$ is finite provided $\E_{\pi}[\varphi(X)^{2}w(x)]<\infty$ \citep[chapter 3.3]{robert04}. Note that \eqref{eq:impsampling} also defines an empirical density $\hat\pi$ with
 %
 \eqa{
 	\hat\pi(x) &=& \sum_{i=1}^{N} w(X^{(i)})\delta_{X^{(i)}}(x)
 }
 %
-with the $w(X^{(i)})$ summing to one. 
+with the weights $w(X^{(i)})$ summing to one. 
 
 %%%%%%%%%%%%%%%%%%%
 \subsubsection{Effective sample size}
 One way to assess the quality of an importance sampling estimator is to consider the ratio of the variance of the corresponding Monte Carlo estimator and the variance of the IS estimator. The general ratio is hard to handle and depends upon the test function with respect to which the expected value is computed. \citet{kong92} suggested considering the following proxy known as the \emph{effective sample size}:
 %
 \eqa{
-	\text{ESS} &=& {n\over 1+\V_{q}(W)},
+	\text{ESS} &=& {N\over 1+\V_{q}(W)},
 }
 %
-where $\V_{q}(W)$ is the variance of the importance sampling ratio. Using the sample variance of the normalised weights and simplifying the expression a bit, the proxy that is usually considered for the ESS nowadays is
+where $\V_{q}(W)$ is the variance of the importance sampling ratio. Using the sample variance of the normalised weights and simplifying the expression, the proxy that is usually considered for the ESS nowadays is
 %
 \eqa{
-	\text{ESS} &=& \pat{\sum_{i=1}^{n}w(X^{(i)})^{2}}^{-1}\label{eq:ESS}
+	\text{ESS} &=& \pat{\sum_{i=1}^{N}w(X^{(i)})^{2}}^{-1}\label{eq:ESS}
 }
 %
-This metric is bounded from below by $1$ -- the degenerate case where a single particle is carrying all the weight -- and from above by $n$ -- the ideal case where the samples are comparable to ideal Monte Carlo samples.
+This metric is bounded from below by $1$ -- the degenerate case where a single particle is carrying all the weight -- and from above by $N$ -- the ideal case where the samples are comparable to ideal Monte Carlo samples. \check{par jul16}
 
 %%%%%%%%%%%%%%%%%%%
 \subsubsection{Hidden Markov models}
@@ -70,13 +69,13 @@ In the context of HMM, we are usually interested in estimating a sequence of tar
 	\pi_{t}(x_{1:t}) &=& \pi_{t}(x_{t}\st x_{1:t-1})\pi_{t-1}(x_{1:t-1}).\nn
 }
 %
-This lead to the development of \emph{sequential Monte Carlo} (SMC) methods \citep[chapter 14.3]{robert04}. The principle is the same as that of importance sampling except that a different proposal is considered at every step $t$ taking into account the previous draw of particles and the evolution of the system:
+This lead to the development of \emph{sequential Monte Carlo} (SMC) methods \citep[chapter 14.3]{robert04}. The underlying principle of sequential importance sampling is the same as that of importance sampling except that a different proposal is considered at every step $t$ taking into account the previous draw of particles and the evolution of the system:
 %
 \eqa{
 	q_{t}(x_{1:t}) &=& q_{t}(x_{t}\st x_{1:t-1})q_{t-1}(x_{1:t-1}).	\nn
 }
 %
-Following this form, new samples or \emph{particles} $X^{(i)}_t$ can be drawn from $q_{t}(x_{t}\st X^{(i)}_{1:t-1})$ and the weights corresponding to the trajectories $\{X^{(i)}_{1:t}\}$ then need to be updated by a factor $\alpha^{(i)}_{t}$ with\check{jun24}
+Following this form, new samples or \emph{particles} $X^{(i)}_t$ can be drawn from $q_{t}(x_{t}\st X^{(i)}_{1:t-1})$ and the weights corresponding to the trajectories $\{X^{(i)}_{1:t}\}$ then need to be updated by a factor $\alpha^{(i)}_{t}$ with\check{jul16, jun24}
 %
 \eqa{
 	\alpha^{(i)}_{t} := {\pi_{t}(X^{(i)}_{1:t} )\over \pi_{t-1}(X^{(i)}_{1:t-1}) q_{t}(X^{(i)}_{t}\st X^{(i)}_{1:t-1})}.
@@ -84,7 +83,7 @@ Following this form, new samples or \emph{particles} $X^{(i)}_t$ can be drawn fr
 %
 The variance of an IS estimator is directly related to the variance of the associated importance weights. In order to counter the increase of variance induced by the sequential IS procedure, the proposal at step $t$ should be such that the variance of the update factors $\alpha_t$ is as small as possible. In particular, the \emph{optimal proposal} \citep{doucet11} keeps it at zero with
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{1:t-1}) &:=& \pi_{t}(x_{t}\st x_{1:t-1}).	\label{optimal proposal}}
-Note that "optimality" here is understood in terms of the variance of the estimator. Additionally, since we can't typically sample easily from the optimal proposal, we have to resort to approximating distributions.\check{jun24}\add{check transition density introduced} 
+Note that "optimality" here is understood in terms of the variance of the estimator. Additionally, since we can't typically sample easily from the optimal proposal, we have to resort to approximating distributions.\check{jul16, jun24}\add{check transition density introduced} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Particle filtering}
@@ -97,7 +96,7 @@ where we exploited the conditional dependence structure of a HMM. Consequently, 
 which could also have obtained from applying \eqref{optimal proposal}.\add{make a reference to MRF, this is edge potential x node potential} A skeleton of a particle filter algorithm is given below.\check{jun24}
 %
 \begin{algorithm}[!h]\small
-	\caption{\label{alg:particle-filter}\dblue{\emph{\small Skeleton of a particle filter algorithm}}}
+	\caption{\label{alg:particle-filter}\dblue{\emph{\small Particle filter}}}
 	\begin{algorithmic}[1]
 		\State sample $X_{1}^{(i)}\simiid q_{1}$ for $i=1,\dots,N$	%\Comment{\emph{Initialization}}
 		\State compute and normalise the weights $w_{1}(X^{(i)}_{1})\propto {\pi_{0}( X^{(i)}_{1})p(y_{1}\st X^{(i)}_{1})/ q_{1}(X^{(i)}_{1})}$
@@ -111,13 +110,13 @@ which could also have obtained from applying \eqref{optimal proposal}.\add{make 
 \end{algorithm}
 %
 
-The complexity of algorithm \ref{alg:particle-filter} is $\mathcal O(TN)$. Indeed, at each step $t$,  the algorithm samples $N$ particles and computes their corresponding weights which has linear complexity in the number of particles.\check{jun24}
+The computational complexity of algorithm \ref{alg:particle-filter} is $\mathcal O(TN)$. Indeed, at each step $t$,  the algorithm samples $N$ particles and computes their corresponding weights which has linear complexity in the number of particles.\check{jun24}
 
 Sampling directly from the optimal proposal is often an intractable problem by itself. In the context of filtering, an alternative choice is the \emph{bootstrap proposal} \citep{doucet11} with
 \eqa{q^{\text{bs}}(x_{t}\st x_{t-1})&:=&p(x_{t}\st x_{t-1}),}
-which is often easier to sample from. In that case, the update factor simply reduces to $\alpha^{(i)}_t \propto p(y_t\st X^{(i)}_t)$. However, since the likelihood and the transition density may not be well aligned, those update factors can vary a lot incurring an increase in the variance of the resulting estimator.\check{jun29}
+which is often easier to sample from. In that case, the update factor simply reduces to $\alpha^{(i)}_t \propto p(y_t\st X^{(i)}_t)$. However, since the likelihood and the transition density may not be well aligned, those update factors can vary a lot incurring an increase in the variance of the resulting estimator.\check{jul16,jun29}
 
-We have omitted the \emph{resampling step} in algorithm \ref{alg:particle-filter}. That step resamples particles with replacement based on their weights \citep{delmoral06}.\add{If the ESS below a threshold, needs to introduce ESS then} In practice, this alleviates the problem of variance growth over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. Although this step is a key aspect of particle filters, it is not an aspect that plays an important role in the issues we consider in this document; in the sequel we will therefore assume that a standard multinomial resampling is applied \citep{doucet11}.
+We have omitted the \emph{resampling step} in algorithm \ref{alg:particle-filter}. That step resamples particles with replacement based on their weights if the ESS comes under a pre-assigned threshold \citep{delmoral06}. In practice, this alleviates the problem of weight degeneracy incurring growth of variance over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. Although this step is a key aspect of particle filters, it is not an aspect that plays an important role in the issues we consider in this document; in the sequel we will therefore assume that a standard multinomial resampling is applied \citep{hol06,doucet11}.\check{jul16}
 
 \subsection{\label{bg:particle-smoothing}Particle smoothing}
 
@@ -128,12 +127,12 @@ This relation leads to the \emph{forward filtering, backward smoothing} (FFBS) a
 Plugging the particle approximation to the filtering distribution in equation \eqref{eq FFBS} gives:
 \eqa{		
 	\hat{p}(x_{t}\st y_{1:T}) &=& \hat{p}(x_{t}\st y_{1:t})\int {p(x_{t+1}\st x_{t})\over \int p(x_{t+1}\st x_{t})\hat p(x_{t}\st y_{1:t})  \dx_{t}}\hat p(x_{t+1}\st y_{1:t+1})\dx_{t+1}\nn \\
-			&= &	\sum_{i}^{N}w^{(i)}_{t\st T}\delta_{X^{(i)}_{t}}(x_{t}),	}
+			&= &	\sum_{i=1}^{N}w^{(i)}_{t\st T}\delta_{X^{(i)}_{t}}(x_{t}),	}
 where the smoothing weights are given recursively by
 \eqa{		w^{(i)}_{t\st T} &\propto& w^{(i)}_{t}\sum_{j=1}^{N}{w^{(j)}_{t+1\st T}\pac{p(X^{(j)}_{t+1}\st X^{(i)}_{t})\over \sum_{k=1}^{N}w^{(k)}_{t}p(X^{(j)}_{t+1}\st X^{(k)}_{t})}}. \label{eq FFBS weights}	}
-In essence, the FFBS algorithm simply recycles a particle filter updating its weights according to equation \eqref{eq FFBS weights}. 
+In essence, the FFBS algorithm simply recycles a particle filter updating its weights according to equation \eqref{eq FFBS weights}. \check{jul16}
 
-The computation of the updated smoothing weights has complexity $\mathcal O(TN^{2})$ since, at each step, we need to consider the matrix of all pairwise interactions between the particles at two subsequent steps: $[p(X^{(j)}_{t+1}\st X^{(i)}_{t})]_{i,j=1}^{N}$. Since the FFBS algorithm recycles the particles from a particle filter, the performances of the resulting estimators can suffer if the support of the filtering distribution at step $t$ is significantly distinct from that of the smoothing distribution at step $t$.\add{algorithm representing the FFBS?}\check{jun29,jun24}
+The computation of the updated smoothing weights has complexity $\mathcal O(TN^{2})$ since, at each step, we need to consider the matrix of all pairwise interactions between the particles at two subsequent steps: $[p(X^{(j)}_{t+1}\st X^{(i)}_{t})]_{i,j=1}^{N}$. Since the FFBS algorithm recycles the particles from a particle filter, the performances of the resulting estimators can suffer if the support of the filtering distribution at step $t$ is significantly distinct from that of the smoothing distribution at step $t$.\check{jul16, jun29,jun24}
 
 
 

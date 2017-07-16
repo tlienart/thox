@@ -1,16 +1,12 @@
 % !TEX root = ../thesis.tex
 
-\todofr{
-\begin{itemize}
-	\item General reference, say that aim is to be self contained rather than completely general, suggest Brown and Rockafellar for the details.
-	\item notations inspired from \citet{wainwright08}
-\end{itemize}
-}
+In this part we introduce the notations and tools from the theory of exponential families and convex analysis. The aim is to offer a self-contained presentation rather than a fully exhaustive or general one, we refer to \citet{brown86} for exponential families and to \citet{rockafellar70} for convex analysis. The notations used here are inspired from these authors and \citet{wainwright08}.
 
 \subsubsection*{Log partition function and natural parameter space
 }
+
 %Following \citet{wainwright08} 
-We define the \emph{exponential family} $\mathcal F_\phi(\mathcal X)\subseteq\mathcal P(\mathcal X)$ associated with a sufficient statistic $\phi:\mathcal X\to\R^{d}$ on a set $\mathcal X\subseteq \R^{n}$ as the collection of probability distribution functions indexed by a parameter $\theta\in\R^{d}$ and of the form\add{review notations, stick to theta for approximating density}
+We define the \emph{exponential family} $\mathcal F_\phi(\mathcal X)\subseteq\mathcal P(\mathcal X)$ associated with a \emph{sufficient statistic} $\phi:\mathcal X\to\R^{d}$ on a set $\mathcal X\subseteq \R^{n}$ as the collection of probability distribution functions indexed by a parameter $\theta\in\R^{d}$ and of the form\add{review notations, stick to theta for approximating density}
 %
 \eqa{
 	q_\theta(x)&=& \exp\pat{\scal{\theta,\phi(x)}-A(\theta)}
@@ -23,7 +19,7 @@ with respect to a base measure $\nu$ on $\mathcal X$. The \emph{log partition} f
 .
 }
 %
-The set of \emph{natural parameters} $\Omega \subseteq \mathbb R^{d}$ is defined as the set of parameters $\theta$ such that $A(\theta)$ is bounded (and, therefore, $q_\theta$ is a proper distribution):\check{may15, april16}
+The set of \emph{natural parameters} $\Omega \subseteq \mathbb R^{d}$ is defined as the set of parameters $\theta$ such that $A(\theta)$ is bounded (and, therefore, $q_\theta$ is a proper distribution):\check{jul16 may15, april16}
 \eqa{	\Omega &:=& \{\theta\in\R^{d}\mid A(\theta) \,<\,\infty\}.\label{def:natural} 	}
 %
 An exponential family is said to be \emph{regular}\margnote{regular fam.} when the corresponding set $\Omega$ is nonempty and open. Additionally, an exponential family is said to be \emph{minimal}\margnote{minimal fam.} provided there does not exist a nonzero vector $a\in\mathbb R^{d}$ such that $\scal{a,\phi(x)}$ is constant $\nu$-almost everywhere. A distribution in a minimal exponential family is therefore one-to-one with its parameter $\theta\in\Omega$. In the rest of this document, we will assume that we are working with a regular and minimal exponential family unless otherwise mentioned.\add{check, add comment otherwise}\check{may15, april16}

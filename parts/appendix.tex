@@ -1,1 +1,111 @@
 % !TEX root = ../thesis.tex
+
+\todofr{Restructure this part, check appendix command}
+%%%%%%%%%%%%%%
+\section{\label{app:fearnhead-lg}Fearnhead's Algorithm for a Linear-Gaussian Model }
+We describe here an algorithm corresponding to the description in \citep{fearnhead10} with a simple linear and Gaussian underlying dynamic:
+%
+\eqa{	\syst{
+	\pi_{0}(x_1)		&=& \mathcal N(x_1; \mu_0, Q_0) 	\\
+	p(x_t\st x_{t-1}) 	&=& \mathcal N(x_t; A_t x_{t-1}, Q)
+		}.
+	\nn}
+We start by discussing the form of the normalising densities following the choice suggested in \citep{briers10} and considered in \citep{fearnhead10} then discuss how the corresponding normalised backward information filter (BIF) can be targeted and finally how the particle filter and the normalised BIF can be coupled to yield estimators of the smoothing densities. \add{code is available in SMC.jl} \check{jul16}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{\label{app:normalising-density-fearnhead-lg}Normalising densities}
+%
+The normalising density are defined with $\gamma_{1}\equiv \pi_{0}$ and subsequently 
+%
+\eqa{
+	\gamma_{t}(x_{t}) = \int p(x_{t}\st x_{t-1}) \gamma_{t-1}(x_{t-1})\dx_{t-1}, \quad \text{for $2\le t\le T$}\label{eq-app:propag-fearnhead}
+	}
+%
+The integrand is a product of two Gaussian terms and so clearly $\gamma_{t}$ will be a Gaussian itself. Let $\mu_{t-1}$ and $\Sigma_{t-1}$ denote the mean and covariance matrix of $\gamma_{t-1}$. The quadratic term corresponding to the integrand is (ignoring the constant terms in $x_{t}$ and $x_{t-1}$):\check{jul16,jul11}
+%
+\eqa{
+x_{t}\transp Q\inv x_{t} - 2x_{t}\transp A\transp Q\inv x_{t-1} -2x_{t-1}\transp \Sigma_{t-1}\inv \mu_{t-1} + x_{t-1}\transp A\transp Q\inv A x_{t-1} + \nn\\x_{t-1}\transp \Sigma_{t-1}\inv x_{t-1} - 2\mu_{t-1}\transp\Sigma_{t-1}\inv x_{t-1}.\label{eq-app:initial-quad-term}
+}
+%
+In order for the integral \eqref{eq-app:propag-fearnhead} to simplify, we need to exhibit a Gaussian term in $x_{t-1}$ so that the term integrates out easily. Assembling the terms in $x_{t-1}$ appropriately we get
+%
+\eqa{
+	x_{t-1}\transp (A\transp Q\inv A + \Sigma_{t-1}\inv) x_{t-1} - 2x_{t-1}\transp (A\transp Q\inv x_{t} + \Sigma_{t-1}\inv \mu_{t-1} )\nn.
+}
+%
+In order to form a complete Gaussian, we need to add a term corresponding to the mean. Let us call the mean and covariance matrix of this Gaussian $\mu^{\bullet}_{t-1}$ and $\Sigma^{\bullet}_{t-1}$ respectively. We have:\check{jul16,jul11}
+%
+\eqa{ \syst{
+	(\Sigma^{\bullet}_{t-1})\inv &=& A\transp Q\inv A + \Sigma_{t-1}\inv \\
+	(\Sigma^{\bullet}_{t-1})\inv \mu^{\bullet}_{t-1} &=& A\transp Q\inv x_{t} + \Sigma_{t-1}\inv \mu_{t-1}
+	}\nn.}
+%
+The completion term is $\mu^{\bullet}_{t-1}(\Sigma^{\bullet}_{t-1})\inv \mu^{\bullet}_{t-1}$ and must now be removed from the remaining terms in \eqref{eq-app:initial-quad-term} to uncover the resulting Gaussian in $x_{t}$. We finally obtain the following quadratic term in $x_{t}$
+%
+\eqa{
+	x_{t}\transp\pat{Q\inv - Q\inv A \Sigma^{\bullet}_{t-1} A\transp Q\inv}x_{t} - 2x_{t}\pat{ Q\inv A \Sigma^{\bullet}_{t-1} \Sigma\inv_{t-1}\mu_{t-1} }.\nn
+}
+%
+This last expression gives the following recursion for the mean and the covariance matrices of the $\gamma_{t}$ for $t=2,\dots, T$:
+%
+\eqa{\syst{
+	\Sigma_{t}\inv &=& Q\inv - Q\inv A\Sigma^{\bullet}_{t-1}A\transp Q\inv \\	\mu_{t} &=& \Sigma_{t}\pat{ Q\inv A \Sigma^{\bullet}_{t-1} \Sigma\inv_{t-1}\mu_{t-1} }
+	}.
+}
+%
+%%%%%%%%%%%%%%%
+\subsection{Targeting the normalised BIF}
+Now that we have defined the normalising densities, we can sample backwards to target the normalised BIF. Let us denote by $\tilde X^{(j)}_{t}$ and $\tilde w^{(j)}_{t}$ the particles and weights associated with the normalised BIF. The initial set of particles for step $T$ can be sampled from the optimal proposal $\gamma_{T}(x_{t})p(y_{T}\st x_{T})$ which is a Gaussian in $x_{T}$; using a similar approach than in the previous point, it is easy to see that the mean $\tilde \mu_{T}$ and covariance matrix $\tilde \Sigma_{T}$ are given by\check{jul16}
+%
+\eqa{\syst{
+	\tilde\Sigma_{T}\inv &=& \Sigma_{T}\inv + B\transp R\inv B\\
+	\tilde\mu_{T} &=& \Sigma_{T}\pat{\Sigma_{T}\inv \mu_{T} + B\transp R\inv y_{T}}
+}.\nn
+}
+The weights are uniform since the sampling is done from the optimal proposal. Subsequently, the optimal proposal for the following steps is derived from \eqref{recursion joint BIF}:
+%
+\eqa{
+	q(x_{t}\st \tilde X^{(j)}_{t+1}) &=& {\gamma_{t}(x_{t})p(x_{t+1}\st x_{t}) p(y_{t}\st x_{t}) \over \gamma_{t+1}(\tilde X^{(j)}_{t+1})},\nn
+}
+%
+and the numerator is a Gaussian in $x_{t}$ and, again, it is easy to obtain
+%
+\eqa{\syst{
+	\tilde\Sigma_{t}\inv &=& \Sigma_{t}\inv + B\transp R\inv B + A\transp Q\inv A\\
+	\tilde\mu_{t} &=& \Sigma_{t}\pat{\Sigma_{t}\inv \mu_{t} + B\transp R\inv y_{t}+A\transp Q\inv x_{t+1}}
+	}.\nn}
+%
+This time, the weights need to be adapted to reflect the term $\gamma_{t+1}(\tilde X^{(j)}_{t+1})$ which is easily computed as it is the likelihood of a Gaussian with known mean and variance. Therefore, we have for $t=T-1,\dots,1$:
+%
+\eqa{\syst{
+	\tilde X^{(j)}_{t} &\sim & \mathcal N(x_{t}; \tilde\mu_{t}, \tilde \Sigma_{t})\\
+	\tilde w^{(j)}_{t} &\propto& \tilde w^{(j)}_{t+1}/\gamma(\tilde X^{(j)}_{t+1}) 
+}\quad \text{for $j=1,\dots,N$}.\nn
+}
+%
+\subsection{Targeting the smoothing distributions}
+The last step of the algorithm is the combination of the representation of the predictive density relying on a particle representation of the filtering densities $\{X^{(i)}_{t}, w^{(i)}_{t}\}_{i,t=1}^{N,T}$ with that of the normalised BIF. For this, as suggested in \citet{fearnhead10}, we follow the procedure below:
+%
+\eqa{\syst{ i^{\star} & \sim&\mathcal M(\{w^{(i)}_{t}\}_{i=1}^{N}) \\
+		 j^{\star} & \sim&\mathcal M(\{\tilde w^{(j)}_{t}\}_{i=1}^{N})\\
+		 \overline X^{(j)}_{t} &\sim& \varphi_{i^{\star},j^{\star}}(x_{t})
+} \quad\text{for $j=1,\dots,N$, and $t=1,\dots,T$}\nn
+}
+%
+where $\varphi_{i^{\star},j^{\star}}(x_{t}) = p(\tilde X^{(j^{\star})}_{t+1}\st x_{t})p(y_{t}\st x_t)p(x_{t}\st X^{(i^{\star})}_{t-1})$ and no reweighing step is needed since we can sample from it exactly (it is a Gaussian) and it is the optimal proposal. Using the same approach as in the previous two points, if we denote the parameters of the optimal proposal $\varphi_{i^{\star},j^{\star}}$ as $\overline \mu_{t}$ and $\overline \Sigma_{t}$ then:\check{jul16}
+%
+\eqa{\syst{
+	\overline\Sigma\inv_{t} &=& Q\inv+ A\transp Q\inv A + B\transp R\inv B\\
+	\overline\mu_{t} &=& \overline\Sigma_{t}\pat{A\transp Q\inv \tilde X^{(j^{\star})}_{t+1} + Q\inv A X^{(i^{\star})}_{t-1} + B\transp R\inv y_{t} }
+}.\nn
+}
+%
+
+
+
+
+
+
+
+
+
+
