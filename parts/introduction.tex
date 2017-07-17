@@ -25,8 +25,8 @@ respectively a potential function on a node $i\in \mathcal V$ and on an edge $(i
 %Note that, in principle, any MRF can be 
 Such a graph represents the factorisation structure of a class of probability density functions on the product space $\mathcal X := \prod\mathcal X_{i}$ that can be written as
 \eqa{		p(x) &\propto & \prod_{i\in\mathcal V}\psi_{i}(x_{i})\prod_{j\in\partial i}\psi_{ij}(x_{i},x_{j}),	}
-where $x=(x_{i})_{i\in \mathcal V}$ and $\partial i:=\{j\st (i,j)\!\in\,\!\mathcal E\}$ denotes the neighbourhood of the $i$th node. 
-A simple MRF is illustrated in \fig{fig:simple-MRF}.\\
+where $x=(x_{i})_{i\in \mathcal V}$ and $\partial i:=\{j\st (i,j)\!\in\,\!\mathcal E\}$ denotes the neighbourhood of the $i$th node. Note that any graphical model can be represented as a pairwise MRF \citep{yedidia00, yedidia01, wainwright08}. 
+A simple pairwise MRF is illustrated in \fig{fig:simple-MRF}.\\
 
 \begin{figure}[!h]
 \center

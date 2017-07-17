@@ -1,23 +1,15 @@
 % !TEX root = ../thesis.tex
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Variational Inference}
+\section{Overview of Approximate Bayesian Inference}
 
-\todofr{
-\begin{itemize}
-	\item general stuff, discuss variational inference in general. don't really need VB so introduce it very briefly
-	\item ORDERING: could do EPBP after EP for distributed because then the whole of EP is already discussed... 
-   	\item general form (discuss things like alpha divergence, KStein, Wasserstein)
-   	\item VB, ELBO, guarantees
-
-\end{itemize}
-}
+\input{parts/varinf}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Expectation Propagation}
 % ===============================================
 \newpage
-\subsection{The exponential family and convexity}
+\subsection{\label{point:expof-convex}The exponential family and convexity}
 
 \input{parts/expofamily}
 
