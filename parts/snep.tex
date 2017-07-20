@@ -264,9 +264,16 @@ The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{a
 \todofr{
 \begin{itemize}
 	\item pitfalls of using EP / VB for large dimensional, have to revert to diagonal gaussians in which case maybe not so interesting. As a result and since we are using a large number of points, the uncertainty recovered is often extremely small in both EP and VB and unusable in practice. One may therefore wonder whether a purely optimisation based approach effectively targeting the MAP directly is not all that we can afford etc.
+	\item mention that ``EP energy'' is somewhat misleading (not min or max really) 
+	\item Explain that just choice to go for $\omega$ vs $\lambda$ and that in fact not clear cut.\\
+	\item Explain that more advanced examples with Neural Networks presented in the paper but with Diagonal Gaussian (+ it's not your work so leave it aside)
+	\item Discuss the quest for converging algorithms and why it's a bit futile (cf graph).
 \end{itemize}
-	\item mention that energy is misleading (not min or max really) 
-
-Explain that just choice to go for $\omega$ vs $\lambda$ and that in fact not clear cut.\\
-Explain that more advanced examples with Neural Networks presented in the paper but with Diagonal Gaussian (+ it's not your work so leave it aside)
 }
+
+\begin{figure}[!h]
+\center
+\includegraphics[width=.6\textwidth]{figures/draft/schema_vb_ep}
+\caption{blah}
+\end{figure}
+

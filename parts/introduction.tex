@@ -25,7 +25,7 @@ respectively a potential function on a node $i\in \mathcal V$ and on an edge $(i
 %Note that, in principle, any MRF can be 
 Such a graph represents the factorisation structure of a class of probability density functions on the product space $\mathcal X := \prod\mathcal X_{i}$ that can be written as
 \eqa{		p(x) &\propto & \prod_{i\in\mathcal V}\psi_{i}(x_{i})\prod_{j\in\partial i}\psi_{ij}(x_{i},x_{j}),	}
-where $x=(x_{i})_{i\in \mathcal V}$ and $\partial i:=\{j\st (i,j)\!\in\,\!\mathcal E\}$ denotes the neighbourhood of the $i$th node. Note that any graphical model can be represented as a pairwise MRF \citep{yedidia00, yedidia01, wainwright08}. 
+where $x=(x_{i})_{i\in \mathcal V}$ and $\partial i:=\{j\st (i,j)\!\in\,\!\mathcal E\}$ denotes the neighbourhood of the $i$th node. Note that any graphical model can be represented as a pairwise MRF \citep{yedidia00}. 
 A simple pairwise MRF is illustrated in \fig{fig:simple-MRF}.\\
 
 \begin{figure}[!h]
@@ -58,7 +58,7 @@ We also illustrate one specific type of loopy graph: the \emph{grid graph}.\chec
 %\dred{COULD ADD hierarchical model as tree graph}
 
 %%%%%%%%%%%
-\subsection{Examples of MRF}
+\subsection{\label{intro:exMRF}Examples of MRF}
 In this point, we present a brief overview of three examples of graph structures on which we will focus most of our effort throughout this document. 
 We also present the type of applications they are connected with. 
 They will be considered in more details in subsequent sections.\add{link to section}

@@ -1,9 +1,17 @@
 % !TEX root = ../thesis.tex
 
-\section{Blah}
+\dred{In this chapter we discuss yada yada avenue of further work, maybe here general conclusion on inference on MRF their relevance etc}
+\todofr{ \begin{itemize}
+	\item be wary of not introducing new stuff apart from avenues for future work
+	\item can discuss here impressions: MRF allow to represent complicated models but the inference is often too slow to be of real practical interests. Approximations exist but often lead to solutions with seemingly insignificant uncertainty estimates. The result is therefore more often of the form of a MAP estimate than anything. In an era of ``big models'' and ``big data'' we therefore question whether it is useful or relevant to attempt using a fully Bayesian model or fake Bayesian models which are actually regularised likelihood models in hiding. While the need for uncertainty estimates is as important as ever for example for automated decision making, it may be better with that regard to attempt using methods which may offer a less aesthetically pleasing theoretical framework than Bayesian statistics but do offer practical and realistic uncertainty estimates for large scale models. A possible avenue for this would be to look at adaptation of the bootstrap methods. This has already been attempted (cite Bags of Little Bootstraps) but can also suffer from dimensionality issues (cite whatever). 
+	\item Bayesian inference within a spherical expoF seem particularly naughty and a fake attempt at being bayesian. Very unclear estimates are actually meaningful
+	\item Sampling methods are fine but achieving regimes for which the LLN hits is often too expensive leaving us in a realm of models which may work but offer no practical guarantees as to the quality of the estimators. This is particularly the case for big models. Additionally, working with a large number of samples can be numerically challenging.
+	\item too little pragmatic literature exists on testing the quality of uncertainty estimates obtained via a sampling or an approximate inference method.
+	\item seems to us that it is a \textbf{good} idea to exploit conditional independency structure in a model however it seems to us that the complexity of the computational models attempting to 
+\end{itemize}}
 
-\begin{figure}[!h]
-\center
-\includegraphics[width=.6\textwidth]{figures/draft/schema_vb_ep}
-\caption{blah}
-\end{figure}
+
+\section{On sampling methods}
+
+\section{On approximate inference methods}
+

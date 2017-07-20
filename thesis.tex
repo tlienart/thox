@@ -10,13 +10,13 @@
 \newif\ifpbp
 \newif\ifsnep
 
-\toctrue    \tocfalse
-\introtrue  %\introfalse
-\bgstrue  \bgsfalse
-\tfstrue    \tfsfalse
-\lbpstrue   \lbpsfalse
+\toctrue   % \tocfalse
+\introtrue %\introfalse
+\bgstrue  %\bgsfalse
+\tfstrue    %\tfsfalse
+\lbpstrue   %\lbpsfalse
 \bgmtrue %  \bgmfalse
-\sneptrue  \snepfalse
+\sneptrue  % \snepfalse
 \pbptrue   % \pbpfalse
 
 \newcommand{\itsepa}{\itsep0} % adjust all itseps in one shot
@@ -122,7 +122,7 @@
 \ifbgs\input{parts/bg_sampling}\fi
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Backward Information Smoothing}
+\chapter{\label{chap:BIS}Backward Information Smoothing}
 
 \iftfs\input{parts/twofilter}\fi
 
@@ -141,7 +141,7 @@
 
 \ifbgm\input{parts/bg_messpass}\fi
 
-\chapter[EP for Distributed Bayesian Inference]{Expectation Propagation for\\ Distributed Bayesian Inference}
+\chapter[EP for Distributed Bayesian Inference]{\label{chap:EPforDBI}Expectation Propagation for\\ Distributed Bayesian Inference}
 \ifsnep\input{parts/snep}\fi
 
 \chapter[EPBP]{Expectation Propagation for\\ Particle Belief Propagation}

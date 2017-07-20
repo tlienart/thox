@@ -8,7 +8,7 @@ q^{\star} &\in& \arg\min_{q\in \mathcal F}\quad D(q,p).\label{eq:generic-abi}
 }
 %
 Techniques attempting to solve such problems rely upon exploiting at least one of the three main characteristics: the definition of the discrepancy measure $D$, the definition of the restricted space $\mathcal F$ and the structure of the target distribution $p$. 
-
+\subsection{Variational inference}
 Many discrepancy measures can be considered such as the total variation distance, the Wasserstein distance or $f$-divergences \citep{minka04, blei16, li16, bernton17}. However, most choices lead to the corresponding problem \eqref{eq:generic-abi} being computationally very expensive to solve in general especially when the space $\mathcal X$ is continuous.
 A popular discrepancy measure that has been widely considered in the literature partly because it leads to variational problems that can be solved cheaply is the Kullback-Leibler divergence. Considering the discrepancy $\KL{q,p}$ leads to the popular \emph{variational inference} algorithms \citep{blei16}. 
 
@@ -21,18 +21,14 @@ In \emph{mean-field variational inference} (MFVI), $\mathcal F$ is taken to be t
 % 
 This choice of distribution space, while rather restrictive, leads to the inference problem \eqref{eq:generic-abi} being tractable and efficient iterative schemes based on the gradient descent can be used that provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}. However, the problem is non-convex and no guarantees exist as to what these methods converge to.\add{in discussion, the graph with things to explain where converges to}
 
-Assumed Density Filtering (ADF) and Expectation Propagation (EP) are other popular methods that are also based on the KL divergence (albeit the reversed one). The choice of distribution space is usually the exponential family associated with a sufficient statistic $\phi$ (see point \ref{point:expof-convex}). Additionally, these methods assume that the target distribution $p$ factorises in terms that are easier to handle than $p$ itself (this is clarified at point \ref{s:ADF+EP}).
+\subsection{Other methods}
 
-Of course, inference on MRF requires targeting distributions which factorise in a specific way. 
+The Assumed Density Filtering (ADF) algorithm and the  Expectation Propagation (EP) algorithm are two other popular methods that are also based on the KL divergence (albeit the reversed one). 
+The choice of distribution space is usually the exponential family associated with a sufficient statistic $\phi$ (see point \ref{point:expof-convex}). Additionally, these methods assume that the target distribution $p$ factorises in terms that are easier to handle than $p$ itself (this is clarified at point \ref{s:ADF+EP}).
 
-\dred{Here introduce BP, LBP}
+The Belief Propagation (BP) algorithm and the Loopy Belief Propagation (LBP) algorithm are message-passing algorithms which target distributions that factorise according to a MRF. Those methods can also be shown to be fixed-point algorithms corresponding to a specific form of \eqref{eq:generic-abi} \citep{yedidia01, yedidia02}.
 
-\dred{add how factorisation hypothesis of target goes well with MRF}
-
-In this part of the thesis we focus on the use of EP and LBP for inference on MRF and applications. \dred{We introduce the basics behind EP in the exponential family at pint 5.2 and Belief Propag at 5.3 blah.}
-
-
-
+In this part of the thesis we focus on the use of EP and (L)BP algorithms for inference on MRF and discuss applications. In point \ref{s:ADF+EP} we cover the ADF and EP algorithms with exponential family distributions and in point \ref{bg:belief-propag} we introduce the BP and LBP algorithms.
 
 
 

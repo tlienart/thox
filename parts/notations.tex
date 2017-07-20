@@ -25,7 +25,11 @@ We write $\KL{p,q}=\E_{p}[\log p(X)]-\E_{p}[\log q(X))]$ the Kullback-Leibler di
 Let $B\subset\R^{n}$ denote the Euclidean unit ball with $B=\{x\in\R^{n}\mid \|x\|_{2}\le 1\}$. For any subset $C\subseteq\R^{n}$, we write $\mathrm{int}\,(C)$ the interior of $C$ with $\mathrm{int}\,(C)=\{x\in C \mid \exists \epsilon>0, x+\epsilon B \subset C\}$. Correspondingly we write $\mathrm{cl}(C)$ the closure of $C$ with $\mathrm{cl}(C) = \cap\{C+\epsilon B\st \epsilon>0\}$. A set $C$ is convex if for any $x,y\in C$, $(1-\lambda)x+\lambda y\in C$ for all $\lambda\in(0,1)$. Let $\Omega$ be an arbitrary connected and nonempty subset of $\R^{n}$; a function $f:\Omega\to\R$ is said to be convex if $f((1-\lambda)x+\lambda y)\le (1-\lambda)f(x)+\lambda f(y)$. For an arbitrary function $f:\Omega\to\R$, we denote by $f^{\star}:\R\to \R\cup\{+\infty\}$ the convex-conjugate of $f$ with $f^{\star}(y)=\sup_{y\in \Omega}[\scal{x,y}-f(x)]$. The set of minimisers of a function $f$ on a open, nonempty set $C$ is denoted by $\arg\min_{x\in C}\,f(x)$ i.e. the set $\pab{x\in C\mid f(y)\ge f(x), \,\forall y\in C}$. For a differentiable, strictly convex function $\varphi:C\to\R$, we denote by $B_\varphi(x,y)$ the Bregman divergence associated to $\varphi$ between $x$ and $y$ in $C$ with $B_\varphi(x,y)=\varphi(x)-\varphi(y)-\scal{x-y,\nabla \varphi(y)}$.  \check{jun21,may13}
 
 \subsection*{Miscellaneous}
-We denote the complexity of an algorithm by $\mathcal O(h(N))$ to indicate that it scales in $N$ like $h(N)$ for large $N$. If the algorithm is $\mathcal O(N)$ (resp.\ $\mathcal O(N^{2})$) we say the algorithm has linear (resp.\ quadratic) complexity in $N$. If the complexity is between linear and quadratic, e.g.: $\mathcal O(N\log N)$, we say the algorithm is sub-quadratic.
+We denote an undirected graph by a set of vertex labels $\mathcal V$ and edges $\mathcal E\subseteq \mathcal V\times\mathcal V$. For a node $u\in\mathcal V$ we write $\partial u = \{v \in\mathcal V \st (u,v)\in \mathcal E\}$ the neighbourhood of node $u$.
+%\subsection*{Complexity and convergence}
+
+We denote the complexity of an algorithm by $\mathcal O(h(N))$ to indicate that it scales in $N$ like $h(N)$ for large $N$. If the algorithm is $\mathcal O(N)$ (resp.\ $\mathcal O(N^{2})$) we say the algorithm has linear (resp.\ quadratic) complexity in $N$. If the complexity is between linear and quadratic, e.g.: $\mathcal O(N\log N)$, we say the algorithm is sub-quadratic. We use the same notations to denote the convergence of the error of an algorithm e.g.: $\mathcal O(N\inv)$ indicates that, for large $N$, the error decreases as $N$ increases
+
 
 %If the function $f$ is convex and differentiable on $C$ we call \emph{first-order condition} the fact that this set is equivalent to the set of points $x\in C$ such that $\nabla f(x)=0$.
 
@@ -72,7 +76,7 @@ We denote the complexity of an algorithm by $\mathcal O(h(N))$ to indicate that 
 \setlength{\tabcolsep}{6pt} % default
 \subsection*{Abbreviations}
 We list below abbreviations that are used in this document by alphabetical order. 
-\add{add link to primary definition, check all are used}
+\add{add link to primary definition, will help to check all are used}
 \setlength{\tabcolsep}{12pt}
 \renewcommand{\arraystretch}{1.2}
 \begin{longtable}{ll}

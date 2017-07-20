@@ -1,36 +1,35 @@
 % !TEX root = ../thesis.tex
 
+In this chapter, we start with a brief overview of approximate bayesian inference. We then cover tools  
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Overview of Approximate Bayesian Inference}
 
 \input{parts/varinf}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Expectation Propagation}
+%\section{\label{bg:exp-propag}Expectation Propagation}
+\section{\label{point:expof-convex}Exponential Family and Convexity}
+
+%Before covering the Expectation Propagation (EP) algorithm, we need to introduce the exponential family as well as a few key elements from convex analysis which will help understand the EP algorithms and the variants we will discuss in chapter \ref{chap:EPforDBI}.
+
 % ===============================================
-\newpage
-\subsection{\label{point:expof-convex}The exponential family and convexity}
+%\subsection{\label{point:expof-convex}The exponential family and convexity}
 
 \input{parts/expofamily}
 
 % ====================================
-\newpage
-\subsection{\label{s:ADF+EP}Assumed density filtering and expectation propagation}
+\section{\label{s:ADF+EP}Assumed Density Filtering and Expectation Propagation}
 \input{parts/bgadfep}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Belief Propagation}
+\section{\label{bg:belief-propag}Belief Propagation}
 
-\todofr{
-    \begin{itemize}\itsep0
-    	\item BP on a tree
-		\item LBP when iterating
-		\item why is it / is it not a good idea (energy min and MERL stuff)
-	\end{itemize}
-}
+\input{parts/bgbp}
 
 % ==================
 \section{Discussion}
+\todofr{is this the right place for a discussion section ?}
 \todofr{
 (see where stuff belongs, either here or in previous points)
 \begin{itemize}\itsep0
@@ -44,3 +43,7 @@
 	\item comparison VI and MAP (choice of loss function, popularity etc.)
 \end{itemize}
 }
+
+
+
+

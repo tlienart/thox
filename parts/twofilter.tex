@@ -6,7 +6,7 @@
 We assume that a sequence of empirical densities approximating the filtering distributions has already been obtained through a particle filtering step.
 We had seen at point \ref{bg:particle-smoothing} that the \emph{forward filtering backward smoothing} algorithm (FFBS) recycles a particle filter and simply updates its weights.\add{Discuss the point of this section: we want to show that BIS is a good idea + leads to good algorithm with subquad complexity} We will introduce a class of algorithms that can be obtained from another factorisation of the smoothing distributions. We will also introduce algorithms with a computational complexity that is less than quadratic in $N$ and compare these algorithms in numerical experiments.
 
-\subsection{Two filter formula}
+\subsection{\label{point:TFS}Two filter formula}
 An alternative to the FFBS approach is to exploit the \emph{two filter formula}. 
 To derive it, note that the smoothing distribution can be written in the following way using Bayes' formula:
 %

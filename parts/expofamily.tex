@@ -1,8 +1,8 @@
 % !TEX root = ../thesis.tex
 
-In this part we introduce the notations and tools from the theory of exponential families and convex analysis. The aim is to offer a self-contained presentation rather than a fully exhaustive or general one, we refer to \citet{brown86} for exponential families and to \citet{rockafellar70} for convex analysis. The notations used here are inspired from these authors and \citet{wainwright08}.
+In this part we introduce the notations and tools from the theory of exponential families and convex analysis. We refer to \citet{brown86} for exponential family theory and to \citet{rockafellar70} for convex analysis. The notations used here are inspired from these authors and \citet{wainwright08}.
 
-\subsubsection*{Log partition function and natural parameter space
+\subsection{Log partition function and natural parameter space
 }
 
 %Following \citet{wainwright08} 
@@ -15,12 +15,12 @@ We define the \emph{exponential family} $\mathcal F_\phi(\mathcal X)\subseteq\ma
 with respect to a base measure $\nu$ on $\mathcal X$. The \emph{log partition} function $A$ is defined such as to normalise $q_{\theta}$:
 %
 \eqa{
-	A(\theta) &=& \log \int_{\mathcal X} \exp\scal{\theta,\phi(x)}\nudx
+	A(\theta) &=& \log \int \exp\scal{\theta,\phi(x)}\nudx
 .
 }
 %
 The set of \emph{natural parameters} $\Omega \subseteq \mathbb R^{d}$ is defined as the set of parameters $\theta$ such that $A(\theta)$ is bounded (and, therefore, $q_\theta$ is a proper distribution):\check{jul16 may15, april16}
-\eqa{	\Omega &:=& \{\theta\in\R^{d}\mid A(\theta) \,<\,\infty\}.\label{def:natural} 	}
+\eqa{	\Omega &:=& \pab{\theta\in\R^{d}\mid A(\theta) \,<\,\infty }.\label{def:natural} 	}
 %
 An exponential family is said to be \emph{regular}\margnote{regular fam.} when the corresponding set $\Omega$ is nonempty and open. Additionally, an exponential family is said to be \emph{minimal}\margnote{minimal fam.} provided there does not exist a nonzero vector $a\in\mathbb R^{d}$ such that $\scal{a,\phi(x)}$ is constant $\nu$-almost everywhere. A distribution in a minimal exponential family is therefore one-to-one with its parameter $\theta\in\Omega$. In the rest of this document, we will assume that we are working with a regular and minimal exponential family unless otherwise mentioned.\add{check, add comment otherwise}\check{may15, april16}
 
@@ -31,7 +31,7 @@ The log-partition function $A$ is convex on $\Omega$. Indeed, let $\theta_1,\the
 }
 Taking the logarithm of that inequality shows that $A$ is convex on $\Omega$ and therefore that $\Omega$ itself is convex.\check{may15, april16}\add{Actually $\Omega$ is the \emph{effective domain} of $A$, Rockafellar p.23}
 %
-\subsubsection*{Gradient and convex-conjugate of $A$}
+\subsection{Gradient and convex-conjugate of $A$}
 In a regular exponential family, it is well known \citep[theorem 2.2]{brown86} that the log-partition function is infinitely continuously differentiable and that its gradient and Hessian are related to the first two moments of the sufficient statistic:\add{make sure the notations are clarified somewhere}
 %
 \eqa{
@@ -85,10 +85,10 @@ Since the inequality \eqref{eq:dualprop} holds for any $\mu^{+}\neq \mu^{\star}$
 \begin{figure}[!h]
 	\center
 	\includegraphics{figures/expf/mapping}
-	\caption{\label{bijOmM}Illustration of the bijection between the set of natural parameters $\Omega$ and its image under $\nabla A$, $\mathcal M^{\star}$.}
+	\caption{\label{bijOmM}Illustration of the bijection between the set of natural parameters $\Omega$ and its image under $\nabla A$: $\mathcal M^{\star}$.}
 \end{figure}
 %
-\subsubsection*{Mean parameter space}
+\subsection{The mean parameter space}
 It remains to characterise more precisely the set $\mathcal M^{\star}=\nabla A(\Omega)$. It is a subset of the set of realisable \emph{mean parameters}:
 %
 \eqa{
@@ -99,13 +99,13 @@ where $\mathcal P(\mathcal X)$ denotes the set of all probability density functi
 \add{max/sup in notations?, discussion of boundary of Omega for EP when problem in projecting}\check{may15,april22}
 
 %
-\subsubsection*{The case of the Gaussian distribution}
+\subsection{The case of the Gaussian distribution}
 %It is useful to consider this specific case as it plays a crucial role in EP
-The $p$-dimensional multivariate Gaussian distribution with mean $\mu_0\in\R^{p}$ and covariance matrix $\Sigma\in\R^{p\times p}$ corresponds to an exponential family with sufficient statistics $\phi(x) = (x,xx\transp/2)$.\footnote{We had defined the sufficient statistics as a mapping from $\mathcal X$ to $\R^{d}$. Here however, $\phi(x)=(x,xx\transp/2)\in\R^{p}\times \R^{p\times p}$. Formally, we consider the vector formed of all the components of $x$ and $xx\transp/2$ but the results are obviously equivalent.} Correspondingly, the parametrisation in the natural parameter space can be written $\theta=(\Sigma\inv \mu_0, -\Sigma\inv)$ with $\Omega = \R^{d}\times \mathbb S_-^{d}$ and the parametrisation in the mean parameter space is $\mu=(\mu_0,(\mu_0\mu_0\transp+\Sigma)/2)$. The transformation $\nabla A$ and $\nabla A^{\star}$ therefore correspond to the mappings
+The $d$-dimensional multivariate Gaussian distribution with mean $\mu_0\in\R^{d}$ and covariance matrix $\Sigma\in\R^{d\times d}$ corresponds to an exponential family with sufficient statistics $\phi(x) = (x,xx\transp/2)$.\footnote{We had defined the sufficient statistics as a mapping from $\mathcal X$ to $\R^{d}$. Here however, $\phi(x)=(x,xx\transp/2)\in\R^{p}\times \R^{p\times p}$. Formally, we consider the vector formed of all the components of $x$ and $xx\transp/2$ but the results are obviously equivalent.} Correspondingly, the parametrisation in the natural parameter space can be written $\theta=(\Sigma\inv \mu_0, -\Sigma\inv)$ with $\Omega = \R^{d}\times \mathbb S_-^{d}$ and the parametrisation in the mean parameter space is $\mu=(\mu_0,(\mu_0\mu_0\transp+\Sigma)/2)$. The transformation $\nabla A$ and $\nabla A^{\star}$ therefore correspond to the mappings
 %
 \eqa{ \nabla A:\qquad (\theta_1,\theta_2) &\to& (-\theta_2\inv\theta_1, (\theta_2\inv\theta_1\theta_1\transp\theta_2\inv-\theta_2\inv)/2),\label{proj-np-mp-gauss}\\
 \nabla A^{\star}:\qquad (\mu_1,\mu_2) &\to& ((2\mu_2-\mu_1\mu_1\transp)\inv\mu_1, -(2\mu_2-\mu_1\mu_1\transp)\inv).\label{proj-mp-np-gauss}
 }
 %
-Therefore, we note that $\mathcal M^{\star} = \{(\mu_1,\mu_2)\st \mu_1\in\R^{d}, \mu_2\in\R^{d\times d}, (2\mu_2-\mu_1\mu_1\transp)\in\mathbb S_+^{d}\}$ and the mean parameter space $\mathcal M$ contains pairs such that $(2\mu_2-\mu_1\mu_1\transp)$ is symmetric \emph{semi} positive definite.\add{connection with thresholding in pragmatic EP}
+Therefore, we note that $\mathcal M^{\star} = \{(\mu_1,\mu_2)\st \mu_1\in\R^{d}, \mu_2\in\R^{d\times d}, (2\mu_2-\mu_1\mu_1\transp)\in\mathbb S_+^{d}\}$ and the mean parameter space $\mathcal M$ contains pairs such that $(2\mu_2-\mu_1\mu_1\transp)$ is symmetric \emph{semi} positive definite.\add{connection with thresholding in pragmatic EP}\check{jul17}
 

@@ -1,8 +1,8 @@
 % !TEX root = ../thesis.tex
 % -------------------------------------------------------------
-\subsubsection{Variational inference in the exponential family}
+\subsection{Approximate inference in the exponential family}
 %
-The premises of both ADF and EP is performing variational inference in the exponential family $\mathcal F_{\phi}(\mathcal X)$.\add{check EP/ADF abbrev introduced} In the previous point, we showed that a target distribution $p$ could be associated with a point $\mu_p\in\mathcal M$ with $\mu_p=\E_{p}[\phi(X)]$ for a sufficient statistic $\phi$. Further, we showed that if the family is minimal and if $\mu_p\in\mathcal M^{\star}$, the mean parameter could be directly associated to a distribution in $\mathcal F_{\phi}(\mathcal X)$ with parameter $\theta$ given by $\nabla A^{\star}(\mu_p)$. It is therefore natural to consider this distribution $q_{\theta}$ as potentially forming a good approximation to $p$ in $\mathcal F_{\phi}(\mathcal X)$.\check{may15,april24}
+The premises for both the ADF and EP algorithms is performing approximate inference in the exponential family $\mathcal F_{\phi}(\mathcal X)$.\add{check EP/ADF abbrev introduced} In the previous point, we showed that a target distribution $p$ could be associated with a point $\mu_p\in\mathcal M$ with $\mu_p=\E_{p}[\phi(X)]$ for a sufficient statistic $\phi$. Further, we showed that if the family is minimal and if $\mu_p\in\mathcal M^{\star}$, the mean parameter could be directly associated to a distribution in $\mathcal F_{\phi}(\mathcal X)$ with parameter $\theta$ given by $\nabla A^{\star}(\mu_p)$. It is therefore natural to consider this distribution $q_{\theta}$ as potentially forming a good approximation to $p$ in $\mathcal F_{\phi}(\mathcal X)$.\check{may15,april24}
 %
 %\begin{figure}[!h]
 %    \center
@@ -21,18 +21,18 @@ which is a strictly convex function in $\theta'$. By definition, a parameter $\t
 	\theta \,\,=\,\, \mathbf P_{\phi}[p] &\Longleftrightarrow& \theta \,\,=\,\, \nabla A^{\star}(\E_{p}[\phi(X)]).
 }
 %
-Assuming $\mathbf P_{\phi}[p] \in \Omega$, $q_{\theta}$ is a proper distribution in $\mathcal F_{\phi}(\mathcal X)$ that minimises the KL \eqref{kldivadf} and equivalently verifies the \emph{global moment matching condition} (GMMC) 
+Provided $\mathbf P_{\phi}[p] \in \Omega$, the parameter $\theta$ labels a proper distribution $q_{\theta}\in\mathcal F_{\phi}(\mathcal X)$ that minimises the KL \eqref{kldivadf} and equivalently verifies the \emph{global moment matching condition} (GMMC) 
 %
 \eqa{
 	(\text{GMMC})\qquad \E_{q_{\theta}}[\phi(X)]&=&\E_{p}[\phi(X)].
 \label{eq:GMMC}}
 %
-It will also be convenient to use the following abuse of notation: for an unnormalised distribution $p_{u}$ with some normalisation constant $Z_{p_{u}}\inv$ we will write $\mathbf P_{\phi}[p_{u}]$ to implicitly mean $\mathbf P_{\phi}[Z_{p_{u}}\inv p_{u}]$.\check{may15,april24}
+It will also be convenient to use the following abuse of notation: for an unnormalised distribution $p_{u}$ with some normalisation constant $Z_{p_{u}}\inv$ we will write $\mathbf P_{\phi}[p_{u}]$ to implicitly mean $\mathbf P_{\phi}[Z_{p_{u}}\inv p_{u}]$.\check{jul20,may15,april24}
 
 The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu_p=\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu_p$, we need to be able to apply the inverse mapping $\nabla A^{\star}(\mu_p)$. We will introduce below contexts in which the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing the inverse mapping $\nabla A^{\star}$ can be done explicitly or is cheap to approximate. For continuous state spaces, it is overwhelmingly the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix.\add{maybe add explicit comment here for the gaussian + discuss briefly stability}\check{may15,april24} 
 %
 % ----------------------------------------
-\subsubsection*{Online Bayesian Learning and Assumed Density Filtering}
+\subsection{Online Bayesian learning and assumed density filtering}
 %
 Let us consider the context of online Bayesian learning where one is interested in the evolution of a posterior distribution $p(x\st y_{1:t})$ given observed \iid data points $y_{1:t}$ up to current time $t$ and a new \iid data point $y_{t+1}$. 
 The new posterior is given directly by Bayes rule with $p(x\st y_{1:t+1})\propto p(y_{t+1}\st x) p(x\st y_{1:t})$. 
@@ -80,7 +80,7 @@ Let $\omega_{i}=(\theta_{i}-\theta_{i-1})$ denote the difference between subsequ
 The main issue with using ADF on an MRF is that the order in which the graph is read, or equivalently the order in which the factors $t_{i}$ are considered, will affect the final approximation $q_{\theta_{K}}$. A natural extension is therefore to perform multiple passes of ADF while considering random orderings of the factors and correct for the fact that each factor is considered multiple times. This is the core idea behind the \emph{Expectation Propagation} algorithm.\check{may14}
 %
 % --------------------------------------
-\subsubsection*{Expectation Propagation}
+\subsection{Expectation Propagation}
 %
 In the Expectation Propagation algorithm \citep{minka01, minka01b, seeger07, gelman14}, we consider that we have an initial approximation $q_{\theta}\in\mathcal F_{\phi}(\mathcal X)$ that we can write as in \eqref{eq:approxadf} (typically obtained with a pass of ADF) and seek to iteratively improve its parameter $\theta$. At each step, a factor $t_{i}$ is considered and, by contrast to ADF, we now consider the projection $\theta_{i}=\mathbf P_{\phi}[q_{\theta}t_{i}/\tilde t_{i}]$. The difference with ADF is therefore the removal of the previous factor approximation $\tilde t_{i}$ from the current approximation $q_{\theta}$ before the projection. ADF can also be reinterpreted as a single pass of EP where, initially, all the factor approximations are set to $\tilde t_{i}\equiv 1$.\check{may15,april27}
 
