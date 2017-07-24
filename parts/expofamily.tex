@@ -31,8 +31,8 @@ The log-partition function $A$ is convex on $\Omega$. Indeed, let $\theta_1,\the
 }
 Taking the logarithm of that inequality shows that $A$ is convex on $\Omega$ and therefore that $\Omega$ itself is convex.\check{may15, april16}\add{Actually $\Omega$ is the \emph{effective domain} of $A$, Rockafellar p.23}
 %
-\subsection{Gradient and convex-conjugate of $A$}
-In a regular exponential family, it is well known \citep[theorem 2.2]{brown86} that the log-partition function is infinitely continuously differentiable and that its gradient and Hessian are related to the first two moments of the sufficient statistic:\add{make sure the notations are clarified somewhere}
+\subsection{Gradient and convex-conjugate of the log-partition function}
+In a regular exponential family, it is well known \citep[theorem 2.2]{brown86} that the log-partition function is infinitely continuously differentiable and that its gradient and Hessian are related to the first two moments of the sufficient statistic:
 %
 \eqa{
 	\nabla A(\theta) &=& \E_{q_\theta}[\phi(X)] \nn\\
@@ -89,14 +89,14 @@ Since the inequality \eqref{eq:dualprop} holds for any $\mu^{+}\neq \mu^{\star}$
 \end{figure}
 %
 \subsection{The mean parameter space}
-It remains to characterise more precisely the set $\mathcal M^{\star}=\nabla A(\Omega)$. It is a subset of the set of realisable \emph{mean parameters}:
+It remains to characterise more precisely the set $\mathcal M^{\star}=\nabla A(\Omega)$. It is a subset of the set of all realisable \emph{mean parameters}:
 %
 \eqa{
-	\mathcal M^{\star} \esp\subseteq\esp \mathcal M &:=& \pab{\mu\in\mathbb R^{d}\mid \exists\, p \in\mathcal P(\mathcal X) \,\,\text{s.t.}\,\, \mu=\E_{p}[\phi(X)] },
+	\mathcal M^{\star} \esp\subseteq\esp \mathcal M &:=& \pab{\mu\in\mathbb R^{d}\mid \exists\, p \in\mathcal P(\mathcal X) \,\,\text{s.t.}\,\, \mu=\E_{p}[\phi(X)] }.
 }
 %
-where $\mathcal P(\mathcal X)$ denotes the set of all probability density functions on $\mathcal X$. This space $\mathcal M$ is also known as the \emph{mean parameter space}. It is easy to see that it is convex since $\mathcal P(\mathcal X)$ is convex. More interestingly, it can be shown that, for a minimal exponential family, $\mathcal M^{\star}$ is, in fact, the interior of $\mathcal M$ \citep[theorem 3.3]{wainwright08}. Note that, since the interior of a convex set is necessarily convex, $\mathcal M^{\star}$ is itself convex. Finally, note that since $\mathcal M^{\star}=\mathrm{int}\,(\mathcal M)$, $A^{\star}$ can be continuously extended on $\mathcal M$ by changing the $\max$ in a $\sup$ in \eqref{eq:defconja}. In a similar fashion, for a point $\mu\in\mathcal M\backslash \mathcal M^{\star}$, we can consider a sequence of points $\mu_{1},\mu_{2},\dots$ in $\mathcal M^{\star}$ such that $\lim_{i\to\infty}\mu_{i}=\mu$ and identify $\nabla A^{\star}(\mu)$ to $\lim_{i\to\infty}\nabla A^{\star}(\mu_{i})$ by continuity. The extended operator is then defined as a mapping from $\mathcal M$ to $\mathrm{cl}(\Omega)$.
-\add{max/sup in notations?, discussion of boundary of Omega for EP when problem in projecting}\check{may15,april22}
+This space $\mathcal M$ is also known as the \emph{mean parameter space}. It is easy to see that it is convex since $\mathcal P(\mathcal X)$ is convex. More interestingly, it can be shown that, for a minimal exponential family, $\mathcal M^{\star}$ is in fact the interior of $\mathcal M$ \citep[theorem 3.3]{wainwright08}. Note that, since the interior of a convex set is necessarily convex, $\mathcal M^{\star}$ is itself convex. Finally, note that since $\mathcal M^{\star}=\mathrm{int}\,(\mathcal M)$, $A^{\star}$ can be continuously extended on $\mathcal M$ by changing the $\max$ in a $\sup$ in \eqref{eq:defconja}. In a similar fashion, for a point $\mu\in\mathcal M\backslash \mathcal M^{\star}$, we can consider a sequence of points $\mu_{1},\mu_{2},\dots$ in $\mathcal M^{\star}$ such that $\lim_{i\to\infty}\mu_{i}=\mu$ and identify $\nabla A^{\star}(\mu)$ to $\lim_{i\to\infty}\nabla A^{\star}(\mu_{i})$ by continuity. The extended operator is then defined as a mapping from $\mathcal M$ to $\mathrm{cl}(\Omega)$.
+\add{max/sup in notations?, discussion of boundary of Omega for EP when problem in projecting}\check{jul21,may15,april22}
 
 %
 \subsection{The case of the Gaussian distribution}

@@ -21,7 +21,7 @@ In a Bayesian setting, we are interested in the posterior distribution over a pa
 %
 where $\pi_0$ is a prior distribution. Each of the likelihood term itself factors over the individual data points of $y_i$, i.e.: $p(y_i\st x)=\prod_{j=1}^{N_i}p(y_{ij}\st x)$ with $N_i$ the number of individual data points held by the compute node $i$.
 
-\todofr{Add here litt, why is this relevant, some basic stuff that have been tried + references}
+\todofr{Add here more literature, why is this relevant, some basic stuff that have been tried + references (see distbayes)}
 
 Defining $t_i$ to be nonnegative factors with $t_i(x)=p(y_i\st x)$, the factorised form \eqref{eq:distrposterior} reads $\pi_0(x)\prod_{i=1:K}t_i(x)$ which is the form \eqref{eq:targetfactorises} that we had used to motivate the introduction of the ADF and EP algorithms (cf.\ point \ref{s:ADF+EP}).
 In the rest of this chapter, we show how different variants of the EP algorithm can be used to perform parallel variational inference in the presence of distributed data.\check{jun8} 
@@ -53,7 +53,7 @@ The general parallel computational framework considered iterates on the followin
 
 As we will see, there are different ways to implement this general framework.
 We will show empirically that a determining element in the performance of a particular implementation is its robustness to Monte Carlo noise. 
-Indeed, in our general setting we do not assume that computing $\E_{q_i}[\phi(X)]$ can be done exactly. Rather, we assume that it is approximated by a Monte Carlo estimator.\check{june8}
+Indeed, in our general setting we do not assume that computing $\E_{q_i}[\phi(X)]$ can be done exactly. Rather, we assume that it is approximated by a Monte Carlo estimator.\check{june8} \add{figure from distbayes paper to represent exchanges}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damped updates in the natural parameter space}
 In their paper, \citet{xu14} suggest a method to synchronise Monte Carlo samplers ran on independent compute nodes. They call it \emph{Sequential Moment Sharing} or SMS for short. Effectively, SMS corresponds precisely to the case mentioned at the previous point consisting of running EP across multiple physical nodes while using noisy estimates of $\E_{q_i}[\phi(X)]$, the expected value of the sufficient statistics under the tilted distribution. 

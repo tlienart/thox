@@ -1,15 +1,19 @@
 % !TEX root = ../thesis.tex
 
 In this thesis we define approximate Bayesian inference in broad terms as the class of methods attempting to recover a distribution $q$ in a restricted family of distributions $\mathcal F\subset \mathcal P(\mathcal X)$ such that $q$ is a ``good'' proxy for a posterior distribution $p$ of interest. 
-This definition then leaves significant room for different methods based on the definition of what a ``good proxy'' is. Let $D:\mathcal P(\mathcal X)\times \mathcal P(\mathcal X)\to \mathbb R_{+}$ denote a discrepancy measure between two probability distributions then the generic variational problem we consider is
+This definition leaves significant room to describe different methods based on the definition of what a good proxy means. 
+
+Let $D:\mathcal P(\mathcal X)\times \mathcal P(\mathcal X)\to \mathbb R_{+}$ denote a discrepancy measure between two probability distribution functions. Then, the generic variational problem we consider is the minimisation of this discrepancy in $\mathcal F$:
 %
 \eqa{
 q^{\star} &\in& \arg\min_{q\in \mathcal F}\quad D(q,p).\label{eq:generic-abi}
 }
 %
 Techniques attempting to solve such problems rely upon exploiting at least one of the three main characteristics: the definition of the discrepancy measure $D$, the definition of the restricted space $\mathcal F$ and the structure of the target distribution $p$. 
-\subsection{Variational inference}
+
 Many discrepancy measures can be considered such as the total variation distance, the Wasserstein distance or $f$-divergences \citep{minka04, blei16, li16, bernton17}. However, most choices lead to the corresponding problem \eqref{eq:generic-abi} being computationally very expensive to solve in general especially when the space $\mathcal X$ is continuous.
+%%%%%%%%%%%%%%%%%
+\subsection{Variational inference}
 A popular discrepancy measure that has been widely considered in the literature partly because it leads to variational problems that can be solved cheaply is the Kullback-Leibler divergence. Considering the discrepancy $\KL{q,p}$ leads to the popular \emph{variational inference} algorithms \citep{blei16}. 
 
 
@@ -19,12 +23,12 @@ In \emph{mean-field variational inference} (MFVI), $\mathcal F$ is taken to be t
 	\mathcal F_{\text{VI}} &=& \pab{q \in \mathcal P(\mathcal X) \st q(x_{1},\dots,x_{d}) = \prod_{i=1}^{d}q_{i}(x_{i}) }.
 }
 % 
-This choice of distribution space, while rather restrictive, leads to the inference problem \eqref{eq:generic-abi} being tractable and efficient iterative schemes based on the gradient descent can be used that provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}. However, the problem is non-convex and no guarantees exist as to what these methods converge to.\add{in discussion, the graph with things to explain where converges to}
+This choice of distribution space, while rather restrictive, leads to the inference problem \eqref{eq:generic-abi} being tractable and efficient iterative schemes based on the gradient descent can be used that provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}. However, the problem is non-convex and no guarantees exist as to what these methods converge to.\add{in discussion, the graph with things to explain where converges to}\add{maybe clarify why you're discussion about it and then not in rest, EP, LBP take more advantage of structure of target}
 
 \subsection{Other methods}
 
-The Assumed Density Filtering (ADF) algorithm and the  Expectation Propagation (EP) algorithm are two other popular methods that are also based on the KL divergence (albeit the reversed one). 
-The choice of distribution space is usually the exponential family associated with a sufficient statistic $\phi$ (see point \ref{point:expof-convex}). Additionally, these methods assume that the target distribution $p$ factorises in terms that are easier to handle than $p$ itself (this is clarified at point \ref{s:ADF+EP}).
+The Assumed Density Filtering (ADF) algorithm and the  Expectation Propagation (EP) algorithm are two other popular methods that are also based on the KL divergence (albeit the reversed one).\add{link to clarification} 
+The choice of distribution space is usually the exponential family associated with a sufficient statistic $\phi$ (see point \ref{point:expof-convex}). Additionally, these methods assume that the target distribution $p$ factorises in terms that are easier to handle than $p$ itself (see point \ref{s:ADF+EP}).
 
 The Belief Propagation (BP) algorithm and the Loopy Belief Propagation (LBP) algorithm are message-passing algorithms which target distributions that factorise according to a MRF. Those methods can also be shown to be fixed-point algorithms corresponding to a specific form of \eqref{eq:generic-abi} \citep{yedidia01, yedidia02}.
 
