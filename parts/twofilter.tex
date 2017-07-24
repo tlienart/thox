@@ -1,10 +1,14 @@
 % !TEX root = ../thesis.tex
 
+In this chapter, we focus on the problem of approximating the smoothing distributions for a Hidden Markov Model (HMM) with continuous state-space.
+We assume that a sequence of empirical densities approximating the filtering distributions has already been obtained through a particle filtering step.
+We had seen at point \ref{bg:particle-smoothing} that the \emph{forward filtering backward smoothing} (FFBS) algorithm can produce an approximation to the smoothing distributions by recycling a particle filter and updating its weights.  As shown in point \ref{bg:particle-smoothing}, the FFBS algorithm has quadratic complexity and may suffer from the lack of resampling step if the smoothing distribution and the filtering distribution have significantly different support. 
+
+In this chapter, we introduce a class of algorithms that can be obtained from another factorisation of the smoothing distributions than that used to obtain the FFBS. We also introduce algorithms with a computational complexity that is sub-quadratic in $N$ and compare these algorithms in numerical experiments.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Two Filter Smoothing}
-\add{Clarify where this comes from (marginal on HMM)}In this chapter, we focus on the problem of approximating the smoothing distributions for a Hidden Markov Model (HMM).\add{specify HMM more specifically, in particular state space} 
-We assume that a sequence of empirical densities approximating the filtering distributions has already been obtained through a particle filtering step.
-We had seen at point \ref{bg:particle-smoothing} that the \emph{forward filtering backward smoothing} algorithm (FFBS) recycles a particle filter and simply updates its weights.\add{Discuss the point of this section: we want to show that BIS is a good idea + leads to good algorithm with subquad complexity} We will introduce a class of algorithms that can be obtained from another factorisation of the smoothing distributions. We will also introduce algorithms with a computational complexity that is less than quadratic in $N$ and compare these algorithms in numerical experiments.
+
 
 \subsection{\label{point:TFS}Two filter formula}
 An alternative to the FFBS approach is to exploit the \emph{two filter formula}. 
@@ -31,7 +35,7 @@ the second term $p(y_{t:T}\st x_{t})$ is called the \emph{backward information f
 	\pd_{t}(x_{t}) \esp:=\esp p(x_{t}\st y_{1:t-1}), \quad\text{and}  \quad \bif_{t}(x_{t}) \esp:=\esp p(y_{t:T}\st x_{t}).
 }
 %
-The prediction density is obtained by integrating the filtering density multiplied by the transition density:\add{add reference to MRF part where introduced}
+The prediction density is obtained by integrating the filtering density multiplied by the transition density:
 %
 \eqa{
 	\pd_{t}(x_{t}) &=& \int p(x_{t}\st x_{t-1})p(x_{t-1}\st y_{1:t-1})\dx_{t-1}.\label{eq:pred-dens}
@@ -49,7 +53,7 @@ In other words, the normalising distribution $\gamma_{t}$ allows to define a \em
 }
 %
 for some normalising constant $Z\inv_{t}$.\check{july5}
-Any $\gamma_{t}\in\mathcal P(\mathcal X)$\add{make sure it's clear that every node is on same space $\mathcal X$} can be chosen as long as it verifies the \emph{support condition} i.e.: as long as its support covers that of the backward information filter:
+Any $\gamma_{t}\in\mathcal P(\mathcal X)$ can be chosen as long as it verifies the \emph{support condition} i.e.: as long as its support covers that of the backward information filter:
 %
 \eqa{	
 	\bif_t(x_t) &>&0 \quad\Longrightarrow\quad \gamma_{t}(x_{t})\esp>\esp 0. \label{eq: tech condition normalisation density}	
@@ -99,13 +103,12 @@ Noting that $\bif_{T}(x_{T})=p(y_{T}\st x_{T})$ and iterating brings
 %
 We can thus define a joint distribution $\tbif_{t}(x_{t:T})$ as the integrand of the above expression with the following sequential structure:
 \eqa{		\tbif_{t}(x_{t:T}) &\propto& {\gamma_{t}(x_{t})p(x_{t+1}\st x_{t})p(y_{t}\st x_{t})\over \gamma_{t+1}(x_{t+1})}\tbif_{t+1}(x_{t+1:T}),	\label{recursion joint BIF}}
-which lends itself well to the SMC framework with the optimal proposal:
+which lends itself well to the SMC framework with the optimal proposal:\check{jul16,july5}
 %
 \eqa{
 	q^{\text{opt}}_{t}(x_{t}\st x_{t+1}) &\propto& {\gamma_{t}(x_{t})p(x_{t+1}\st x_{t})p(y_{t}\st x_{t})\over \gamma_{t+1}(x_{t+1})}.
 }
 %
-\check{jul16,july5}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\label{introTFS}Two filter smoothing algorithm}
 Plugging a particle representation of the filtering distribution in \eqref{eq:pred-dens}, the prediction density can be approximated by
@@ -297,7 +300,7 @@ This can in fact be simplified by compressing the representation of the particle
 %
 
 Note that in the case where one can sample easily from the backward dynamic of the HMM i.e.: sample from $p(x_{t}\st x_{t+1})$ this bootstrap BIS can be reversed and ran forward as well as backward. 
-This is in fact a core element of the idea behind our \emph{expected particle belief propagation} (EPBP) algorithm \citep{lienart15} to target the beliefs on an arbitrary MRF which we discuss in the second part of this thesis.\add{link}\check{jul16, jul13}
+This is in fact a core element of the idea behind our \emph{expected particle belief propagation} (EPBP) algorithm to target the beliefs on an arbitrary MRF which we discuss in the second part of this thesis (see chapter \ref{chap:EPBP}).\check{jul16, jul13}
 
 \subsection{Sub-quadratic forward filtering backward smoothing}
 A similar idea than the one applied at the previous point can be applied in the context of the FFBS algorithm (section \ref{bg:particle-smoothing}).
@@ -320,10 +323,10 @@ where $M$ is sub-linear in $N$. The complexity of the corresponding algorithm is
 \add{mention all the code is online in a package}In this section we discuss the performances of the different smoothing algorithms in different situations. 
 In particular, we show that the default choice of normalisation density \eqref{eq:choice-norma-bad} suggested in \citep{briers10,fearnhead10} can underperform significantly compared to the BIS. It suffices to look at a simple linear-Gaussian model inspired from \citep{fearnhead10} to show this.
 
-We also show that the linear-complexity implementation of the bootstrap BIS compares very favourably with the sub-quadratic and the quadratic implementation at a much reduced computational cost.  We then go on to compare the performances of the sub-quadratic smoothing algorithms on HMMs with a non-linear underlying dynamic.\check{jul16}
+We also show that the linear-complexity implementation of the bootstrap BIS compares very favourably with the sub-quadratic and the quadratic implementation at a much reduced computational cost.  We then go on to compare the performances of the sub-quadratic smoothing algorithms when the underlying dynamic is non-linear.\check{jul16}
 
 %%%%%%%%%%%%
-\newpage
+%\newpage
 %%%%%%%%%%%%
 
 \subsection{Linear Gaussian models}

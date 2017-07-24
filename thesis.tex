@@ -10,13 +10,13 @@
 \newif\ifpbp
 \newif\ifsnep
 
-\toctrue    \tocfalse
-\introtrue \introfalse
-\bgstrue  \bgsfalse
-\tfstrue    \tfsfalse
-\lbpstrue \lbpsfalse
-\bgmtrue  \bgmfalse
-\sneptrue  \snepfalse
+\toctrue    %\tocfalse
+\introtrue %\introfalse
+\bgstrue  %\bgsfalse
+\tfstrue    %\tfsfalse
+\lbpstrue %\lbpsfalse
+\bgmtrue  %\bgmfalse
+\sneptrue  %\snepfalse
 \pbptrue   % \pbpfalse
 
 \newcommand{\itsepa}{\itsep0} % adjust all itseps in one shot
@@ -117,7 +117,7 @@
 \part{Sampling Algorithms} % part I
 
 %%%%%%%%%%%%%%%%%%%%
-\chapter{Background}
+\chapter{\label{chap:BGsampling}Background}
 
 \ifbgs\input{parts/bg_sampling}\fi
 
@@ -144,7 +144,7 @@
 \chapter[EP for Distributed Bayesian Inference]{\label{chap:EPforDBI}Expectation Propagation for\\ Distributed Bayesian Inference}
 \ifsnep\input{parts/snep}\fi
 
-\chapter[EPBP]{Expectation Propagation for\\ Particle Belief Propagation}
+\chapter[EPBP]{\label{chap:EPBP}Expectation Propagation for\\ Particle Belief Propagation}
 
 \ifpbp\input{parts/pbp}\fi
 

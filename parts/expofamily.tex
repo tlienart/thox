@@ -6,7 +6,7 @@ In this part we introduce the notations and tools from the theory of exponential
 }
 
 %Following \citet{wainwright08} 
-We define the \emph{exponential family} $\mathcal F_\phi(\mathcal X)\subseteq\mathcal P(\mathcal X)$ associated with a \emph{sufficient statistic} $\phi:\mathcal X\to\R^{d}$ on a set $\mathcal X\subseteq \R^{n}$ as the collection of probability distribution functions indexed by a parameter $\theta\in\R^{d}$ and of the form\add{review notations, stick to theta for approximating density}
+We define the \emph{exponential family} $\mathcal F_\phi(\mathcal X)\subseteq\mathcal P(\mathcal X)$ associated with a \emph{sufficient statistic} $\phi:\mathcal X\to\R^{d}$ on a set $\mathcal X\subseteq \R^{n}$ as the collection of probability distribution functions indexed by a parameter $\theta\in\R^{d}$ and of the form\add{review consistency of notations, stick to theta for approximating density}
 %
 \eqa{
 	q_\theta(x)&=& \exp\pat{\scal{\theta,\phi(x)}-A(\theta)}
@@ -22,14 +22,14 @@ with respect to a base measure $\nu$ on $\mathcal X$. The \emph{log partition} f
 The set of \emph{natural parameters} $\Omega \subseteq \mathbb R^{d}$ is defined as the set of parameters $\theta$ such that $A(\theta)$ is bounded (and, therefore, $q_\theta$ is a proper distribution):\check{jul16 may15, april16}
 \eqa{	\Omega &:=& \pab{\theta\in\R^{d}\mid A(\theta) \,<\,\infty }.\label{def:natural} 	}
 %
-An exponential family is said to be \emph{regular}\margnote{regular fam.} when the corresponding set $\Omega$ is nonempty and open. Additionally, an exponential family is said to be \emph{minimal}\margnote{minimal fam.} provided there does not exist a nonzero vector $a\in\mathbb R^{d}$ such that $\scal{a,\phi(x)}$ is constant $\nu$-almost everywhere. A distribution in a minimal exponential family is therefore one-to-one with its parameter $\theta\in\Omega$. In the rest of this document, we will assume that we are working with a regular and minimal exponential family unless otherwise mentioned.\add{check, add comment otherwise}\check{may15, april16}
+An exponential family is said to be \emph{regular}\margnote{regular fam.} when the corresponding set $\Omega$ is nonempty and open. Additionally, an exponential family is said to be \emph{minimal}\margnote{minimal fam.} provided there does not exist a nonzero vector $a\in\mathbb R^{d}$ such that $\scal{a,\phi(x)}$ is constant $\nu$-almost everywhere. A distribution in a minimal exponential family is therefore one-to-one with its parameter $\theta\in\Omega$. In the rest of this document, we will assume that we are working with a regular and minimal exponential family.% unless otherwise mentioned.\add{check, add comment otherwise}\check{may15, april16}
 
 The log-partition function $A$ is convex on $\Omega$. Indeed, let $\theta_1,\theta_2\in\Omega$ and $\lambda\in[0,1]$, then using H\"older's inequality with parameters $(1-\lambda)\inv$ and $\lambda\inv$, we can write:\footnote{For two real-valued measurable functions $f$ and $g$, H\"older's inequality with parameters $p,q\in[1,\infty]$ states that $\|fg\|_{1}\le \|f\|_{p}\|g\|_{q}$ provided $p\inv+q\inv=1$.}
 \eqa{
 	\int \exp\scal{(1-\lambda)\theta_1,\phi(x)}\exp\scal{\lambda\theta_2,\phi(x)}\nudx\hspace*{-2cm}&&\nn\\
 	 &\le& \exp(A(\theta_1))^{1-\lambda} \exp(A(\theta_2))^{\lambda}.\label{eq:holderlogp}
 }
-Taking the logarithm of that inequality shows that $A$ is convex on $\Omega$ and therefore that $\Omega$ itself is convex.\check{may15, april16}\add{Actually $\Omega$ is the \emph{effective domain} of $A$, Rockafellar p.23}
+Taking the logarithm of that inequality shows that $A$ is convex on $\Omega$ and therefore that $\Omega$ itself is convex.\check{may15, april16}%\add{Actually $\Omega$ is the \emph{effective domain} of $A$, Rockafellar p.23}
 %
 \subsection{Gradient and convex-conjugate of the log-partition function}
 In a regular exponential family, it is well known \citep[theorem 2.2]{brown86} that the log-partition function is infinitely continuously differentiable and that its gradient and Hessian are related to the first two moments of the sufficient statistic:

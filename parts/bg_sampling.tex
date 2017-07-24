@@ -83,17 +83,17 @@ Following this form, new samples or \emph{particles} $X^{(i)}_t$ can be drawn fr
 %
 The variance of an IS estimator is directly related to the variance of the associated importance weights. In order to counter the increase of variance induced by the sequential IS procedure, the proposal at step $t$ should be such that the variance of the update factors $\alpha_t$ is as small as possible. In particular, the \emph{optimal proposal} \citep{doucet11} keeps it at zero with
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{1:t-1}) &:=& \pi_{t}(x_{t}\st x_{1:t-1}).	\label{optimal proposal}}
-Note that "optimality" here is understood in terms of the variance of the estimator. Additionally, since we can't typically sample easily from the optimal proposal, we have to resort to approximating distributions.\check{jul16, jun24}\add{check transition density introduced} 
+Note that "optimality" here is understood in terms of the variance of the estimator. Additionally, since we can't typically sample easily from the optimal proposal, we have to resort to approximating distributions.\check{jul16, jun24}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Particle filtering}
-In the filtering problem\add{check introduced earlier, link} on a HMM, the target densities are $\pi_{t}(x_{1:t})=p(x_{1:t}\st y_{1:t})$ and their marginals. The incremental update factors are given by
+In the filtering problem on a HMM, the target densities are $\pi_{t}(x_{1:t})=p(x_{1:t}\st y_{1:t})$ and their marginals. The incremental update factors are given by
 \eqa{ \alpha_t(x_{1:t}) &=& {p(x_{1:t}\st y_{1:t})\over p(x_{1:t-1}\st y_{1:t-1})q_t(x_t\st x_{1:t-1})} 	\nn\\
 	&=& {p(x_t,y_t\st x_{1:t-1},y_{1:t-1})p(x_{1:t-1}\st y_{1:t-1})p(y_{1:t-1})\over p(x_{1:t-1}\st y_{1:t-1})q_t(x_t\st x_{1:t-1})p(y_{1:t})}  \nn\\
 	&\propto& {p(y_t\st x_t)p(x_t\st x_{t-1}) \over q_t(x_t\st x_{1:t-1})},}
 where we exploited the conditional dependence structure of a HMM. Consequently, the optimal proposal is
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{t-1}) &\propto& p(y_{t}\st x_{t})p(x_{t}\st x_{t-1})	, \label{particle filter OID}}
-which could also have obtained from applying \eqref{optimal proposal}.\add{make a reference to MRF, this is edge potential x node potential} A skeleton of a particle filter algorithm is given below.\check{jun24}
+which could also have obtained from applying \eqref{optimal proposal}. A skeleton of a particle filter algorithm is given below.\check{jun24}
 %
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:particle-filter}\dblue{\emph{\small Particle filter}}}
@@ -141,11 +141,11 @@ The computation of the updated smoothing weights has complexity $\mathcal O(TN^{
 \section{Sampling with piecewise deterministic Markov processes}
 
 
-\section{Discussion}
-
-\todofr{
-\textbf{move this discussion where it belongs: at end of content chapters}
-	Connect the two background sections with main element (PF, PS link to HMM, PDMP, Local PDMP for anything. Exact methods.).
-}
+%\section{Discussion}
+%
+%\todofr{
+%\textbf{move this discussion where it belongs: at end of content chapters}
+%	Connect the two background sections with main element (PF, PS link to HMM, PDMP, Local PDMP for anything. Exact methods.).
+%}
 
 

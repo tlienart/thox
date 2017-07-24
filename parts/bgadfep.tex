@@ -29,7 +29,8 @@ Provided $\mathbf P_{\phi}[p] \in \Omega$, the parameter $\theta$ labels a prope
 %
 It will also be convenient to use the following abuse of notation: for an unnormalised distribution $p_{u}$ with some normalisation constant $Z_{p_{u}}\inv$ we will write $\mathbf P_{\phi}[p_{u}]$ to implicitly mean $\mathbf P_{\phi}[Z_{p_{u}}\inv p_{u}]$.\check{jul20,may15,april24}
 
-The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu_p=\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu_p$, we need to be able to apply the inverse mapping $\nabla A^{\star}(\mu_p)$ which is not tractable in general. We will introduce below contexts in which the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing the inverse mapping $\nabla A^{\star}$ can be done explicitly or is cheap to approximate. For continuous state spaces, it is overwhelmingly the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix.\add{maybe add explicit comment here for the gaussian + discuss briefly stability}\check{may15,april24} 
+The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu_p=\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu_p$, we need to be able to apply the inverse mapping $\nabla A^{\star}(\mu_p)$ which is not tractable in general. We will introduce below contexts in which the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing the inverse mapping $\nabla A^{\star}$ can be done explicitly or is cheap to approximate. For continuous state spaces, it is overwhelmingly the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix.%\add{maybe add explicit comment here for the gaussian + discuss briefly stability}
+\check{may15,april24} 
 %
 % ----------------------------------------
 \subsection{Online Bayesian learning and assumed density filtering}
@@ -56,7 +57,7 @@ We can therefore reinterpret the algorithm more generally as targeting a distrib
 	p(x) & \propto&  \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x) \label{eq:targetfactorises}
 }
 %
-where the factors $t_i$ are nonnegative.\add{notations: make sure it's clear that $\pi_{0}$ is always the prior} This is the \emph{Assumed Density Filtering} (ADF) algorithm. Note that in this case there is no ``natural ordering'' as in the original online learning case and the algorithm can be applied after any permutation of the factors.\check{april27}
+where the factors $t_i$ are nonnegative. This is the \emph{Assumed Density Filtering} (ADF) algorithm. Note that in this case there is no ``natural ordering'' as in the original online learning case and the algorithm can be applied after any permutation of the factors.\check{april27}
 
 
 \begin{algorithm}[!h]\small
@@ -106,4 +107,4 @@ In Expectation Propagation, we denote by $q_{-i}\propto q_{\theta}/\tilde t_{i}$
 	(\text{LMMC})\qquad	\E_{q_{i}}[\phi(X)] &=& \E_{q_{\theta}}[\phi(X)], \quad i=1,\dots,K.\label{eq:LMMC}
 } 
 %
-These conditions can be interpreted as a relaxation of the GMMC \eqref{eq:GMMC} and the EP algorithm can be interpreted as a fixed point algorithm targeting the LMMC.\add{depending on how much you discuss in SNEP, link here to that part and say will discuss in more details.}\check{jul21, may15}
+These conditions can be interpreted as a relaxation of the GMMC \eqref{eq:GMMC} and the EP algorithm can be interpreted as a fixed point algorithm targeting the LMMC. We will expand on this in chapter \ref{chap:EPforDBI}.\check{jul21, may15}

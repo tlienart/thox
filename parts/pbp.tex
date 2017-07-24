@@ -167,7 +167,7 @@ Alternatively, once each particle approximated message $\widehat{m}_{st}(x_t)$ i
 Note that, in the EP step, if the projection leads to an invalid distribution (e.g., in the Gaussian case, if it leads to an element with negative variance), we simply revert the approximation to its previous value as in \citet{minka01}. \add{this should be discussed in EP intro}
 
 %%%%%%%%%%%%%%%%%%
-\subsection{Projection mechanisms}
+\subsection{\label{point:epbp-proj}Projection mechanisms}
 
 In the description above, we used the projection $\mathbf P_{\phi}$ from \ref{eq:def-proj-operator-ep}. 
 Computing this projection requires computing the moments of the tilted distribution. 
@@ -326,18 +326,9 @@ The \fig{compTree} compares the estimator of the beliefs obtained by all the met
 \end{figure}
 
 \subsection{Sub-quadratic implementation and denoising application}
-As outlined at point \ref{sec:EPBP-compcompl}, the inherent quadratic complexity of the EPBP algorithm can be reduced to $\mathcal O(MN)$ where $M$ is the number of mixture components effectively considered to represent the messages. 
-We apply this method to the $3\times 3$ grid example in the case where $M=\mathcal O(\log(N))$: for $N=\{10,20,50,100,200,500\}$, we pick $M=\{5, 6,8,10,11,13\}$. The results are illustrated in \fig{figCompNLOGN} where one can see that the $N\log N$ implementation compares very well to the original quadratic implementation at a much reduced cost. We apply this sub-quadratic method on a simple probabilistic model for an image denoising problem. The aim of this example is to show that the method can be applied to larger graphs and still provide good results. The model underlined is chosen to showcase the flexibility and applicability of our method in particular when the edge-potential is non-integrable. It is not claimed to be an optimal approach to image denoising.\footnote{In this case in particular, an optimization-based method such as that of \citet{rudin92} is very likely to yield better results and much faster.} \\
-The node and edge potentials are defined as follows:
-\eqa{	
-	\left\{
-		\begin{array}{lcl}
-			\psi_{u}(x_{u}) &=& \mathcal N(x_{u}-y_{u};0,0.1)\\
-			\psi_{uv}(x_{u},x_{v}) &=& \mathcal L^{\lambda}(x_{u}-x_{v};0,0.03)
-		\end{array}
-	\right.,\label{modelIMG}
-}
-where $\mathcal L^{\lambda}(x;\mu,\beta)=\mathcal L(x;\mu,\beta)$ if $|x|\le \lambda$ and $\mathcal L(\lambda;\mu,\beta)$ otherwise. In this example we set $\lambda=0.2$. The value assigned to each pixel of the reconstruction is the estimated mean obtained over the corresponding node (figure \ref{figIMG}). The image has size $50\times 50$ (therefore corresponding to a grid graph of 2500 nodes) and the simulation was run with $N=30$ particles per nodes, $M=5$ and $10$ BP iterations taking under 2 minutes to complete. We compare it with the result obtained with EP on the same model. Note that running PBP on this example would be unrealistic due to the size of the underlying graph.
+As outlined at point \ref{sec:EPBP-compcompl}, the inherent quadratic complexity of the EPBP algorithm can be reduced to $\mathcal O(MN)$ where $M$ is the number of mixture components effectively considered to represent the messages. We also consider the maximum likelihood-based projection mechanism as discussed in point \ref{point:epbp-proj} for the two experiments.
+
+We apply this method to the $3\times 3$ grid example in the case where $M=\mathcal O(\log(N))$: for $N=\{10,20,50,100,200,500\}$, we pick $M=\{5, 6,8,10,11,13\}$. The results are illustrated in \fig{figCompNLOGN} where one can see that the $N\log N$ implementation compares very well to the original quadratic implementation at a much reduced cost. 
 
 
 \begin{figure}[!h]
@@ -350,20 +341,35 @@ where $\mathcal L^{\lambda}(x;\mu,\beta)=\mathcal L(x;\mu,\beta)$ if $|x|\le \la
 \includegraphics[width=.51\textwidth]{figures/epbp/timeCompNLOGN}
 %\vspace*{-.4cm}
 \caption{\label{figCompNLOGN}Comparison of the quadratic and $\mathcal O(N log N )$ implementations. (left) Comparison of the mean L1 error, (right) comparison of the wall-clock time. The sub-quadratic implementation performs almost as well as the original implementation and offers a significant speedup.}
-
-
 \end{figure}
+
+
+We apply the same sub-quadratic method on a simple probabilistic model for an image denoising problem. The aim of this example is to show that the method can be applied to larger graphs and still provide good results. The model underlined is chosen to showcase the flexibility and applicability of our method in particular when the edge-potential is non-integrable. It is not claimed to be an optimal approach to image denoising.\footnote{In this case in particular, an optimisation-based method such as that of \citet{rudin92} is very likely to yield better results and much faster.}
+
+The node and edge potentials are defined as follows:
+\eqa{	
+	\left\{
+		\begin{array}{lcl}
+			\psi_{u}(x_{u}) &=& \mathcal N(x_{u}-y_{u};0,0.1)\\
+			\psi_{uv}(x_{u},x_{v}) &=& \mathcal L^{\lambda}(x_{u}-x_{v};0,0.03)
+		\end{array}
+	\right.,\label{modelIMG}
+}
+where $\mathcal L^{\lambda}(x;\mu,\beta)=\mathcal L(x;\mu,\beta)$ if $|x|\le \lambda$ and $\mathcal L(\lambda;\mu,\beta)$ otherwise. In this example we set $\lambda=0.2$. The value assigned to each pixel of the reconstruction is the estimated mean of the belief obtained over the corresponding node (figure \ref{figIMG}). The image has size $50\times 50$ (therefore corresponding to a grid graph of 2500 nodes) and the simulation was run with $N=30$ particles per nodes, $M=5$ and $10$ BP iterations taking under 2 minutes to complete with the setup described earlier. 
+We compare it with the result obtained with EP on the same model. 
+Running PBP or any other quadratic method on this example is prohibitively expensive due to the size of the underlying graph.
+
 \begin{figure}[!h]
 \center
 %\hspace*{-2cm}
 %\vspace*{-.4cm}
-\includegraphics[scale=.25]{figures/epbp/denoisingExpleORIG}
+\includegraphics[scale=.28]{figures/epbp/denoisingExpleORIG}
 \hspace*{.3cm}
-\includegraphics[scale=.25]{figures/epbp/denoisingExpleINPUT}
+\includegraphics[scale=.28]{figures/epbp/denoisingExpleINPUT}
 \hspace*{.3cm}
-\includegraphics[scale=.25]{figures/epbp/denoisingExpleRECO}
+\includegraphics[scale=.28]{figures/epbp/denoisingExpleRECO}
 \hspace*{.3cm}
-\includegraphics[scale=.25]{figures/epbp/denoisingEP2}
+\includegraphics[scale=.28]{figures/epbp/denoisingEP2}
 %\hspace*{-1.5cm}
 %\vspace*{-.3cm}
 \caption{\label{figIMG} From left to right: comparison of the original (first), noisy (second) and recovered image using the sub-quadratic implementation of EPBP (third) and with pure EP (fourth). % with $N=30$ samples per nodes and $10$ BP iterations with the model \eqref{modelIMG}.
@@ -378,10 +384,19 @@ where $\mathcal L^{\lambda}(x;\mu,\beta)=\mathcal L(x;\mu,\beta)$ if $|x|\le \la
 %%%%%%%%%%
 \section{Discussion}
 
-\todofr{
-\begin{itemize}
-\item watch out to not stress consistency for subquad algo (consistency probably incorrect anyway as per conversation with Naesseth)
-\item discuss existing, PBP, NBP etc. explain that NBP probably good for most cases (?) a little bit like KF for HMM.
-\item add here or otherwise
-\end{itemize}
-}
+In this chapter, we presented an original way to design adaptively efficient and easy-to-sample-from proposals for a particle implementation of the LBP algorithm. The construction of proposals is done in the Expectation Propagation framework.
+
+We have demonstrated empirically that the resulting algorithm is significantly faster and more accurate than an implementation of the PBP algorithm using the estimated beliefs as proposals and sampling from them using MCMC as proposed in \cite{ihler09}. 
+It is also more accurate than using plain EP due to the nonparametric nature of the messages and offers consistent estimators of the LBP messages. 
+
+A sub-quadratic version of the method was also outlined and shown to perform almost as well as the original method on mildly multi-modal models, it was also applied successfully in a simple image denoising example illustrating that the method can be applied on graphical models with thousands of nodes at a reasonable computational cost.
+
+We believe that our method could be applied successfully to a wide range of applications requiring good approximation of the marginals of continuous MRF such as smoothing for Hidden Markov Models \cite{briers10}, tracking or computer vision \cite{sudderth04,felzenszwalb04}. 
+
+%\subsubsection*{Possible paths for future work}
+
+As discussed in point \label{point:epbp-proj}, other projection mechanisms than the KL projection can be considered. We could also look at other discrepancy measure than the KL such as $\alpha$-divergences. This latter choice would suggest considering the power-EP framework \citep{minka04} and could be justified if we seek to build representations of the messages with specific properties. It is unclear to us however how the choice of power in power-EP affects the quality of the proposals representing the node beliefs nor how it would affect the performances of the algorithm.
+
+%To conclude, note that the NBP algorithm of \citet{sudderth03} may in fact be sufficient for a large number of practical applications where MRF does verify the integrability conditions \eqref{conditions NBP} and if the beliefs are not expected to be highly multimodal or non-Gaussian. In a way the NBP algorithm can be compared with the Kalman filter and smoother for a HMM and related techniques: as a first go-to method which may, in fact, lead to satisfactory results. In situations where the NBP algorithm fails or is not applicable, the EPBP algorithm could prove to be a more sensible choice than the PBP algorithm.
+
+

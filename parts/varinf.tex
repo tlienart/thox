@@ -23,11 +23,11 @@ In \emph{mean-field variational inference} (MFVI), $\mathcal F$ is taken to be t
 	\mathcal F_{\text{VI}} &=& \pab{q \in \mathcal P(\mathcal X) \st q(x_{1},\dots,x_{d}) = \prod_{i=1}^{d}q_{i}(x_{i}) }.
 }
 % 
-This choice of distribution space, while rather restrictive, leads to the inference problem \eqref{eq:generic-abi} being tractable and efficient iterative schemes based on the gradient descent can be used that provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}. However, the problem is non-convex and no guarantees exist as to what these methods converge to.\add{in discussion, the graph with things to explain where converges to}\add{maybe clarify why you're discussion about it and then not in rest, EP, LBP take more advantage of structure of target}
+This choice of distribution space, while rather restrictive, leads to the inference problem \eqref{eq:generic-abi} being tractable and efficient iterative schemes based on the gradient descent can be used that provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}. However, the problem is non-convex and no guarantees exist as to what these methods converge to.\add{in discussion, the graph with things to explain where converges to}\add{maybe clarify why discussed here and then not used in rest --> EP, LBP take more advantage of structure of target}
 
 \subsection{Other methods}
 
-The Assumed Density Filtering (ADF) algorithm and the  Expectation Propagation (EP) algorithm are two other popular methods that are also based on the KL divergence (albeit the reversed one).\add{link to clarification} 
+The Assumed Density Filtering (ADF) algorithm and the  Expectation Propagation (EP) algorithm are two other popular methods that are also based on the KL divergence (albeit the reversed one, see point \ref{s:ADF+EP}).
 The choice of distribution space is usually the exponential family associated with a sufficient statistic $\phi$ (see point \ref{point:expof-convex}). Additionally, these methods assume that the target distribution $p$ factorises in terms that are easier to handle than $p$ itself (see point \ref{s:ADF+EP}).
 
 The Belief Propagation (BP) algorithm and the Loopy Belief Propagation (LBP) algorithm are message-passing algorithms which target distributions that factorise according to a MRF. Those methods can also be shown to be fixed-point algorithms corresponding to a specific form of \eqref{eq:generic-abi} \citep{yedidia01, yedidia02}.

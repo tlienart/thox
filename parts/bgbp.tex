@@ -135,15 +135,15 @@ which is the two filter formula for the smoothing distribution $p(x_{t}\st y_{1:
 \subsection{\label{point:LBP}Loopy belief propagation}
 
 In the presence of cycles in the graph (\emph{loopy graph}), there is not a unique way to go through all nodes. 
-Propagating messages through different ordering of the nodes can therefore lead to inconsistent messages. \add{show?}
+Propagating messages through different ordering of the nodes can therefore lead to inconsistent messages (see \ref{fig:lbp-inconsistent} for an illustration).
  
 \begin{figure}[!h]
 \center
-\includegraphics[width=.6\textwidth]{figures/draft/schema_loop}
-\caption{blah}
+\includegraphics[width=.7\textwidth]{figures/lbp/loopy1}
+\caption{\label{fig:lbp-inconsistent}A simple graph with a loop. Starting from the leaf node (blue arrow), the message can be propagated in the loop following a clock-wise ordering (green arrow) or a anti-clockwise ordering (orange arrow). The two backward messages coming back to the leaf node do not necessarily match.}
 \end{figure}
 
-A workaround is to iterate the algorithm over different ordering of the nodes and hope that the iteration converge to a fixed point. This is know as the \emph{loopy belief propagation} (LBP) algorithm \citep{pearl88, yedidia02}:
+A common workaround is to perform the BP algorithm multiple times on different spanning trees of the graphs corresponding to different ordering of the nodes and hope that the iteration converge to a fixed point. This is know as the \emph{loopy belief propagation} (LBP) algorithm \citep{pearl88, yedidia02}:
 %
 \eqa{		\syst{	M_{st}^{n}(x_{s}) &=& \psi_{s}(x_{s}) \prod_{r\in\partial s\backslash t} m^{n-1}_{r s}(x_{s}) \\
 				m^{n}_{ts}(x_{s}) &=& \int \psi_{ts}(x_{t},x_{s})M^{n}_{ts}(x_{t})\dx_{t}\\
