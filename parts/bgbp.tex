@@ -1,28 +1,19 @@
 % !TEX root = ../thesis.tex
 
-\todofr{
-    \begin{itemize}\itsep0
-    	\item BP on a tree
-		\item LBP when iterating
-		\item why is it / is it not a good idea (energy min and MERL stuff)
-	\end{itemize}
-}
+In this section we introduce the Belief Propagation (BP) algorithm for tree-structured MRF which, we show, is an iterative algorithm that can recover functions -- the beliefs -- proportional to the exact node marginals by passing ``messages'' through the graph \citep{pearl88,wainwright08}. We show how this algorithm can be related to the two-filter formula for smoothing on a HMM discussed in chapter \ref{chap:BIS}.
 
-\dred{explain general idea here: interested in finding marginals 
-We show below briefly the steps leading to the algorithms as well as how it can be adapted on loopy graphs.
-In the case of a tree graph, the problem of computing marginals can be decomposed into a sequence of simple problems in a straightforward way. This leads to the \emph{belief propagation} algorithm which, starting from the leaf nodes of the tree, propagates information back to the root node corresponding to the marginal of interest \citep{pearl88,wainwright08}. }
+We then introduce the Loopy Belief Propagation (LBP), an extension of the BP algorithm on graphs with cycles. This algorithm does not lead to functions proportional to the exact node marginals but recovers proxies for it which work well in practice \citep{yedidia02,sudderth03}.
 
-\subsection{Belief propagation on a tree}
+In line with the rest of this document we concern ourselves with the case where the state-spaces associated with the graph nodes are continuous
+
+\subsection{Belief Propagation on a tree}
 
 %\dred{Should revisit this, explain a touch more how this comes to life, also see if the extension to cliques as opposed to single node is trivial or not. It may or may not be relevant, think!}
 %\dred{Go back to the original equations and suggest how one can compute the integrals in a tree from the leaf nodes to a root node blah blah blah BP updates}
 
 %\subsubsection{Tree graphs}
 
-The problem of computing singleton marginals on a tree is relatively easy since the recursive structure of the problem can be exploited. 
-This leads to the BP algorithm which, on a tree, leads to functions -- the \emph{beliefs} -- that are proportional to the true marginals.\add{come back to this intro paragraph after having written intro to section}
-
-Let $s$ denote a node of interest so that we are targeting the marginal $p(x_{s})$. 
+The problem of computing singleton marginals on a tree is relatively easy since the recursive structure of the problem can be exploited. Let $s$ denote a node of interest so that we are targeting the marginal $p(x_{s})$. 
 The full joint on the tree can then be written relatively to that node:
 \eqa{	p(x) &\propto& \psi_s(x_s) \prod_{t\in\partial s} \psi_{ts}(x_t,x_s)\pac{\psi_t(x_t)\phi_{\partial t\backslash s}(x_t,x_{\partial t\backslash s})},	\label{eq:factorisation-tree}}
 where the $\phi_{\partial t\backslash s}$ are given recursively by

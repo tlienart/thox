@@ -22,7 +22,7 @@ In \citet{sudderth03}, the authors suggest representing the messages in the LBP 
 \eqa{	
 	\widehat m^{\text{NBP}}_{ts}(x_{s}) &:=& \sum_{i=1}^{M} w_{s}^{i}\,\mathcal N(x_{s};\mu^{i}_{s},\Lambda_{s}). \label{eq:nbp-representation}
 }
-They call their algorithm \emph{nonparametric belief propagation} (NBP). In order to make computations more efficient, the authors restrict the covariance matrices to be diagonal.\add{mention this in general complaint for VI}
+They call their algorithm \emph{nonparametric belief propagation} (NBP). In order to make computations more efficient, the authors restrict the covariance matrices to be diagonal.
 As indicated in the paper, the representation \eqref{eq:nbp-representation} makes sense only when the messages are finitely integrable. To guarantee this, the authors require that all potentials satisfy the following constraints:
 \eqa{	
 	\sup_{x_{t}} \int \psi_{st}(x_{s},x_{t})\dx_{t} &<&\infty, \quad \text{and}\quad \int \psi_{s}(x_{s})\dx_{s} \esp<\esp \infty,\label{conditions NBP}
@@ -71,7 +71,7 @@ Alternatively the author suggest running a short MCMC simulation targeting it wh
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \section{Expectation Particle Belief Propagation}
-As for the PBP algorithm, we consider importance sampling to build particle representations of the messages. In our method, however, we consider a \emph{sequence} of proposal distributions at each node from which one can cheaply sample particles at a given iteration of the LBP algorithm. 
+As for the PBP algorithm, we consider importance sampling to build particle representations of the messages. In our method, however, we consider a \emph{sequence} of proposal distributions at each node from which one can cheaply sample particles at a given iteration of the LBP algorithm \citep{lienart15}.
 
 The novelty of the approach is to propose a principled and automated way of designing a sequence of proposals in a tractable exponential family using the expectation propagation (EP) algorithm. The resulting method, which we call \emph{Expectation Particle Belief Propagation} (EPBP), does not suffer from the restrictive integrability conditions of the NBP algorithm and sampling is done exactly unlike the PBP algorithm which implies that we obtain consistent estimators of the LBP messages.
 
@@ -90,8 +90,8 @@ This is illustrated at figure \ref{representation-edge-pbp}.
 
 \begin{figure}[!h]
 \center
-\includegraphics[width=.7\textwidth]{figures/draft/schema_pbpsel}
-\caption{\label{representation-edge-pbp}}
+\includegraphics[width=.4\textwidth]{figures/general/belief-st}
+\caption{\label{representation-edge-pbp}Illustration of the situation for an edge $(s,t)$: all messages coming into $s$ and $t$ have been approximated apart from the messages between $s$ and $t$. Therefore approximated pre-messages (denoted $\widehat M$) are available on both nodes. We are considering the problem of determining the best proposals on $s$ and $t$ in order to approximate the messages between $s$ and $t$ given the situation.}
 \end{figure}
 
 We would like to define $q_{s}$ and $q_{t}$ in a joint manner in such a way that all objects remain consistent with the LBP iterations. For that reason, we consider the joint belief $ B_{st}$ on $s$ and $t$ given the approximation to the pre-messages:
@@ -176,8 +176,8 @@ In our scenario the moment computation can be performed crudely on a small numbe
 Since the dimensionality of the tilted distribution in the EPBP algorithm is typically low, a simple deterministic quadrature rule can be used \citep{davis75}. \\
 
 The key desired element for the projection is that the resulting updated proposal distribution captures the support of the current estimator of the belief on the node. Since this is a rather general requirement, the KL-projection $\mathbf P_{\phi}$ does not necessarily lead to the best proposals and in fact may suffer from the fact that we have to compute the projection from the mean-parameter space to the natural parameter space $\nabla A^{\star}$ associated with the exponential family of interest which may be numerically unstable.  
-This can be mitigated by damping as described at point \dred{XXXXX}\add{link} but alternative projection schemes can be tried as well.
-In our experiments for example, we tried considering the $q_{s}\in\mathcal F_{\phi}$ obtained by doing a maximum likelihood estimation of the natural parameters based on a small number of evaluation points of the tilted distribution. This proved to work well in practice.
+This can be mitigated by damping as described at section \ref{sec:ep-for-dbi} but alternative projection schemes can be tried as well.
+In our experiments for example, we tried considering the $q_{s}\in\mathcal F_{\phi}$ obtained by doing a maximum likelihood estimation of the natural parameters based on a small number of evaluation points of the tilted distribution. This proved to work well in practice and can be numerically more stable than the original KL-projection.
 
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{\label{sec:EPBP-compcompl}Computational complexity}

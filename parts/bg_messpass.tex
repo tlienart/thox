@@ -1,6 +1,6 @@
 % !TEX root = ../thesis.tex
 
-In this chapter, we start with a brief overview of approximate bayesian inference. We then cover tools  necessary to understand and extend the Expectation Propagation algorithm and the Loopy Belief Propagation algorithm. These methods and variants form the core of this part of the thesis.\check{jul21}
+In this chapter, we start with a brief overview of approximate Bayesian inference. We then cover tools  necessary to understand and extend the Expectation Propagation algorithm and the Loopy Belief Propagation algorithm. These methods and variants form the core of this part of the thesis.\check{jul21}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Overview of Approximate Bayesian Inference}
@@ -27,22 +27,6 @@ In this chapter, we start with a brief overview of approximate bayesian inferenc
 
 \input{parts/bgbp}
 
-% ==================
-\section{Discussion}
-\todofr{is this the right place for a discussion section ?}
-\todofr{
-(see where stuff belongs, either here or in previous points)
-\begin{itemize}\itsep0
-	\item more literature quotations probably especially indicating the different pieces of work for different applications (?)
-	\item can do expoF but in practice people do Gaussian, why
-	\item EP energy and showing that it's not really justified, maybe drawing where you show that VB arrives to a point (convergence guarantees, no guarantee of quality), EP goes to a point (no convergence guarantee, no guarantee of quality) and so that we're a bit in the dark. See whether Gelman discusses VB vs EP...
-	\item poor recovery of variance, why
-	\item link EP, BP, show BP can be interpreted as EP
-	\item other, non-KL recovery, make link with choice of loss function in general, discuss that (maybe)
-	\item power EP from EP (maybe in SNEP or in EPBP when discussing extensions see how can include story)
-	\item comparison VI and MAP (choice of loss function, popularity etc.)
-\end{itemize}
-}
 
 
 
