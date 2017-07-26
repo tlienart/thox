@@ -1,6 +1,8 @@
 % !TEX root = ../thesis.tex
 
 \chapter*{Notations}
+\pagenumbering{roman}
+\setcounter{page}{1}
 
 We list here notations used throughout the document that are considered to be commonly used in computational statistics. Non-standard notations will be introduced in the document explicitly.
 
@@ -75,32 +77,34 @@ We denote the complexity of an algorithm by $\mathcal O(h(N))$ to indicate that 
 
 \setlength{\tabcolsep}{6pt} % default
 \subsection*{Abbreviations}
-We list below abbreviations that are used in this document by alphabetical order. 
-\add{add link to primary definition, will help to check all are used}
+We list below abbreviations that are used in this document by alphabetical order and link to where they are first used or introduced in the document.
 \setlength{\tabcolsep}{12pt}
 \renewcommand{\arraystretch}{1.2}
-\begin{longtable}{ll}
-BIF 			& Backward Information Filter \eqref{def normalised BIF}\\
-BB$\alpha$	& BlackBox $\alpha$-divergence minimisation algorithm\\
-BP/LBP 		& (Loopy) Belief Propagation\\
-EP	 		& Expectation Propagation\\
-EPBP 		& Expectation Particle Belief Propagation\\
-ESS 			& Effective Sample Size \eqref{eq:ESS}\\
-FFBS 		& Forward Filtering Backward Smoothing \\
-IPP 			& Inhomogeneous Poisson Process\\
-HMM 		& Hidden Markov Model\\
-MCMC 		& Markov Chain Monte Carlo\\
-(L/G)MMC	& Local/Global Moment Matching Conditions \eqref{eq:LMMC}, \eqref{eq:GMMC}\\
-MRF 		& Markov Random Field (\ref{subsection: mrf})\\
-NBP 			& Nonparametric Belief Propagation\\
-PBP	 		& Particle Belief Propagation\\
-PD 			& Predictive Density \eqref{eq PDhat}\\
-RMS(E) 		& Root Mean Squared (Error)\\
-SMC 		& Sequential Monte Carlo\\
-SMS 		& Sampling via Moment Sharing algorithm\\
-SEP 		& Stochastic EP\\
-SNEP		& Stochastic Natural gradient EP\\
-TFS 		& Two Filter Smoothing\\ 
+\begin{longtable}{llc}
+BIF 			& Backward Information Filter &(section \ref{sec:TFS})\\
+%BB$\alpha$	& BlackBox $\alpha$-divergence minimisation algorithm\\
+BP/LBP 		& (Loopy) Belief Propagation &(section \ref{bg:belief-propag})\\
+BPS/LBPS 	& (Local) Bouncy Particle Sampler & (section \ref{point:BPS})\\
+EP	 		& Expectation Propagation &(section \ref{s:ADF+EP})\\
+EPBP 		& Expectation Particle Belief Propagation &(section \ref{sec:EPBP})\\
+ESS 			& Effective Sample Size &(section \ref{sec:MC+SMC})\\
+FFBS 		& Forward Filtering Backward Smoothing &(section \ref{sec:MC+SMC})\\
+IPP 			& Inhomogeneous Poisson Process &(section \ref{point:BPS})\\
+KL 			& Kullback-Leibler divergence & (section \ref{sec:ABI})\\
+GMMC/LMMC	& Local/Global Moment Matching Conditions &(section \ref{s:ADF+EP})\\
+HMM 		& Hidden Markov Model &(section \ref{intro:exMRF})\\
+MCMC 		& Markov Chain Monte Carlo &(section \ref{sec:MC+SMC})\\
+MRF 		& Markov Random Field &(section \ref{subsection: mrf})\\
+NBP 			& Nonparametric Belief Propagation &(section \ref{sec:LBPonCS})\\
+PBP	 		& Particle Belief Propagation &(section \ref{sec:LBPonCS})\\
+PD 			& Predictive Density &(section \ref{intro:exMRF})\\
+PDMP 		& Piecewise Deterministic Markov Processes & (section \ref{point:BPS})\\
+RMS(E) 		& Root Mean Squared (Error) &(section \ref{sec:TFSexp})\\
+SMC 		& Sequential Monte Carlo &(section \ref{sec:MC+SMC})\\
+SMS 		& Sampling via Moment Sharing &(section \ref{sec:ep-for-dbi})\\
+%SEP 			& Stochastic EP\\
+SNEP		& Stochastic Natural gradient EP &(section \ref{sec:ep-for-dbi})\\
+TFS 			& Two Filter Smoothing &(section \ref{sec:TFS})\\ 
 \end{longtable}
 \setlength{\tabcolsep}{6pt} % default
 \newpage

@@ -1,1 +1,39 @@
 % !TEX root = ../thesis.tex
+
+In this thesis we concern ourselves with sampling or approximating distributions that factorise in a specific way. In this short chapter we cover the Local Bouncy Particle Sampler (LBPS), a version of the BPS introduced at point \ref{point:BPS} for target distributions that factorise according to a MRF. In particular, we focus on the application of the BPS and LBPS algorithms and show that they can be used on large models such as the probabilistic matrix factorisation problem and compare well with other state of the art methods.
+
+\section{Local Bouncy Particle Sampler}
+In \cite{bouchard15}, the authors consider the case where the target distribution factorises as
+%
+\eqa{
+	\pi(x)&\propto& \prod_{f=1\in F} \gamma_{f}(x_{f})
+}
+%
+where $x_{f}$ is a restriction of $x$ and $F$ is an index set of \emph{factors}. In the specific case of a pairwise MRF, the factors are the edges and the restrictions are the variables on each nodes. The energy associated to $\pi$ consequently decomposes as $U\equiv \sum_{f\in F}U_{f}$.
+
+%\subsection{Local BPS: algorithm}
+For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $R_{f}$ can be defined in the same way as for the BPS except that, by convention, $\nabla U_{f}$ has zero components for all variables not affected by the factor. We can then define a collection of intensities based on $(x^{(i-1)},v^{(i-1)})$ with
+%
+\eqa{
+	\chi_{f}(t) &=& \lambda_{f}(x^{(i-1)}+v^{(i-1)}t,v^{(i-1)}). 
+}
+%
+Using the superposition principle, the next bounce time is the first arrival of a poisson process with intensity $\chi\equiv\sum_{f} \chi_{f}$. However, instead of modifying all velocity variables at a bounce as in the basic BPS, the authors suggest sampling a factor $f$ with probability $\chi_{f}(\tau)/\chi(\tau)$ and modify only the variables connected to the sampled factor. This can significantly the overall computational cost associated with the algorithm and especially so when the underlying MRF has a sparse connection structure.\add{come back}
+
+\section{Experiments}
+
+\subsection{Smoothing}
+
+\subsection{Probabilistic Matrix Factorisation}
+
+\section{Discussion}
+
+
+
+
+
+
+
+
+
+

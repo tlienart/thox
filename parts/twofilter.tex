@@ -7,7 +7,7 @@ We had seen at point \ref{bg:particle-smoothing} that the \emph{forward filterin
 In this chapter, we introduce a class of algorithms that can be obtained from another factorisation of the smoothing distributions than that used to obtain the FFBS. We also introduce algorithms with a computational complexity that is sub-quadratic in $N$ and compare these algorithms in numerical experiments.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Two Filter Smoothing}
+\section{\label{sec:TFS}Two Filter Smoothing}
 
 
 \subsection{\label{point:TFS}Two filter formula}
@@ -302,7 +302,7 @@ This can in fact be simplified by compressing the representation of the particle
 Note that in the case where one can sample easily from the backward dynamic of the HMM i.e.: sample from $p(x_{t}\st x_{t+1})$ this bootstrap BIS can be reversed and ran forward as well as backward. 
 This is in fact a core element of the idea behind our \emph{expected particle belief propagation} (EPBP) algorithm to target the beliefs on an arbitrary MRF which we discuss in the second part of this thesis (see chapter \ref{chap:EPBP}).\check{jul16, jul13}
 
-\subsection{Sub-quadratic forward filtering backward smoothing}
+\subsection{Sub-quadratic FFBS}
 A similar idea than the one applied at the previous point can be applied in the context of the FFBS algorithm (section \ref{bg:particle-smoothing}).
 In the FFBS algorithm, a particle filter is ran forward and the weights are then updated in a backward step:
 %
@@ -318,7 +318,7 @@ w^{(i)}_{t\st T} &\propto& w^{(i)}_{t}\sum_{j=1}^{M}{w^{(r_{j})}_{t+1\st T}\pac{
 %
 where $M$ is sub-linear in $N$. The complexity of the corresponding algorithm is then $\mathcal O(MN)$. We show in the comparisons that this algorithm compares favourably with the full complexity FFBS. \check{jul16}
 
-\section{Comparisons}
+\section{\label{sec:TFSexp}Experiments}
 
 \add{mention all the code is online in a package}In this section we discuss the performances of the different smoothing algorithms in different situations. 
 In particular, we show that the default choice of normalisation density \eqref{eq:choice-norma-bad} suggested in \citep{briers10,fearnhead10} can underperform significantly compared to the BIS. It suffices to look at a simple linear-Gaussian model inspired from \citep{fearnhead10} to show this.
@@ -360,7 +360,7 @@ We compare the average RMSE across the time steps computed as:
 where $j$ indicates the experiment run ($j=1,\dots,J$), the superscript $a$ indicates the algorithm, $x_{j}$ denotes the ground truth for the $j$th experiment and $\hat\mu^{a}_{j}$ the recovered mean from the algorithm. 
 This is a crude measure of quality but is enough to show how the different algorithms compare (and, in particular, that the BIS outperforms Fearnhead's algorithm); \citet{arulampalam02} in their widely cited paper mention that the RMSE is widely used in the literature and facilitates quantitative comparison.  
 
-In the figures below, \emph{KF} and \emph{KS} refer to the Kalman filter and smoother, \emph{PF} to a bootstrap particle filter, \emph{FFBS} to the forward filtering backward smoothing algorithm applied after the PF and \emph{FFBS$_{\text{L}}$} to the sub-quadratic implementation (with $M=25$). The \emph{BIS} symbols refer to the (bootstrap) backward information smoothers and the subscript indicates the version: Q for quadratic, L for linear, S for sub-quadratic (with $M=25$). Finally, FH refers to Fearnhead's algorithm (the full description of Fearnhead's algorithm for this model is available in the appendix \ref{app:fearnhead-lg}).\add{link to reproducible code sims}\check{jul13}
+In the figures below, \emph{KF} and \emph{KS} refer to the Kalman filter and smoother, \emph{PF} to a bootstrap particle filter, \emph{FFBS} to the forward filtering backward smoothing algorithm applied after the PF and \emph{FFBS$_{\text{L}}$} to the sub-quadratic implementation (with $M=25$). The \emph{BIS} symbols refer to the (bootstrap) backward information smoothers and the subscript indicates the version: Q for quadratic, L for linear, S for sub-quadratic (with $M=25$). Finally, FH refers to Fearnhead's algorithm (the full description of Fearnhead's algorithm for this model is available in the appendix \ref{app:fearnhead-lg}).\add{link to reproducible code sims, SMC.jl}\check{jul13}
 
 In figure \ref{comp-smoothing-A} it is already clear that the FH algorithm underperforms. It is also interesting to observe that all three BIS offer comparable performances while the BIS$_{\text{L}}$ is computationally the least expensive.
 The FFBS algorithm performs quite well as well which can be expected as the dynamic is simple and hence the FFBS results does not suffer too much from the lack of resampling in the backward stage.\check{jul13}
@@ -375,7 +375,7 @@ We can also observe that both sub-quadratic implementations (FFBS$_{\text{L}}$ a
 
 \begin{figure}[!h]
 \center
-\includegraphics[width=.75\textwidth]{figures/tfs/comparison_caseA}
+\includegraphics[width=.65\textwidth]{figures/tfs/comparison_caseA}
 \caption{\label{comp-smoothing-A}Violin plots comparing the RMSE of the algorithms in \emph{case A} over 50 runs. As expected the optimal Kalman smoother tends to perform best, the FFBS and all BIS have comparable performances while the FH underperforms.}
 \end{figure}
 
@@ -383,7 +383,7 @@ We can also observe that both sub-quadratic implementations (FFBS$_{\text{L}}$ a
 \center
 \includegraphics[width=.24\textwidth]{figures/tfs/comparison_caseB_fh+kf}
 \includegraphics[width=.61\textwidth]{figures/tfs/comparison_caseB}
-\caption{\label{comp-smoothing-B}Violin plots comparing the RMSE of the algorithms in \emph{case B} over 50 runs. (left) The FH significantly underperforms  compared to the other algorithms as can be seen compared to the KF which is reproduced on both graph to give an idea of scale (FH is not reproduced on the right as the scale is significantly different from the other algorithms). (right) the other smoothing algorithms offer performances in line with the observations made in case A and do not suffer as much from the decreased noise ratio unlike the FH.}
+\caption{\label{comp-smoothing-B}Violin plots comparing the RMSE of the algorithms in \emph{case B} over 50 runs. (\textbf{left}) The FH significantly underperforms  compared to the other algorithms as can be seen compared to the KF which is reproduced on both graph to give an idea of scale (FH is not reproduced on the right as the scale is significantly different from the other algorithms). (\textbf{right}) the other smoothing algorithms offer performances in line with the observations made in case A and do not suffer as much from the decreased noise ratio unlike the FH.}
 \end{figure}
 
 %%%%%%%%%%%%%
@@ -398,7 +398,7 @@ However, the algorithms which apply a resampling of the representation of the pa
 
 \begin{figure}[!h]
 \center
-\includegraphics[width=.75\textwidth]{figures/tfs/comparison_mod2}
+\includegraphics[width=.65\textwidth]{figures/tfs/comparison_mod2}
 \caption{\label{comp-model2}Violin plots comparing the RMSE of the algorithms for model LG-10-6 over 50 runs. In this case, the sub-quadratic implementations of the BIS perform outstandingly well compared to the other algorithms which offer little performance gain over simply considering the particle filter.}
 \end{figure}
 

@@ -1,7 +1,7 @@
 % !TEX root = ../thesis.tex
 
 In this chapter we discuss how the Expectation Propagation (EP) algorithm can be exploited when attempting to perform Bayesian inference with distributed data. 
-We focus on how different variants of the EP algorithm perform and how amenable they are to scaling. \add{here or later, mention powerEP is easy to add to the game. (could be just redefined in $\P_{\phi}$}
+We focus on how different variants of the EP algorithm perform. how amenable they are to scaling and how robust they are to noisy estimations of the EP updates. \add{here or later, mention powerEP is easy to add to the game. (could be just redefined in $\P_{\phi}$}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Distributed Bayesian inference}
@@ -23,7 +23,7 @@ In the rest of this chapter, we show how different variants of the EP algorithm 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{sec:ep-for-dbi}EP variants for distributed inference}
-As indicated in the previous point, we consider a target distribution of the form $p(x)\propto \pi_0\prod_{i=1:K}t_i(x)$ where the evaluation of one of the $t_i$ requires access to the compute node $i$. The aim is to construct an approximation $q\in\mathcal F_\phi$ parametrised by a vector $\theta$ with
+The target distribution of interest has the form $p(x)\propto \pi_0\prod_{i=1:K}t_i(x)$ where the evaluation of one of the $t_i$ requires access to the compute node $i$. The aim is to construct an approximation $q\in\mathcal F_\phi$ parametrised by a vector $\theta$ with
 %
 \eqa{
 	q(x) &=& \pi_0(x)\exp(\scal{\theta,\phi(x)}-A(\theta)) \spe \pi_0(x)\exp(-A(\theta))\prod_{i=1}^{K}\tilde t_i(x)
@@ -44,7 +44,7 @@ The general parallel computational framework considered iterates on the followin
 	\item the master node integrates the new $\omega_i$ into $\theta$.
 \end{enumerate} 
 
-This is illustrated at the figure \ref{fig:SNEP-arch}.
+\noindent This is illustrated at the figure \ref{fig:SNEP-arch} drawn from our paper \citep{hasenclever16}.
 
 \begin{figure}[!h]
 	\center
@@ -194,13 +194,13 @@ Therefore the gradient of the complete right hand side of \eqref{eq:decomposeKL}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsubsection*{Looking for a stationary point of the EP energy}
 %\todofr{Think first about how you want to present information and in particular what you want to say. Could just present the min max problem. Say that if torture the problem you can get to a double loop that looks like SNEP. Would be good not to go along the crappy road of the dev a la Teh, just showing that we're actually doing some kind of Newton's method would already be quite nice use for this \url{http://homes.soic.indiana.edu/classes/spring2012/csci/b553-hauserk/newtons_method.pdf} and probably ``Information geometry of mirror descent'' \citep{raskutti15}}
-In \citet{heskes05}, the authors show that the energy \eqref{EP-energy} is in fact equivalent to their \emph{Expectation Consistent free energy}. Further, they indicate that several stationary points can exist and that the framework does not provide a criterion to pick an optimal one. Lastly, they remind the reader that since the energy is neither convex nor concave with respect to the parameters $\lambda_i$, it does not tell whether stationary points are minimum, maximum or saddle points. \check{june21}
+In \citet{heskes05}, the authors show that the energy \eqref{EP-energy} is in fact equivalent to their \emph{Expectation Consistent free energy}. Further, they indicate that several stationary points can exist and that the framework does not provide a criterion to pick an optimal one. Lastly, they remind the reader that since the energy is neither convex nor concave with respect to the parameters $\lambda_i$, it does not tell whether stationary points are minimum, maximum or saddle points. \check{june21}\add{should probably emphasise that ``energy'' is a bit misnomer}
 %However, since the first term is concave in $\theta$ while each of the terms in the sum is convex in $\lambda_i$, \citet{minka01c} suggests writing the EP stationary points as corresponding to the following min-max problem 
 %%
 %\eqa{	\min	_\theta\max_{\{\lambda_i\}} \quad(K-1)A(\theta)-\sum_{i=1}^{K}A_i(\lambda_i), \quad \text{s.t.}\quad \theta = (K-1)\inv\sum_{i=1}^{K}\lambda_i.}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{\label{point:MD-for-EP}Mirror descent for the EP energy}
+\subsection{\label{point:MD-for-EP}Mirror Descent for the EP energy}
 Let us define $\mathcal E_i(\lambda_i)$ as the energy \eqref{EP-energy} with all parameters other than $\lambda_i$ kept fixed. On the corresponding compute node, the aim is then to determine a stationary point $\lambda_i^{\text{new}}$ for $\mathcal E_i(\lambda_i)$. This is in fact equivalent to finding a stationary point for $\mathcal G_i(\lambda_i)$ with
 \eqa{
 	\mathcal G_i(\lambda_i) &:=& A(\theta_{-i} + \eta\lambda_i) - \eta A_i(\lambda_i)	
@@ -214,7 +214,7 @@ where $\theta_{-i}:=\eta\sum_{j\neq i}\lambda_j$ and $\eta=(K-1)\inv$. A common 
 && {\eta^{2}\over 2}\scal{\lambda_i^{\text{new}}-\lambda_i, \nabla^{2} \mathcal G_i(\lambda_i)(\lambda_i^{\text{new}}-\lambda_i)} .\label{ep-energy-newton}
 }
 %
-Taking the gradient in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a Newton-like step. However, this requires the inversion of the Hessian of $\mathcal G_i$ which may be expensive and numerically unstable to compute. An alternative can be obtained by observing that, if $\nabla^{2}\mathcal G_i(\lambda_i)$ is positive definite,\add{an argument can probably be made that this will likely be the case since if variance of q does not encompass that of qi we're in trouble (could test this), could in fact explain problems towards ``end'' of algorithm} then the quadratic term in the approximation is simply a measure of discrepancy between $\lambda_i^{\text{new}}$ and $\lambda_i$. As in the mirror-descent algorithm \citep{nemirovski83, beck03} we could therefore try to replace it by a Bregman divergence. In our case, it is convenient to consider the Bregman divergence induced by the log-partition function $A$ itself;\footnote{Recall that $B_A(\lambda_i^{\text{new}},\lambda_i):=A(\lambda_i^{\text{new}})-A(\lambda_i)-\scal{\lambda_i^{\text{new}},\nabla A(\lambda_i)}$.} this leads to the alternative approximation:
+Taking the gradient in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a Newton-like step. However, this requires the inversion of the Hessian of $\mathcal G_i$ which may be expensive and numerically unstable to compute. An alternative can be obtained by observing that, if $\nabla^{2}\mathcal G_i(\lambda_i)$ is positive definite,\add{an argument can probably be made that this will likely be the case since if variance of q does not encompass that of qi we're in trouble (could test this), could in fact explain problems towards ``end'' of algorithm} then the quadratic term in the approximation is simply a measure of discrepancy between $\lambda_i^{\text{new}}$ and $\lambda_i$. As in the mirror-descent algorithm \citep{nemirovski83, beck03} we could therefore try to replace it by a Bregman divergence (we briefly cover the Mirror Descent algorithm and the Natural Gradient algorithm in the appendix \ref{app:MDA+NG}). In our case, it is convenient to consider the Bregman divergence induced by the log-partition function $A$ itself;\footnote{Recall that $B_A(\lambda_i^{\text{new}},\lambda_i):=A(\lambda_i^{\text{new}})-A(\lambda_i)-\scal{\lambda_i^{\text{new}},\nabla A(\lambda_i)}$.} this leads to the alternative approximation:
 %
 \eqa{
 	\mathcal G_i(\lambda_i^{\text{new}}) &\approx&
@@ -235,7 +235,9 @@ where $\kappa'=\eta/\kappa$ can be interpreted as a step-size and $\hat\mu_i$ is
 %
 which resembles the damped updates in the mean-parameter space \eqref{eq:damped-update-mp} we had obtained earlier. 
 More importantly, the updates \eqref{eq:snep-updates} form the core of the \emph{Stochastic Natural gradient Expectation Propagation} (SNEP) algorithm we suggested in \citet{hasenclever16}.\add{Here add small discussion where you pre-announce results from experimental section}\check{june21}
-The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the first ``SNEP'' variant which we will call \emph{SNEP-a}. Note that the complete algorithm presented in \citet{hasenclever16} includes a few additional elements in order to be a fully asynchronous algorithm.\add{come back to this probably if you compare call SNEP-a, SNEP, etc.} 
+The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the first ``SNEP'' variant which we will call \emph{SNEP-a}. \add{come back to this probably if you compare call SNEP-a, SNEP, etc.}
+%Note that the complete algorithm presented in \citet{hasenclever16} includes a few additional elements in order to be a fully asynchronous algorithm.
+ 
 
 
 
@@ -256,37 +258,57 @@ The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{a
 %Key point is that the $\mathcal E_{BBA}$ is bounded from below for $\alpha\le N$ (see BBA) therefore convergence or something.
 
 %%%%%%%%%%%%%%%%%%%%%
-\section{Comparisons}
+\section{Experiments}
+In this section we compare SNEP against 
+\emph{Sampling via Moment Sharing} (SMS) \citep{xu14}, a related algorithm for distributed Bayesian learning whereby each worker has a separate MCMC sampler and coordination across workers is achieved using plain EP. SMS was originally proposed to scale up MCMC methods and as such it assumes that MCMC chains can be run for many iterations to convergence in between communications with the master.  SMS uses the MCMC iterates to estimate the moments required for EP updates and so, as discussed earlier, requires a large number of iterations to produce the low Monte Carlo noise for EP updates to work properly.
+
+We illustrate below the differing dynamics of SMS and SNEP when applied to a Bayesian logistic regression model with simulated data.  We took a  similar setup as in the SMS paper \citep{xu14}, generating a dataset $\mathcal D=\{( z_{c},y_{c})\}_{c=1}^{N}$ where covariates $ z_{c}\in\mathbb R^{d}$ and response $y_{c}\in\{0,1\}$. The conditional distribution of $y_{c}$ given $ z_{c}$ and weights $ x$ is
+\begin{align}
+	p(y_{c}=1 \mid  z_{c}, x) &= \sigma( z_{c}^{\top} x)	
+\end{align}
+where $\sigma$ denotes the logistic function. 
+
+We used a Gaussian prior $p_{0}( x)=\mathcal N( x; 0_{d},10 I_{d})$ on $ x$ and the aim is to construct an approximation to the posterior $p( x \mid \mathcal D)$. We generated $N=50000$ data points  with $d=50$ using iid draws for the covariates, $z_c\sim \mathcal N(\mu,\Sigma)$ where $\mu\in[0,1]^{d}$ and $\Sigma=PP^{\top}$ with $P\in[-1,1]^{d\times d}$, with entries drawn uniformly at random for both $P$ and $\mu$. The generating weight vector $ x^*$ is drawn from the prior $\mathcal N( x; 0_{d},10 I_{d})$. The labels $y_{c}$ are then sampled according to the model. 
+
+%
+%
+Both algorithms were run with three workers, each with one third of the data. SNEP is run with 1 inner loop iteration per synchronisation with the master (for the purpose of comparing against SMS).  Varying numbers of MCMC samples per inner loop iteration were used for both algorithms, to investigate the effect of Monte Carlo noise on the performances of the algorithms (low number of samples meaning high noise and both lower performance and lower computational cost).   The damping for SMS and the learning rate for SNEP were tuned for best performances. As the base exponential family, we used a full-covariance Gaussian.  
+We compared the predictive RMSE $\sqrt{\sum_{c}|\hat{p}_{c}- y_{c}|^{2}/N}$ obtained with both methods over time where $\hat{p}_{c}=\sigma( z_{c}^{T}\overline{ x})$ where $\overline{ x}$ is the currently estimated posterior mean. We also compared the relative difference between the estimated posterior mean and that estimated from a long run of the No-U-Turn sampler \citep{hoffman14} as implemented in Stan \citep{carpenter16} with 4 chains and 50000 iterations.
+
+The \fig{fig:sms-vs-snep} illustrates the performances of both algorithms and how they are influenced by the number of MCMC samples used per iteration. It can be observed that SNEP is more robust and better performing than SMS in the presence of noise.
+In general, we found that the number of samples needed for SMS to perform well grows with the dimensionality of the problem. In models with very high dimensionality and multi-modality (e.g., neural networks), the number of samples needed per step is very large leading to iterations that are computationally impractical, whereas SNEP can afford to use many fewer samples.\\
+
+%%This can be explained by the fact that the updates in SNEP are done in the mean-parameter space and the noise is thus directly damped whereas in SMS the noisy updates are first projected in the natural-parameter space (which requires the inversion of a noisy covariance matrix) and then damped which can lead to unstable updates. 
+%%We consider the least favourable case for SNEP where only a single inner loop step is done per iteration (update \eqref{eq:meandamped}). This allows to compare fairly the number of iterations executed by SNEP and SMS since the computational cost of each iteration is similar. The results are illustrated at the figure \ref{fig:sms-vs-ep} below.
+
+\begin{figure}[!h]
+	\center
+	\includegraphics[width=0.65\textwidth]{figures/snep/SMSvSNEP_RMSE}
+	\includegraphics[width=0.65\textwidth]{figures/snep/SMSvSNEP_DIFF.pdf}
+	\caption{\label{fig:sms-vs-snep}(\textbf{top}) Comparison of the predictive RMSE obtained with SMS (dashed-lines) and SNEP (full lines) versus the time on the master node when varying the number of MCMC samples per iteration (numbers reported in the legend). When too few samples are used for the moment estimates, SMS becomes unstable whilst SNEP does not suffer from this. SNEP is also consistently faster and more accurate than SMS. The accuracy obtained with the posterior mean estimated with a long run of Stan/NUTS is also displayed as comparison (horizontal line). (\textbf{bottom}) Relative difference between the posterior means estimated using Stan/NUTS and using SMS (dashed lines) or SNEP (full lines). Each coloured line corresponds to an average over several runs (represented in light grey).}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 
 In this chapter we showed that Expectation Propagation could be used as the backbone of a distributed approximate Bayesian inference mechanism. 
 We showed that different variant of the EP algorithm could be used and that, in our experiments, performing updates in the mean parameter space can outperform updates in the natural parameter space. 
-In particular we showed that updates in the mean parameter space can be much more robust to noise introduced by following inexact EP updates when the moments of the tilted distribution are computed via Monte Carlo estimators. This is particularly important for complex models like Bayesian Neural Networks where the tilted distributions are complex and sampling is very expensive so that cheap Monte Carlo estimators based on a few sampling points are favoured. 
+In particular we showed that updates in the mean parameter space can be much more robust to noise introduced by following inexact EP updates when the moments of the tilted distribution are computed via Monte Carlo estimators. This is particularly important for complex models like Bayesian Neural Networks where the tilted distributions are complex and sampling is very expensive so that cheap Monte Carlo estimators based on a few sampling points are favoured. \add{see references in confirmation with MC estimators in EP}
 
 A critique often raised against EP is that the algorithm does not offer convergence guarantees. In fact, Minka addresses this in his paper \citep{minka01} indicating that when EP does not converge it is usually a sign of a poor choice of approximating family $\mathcal F_{\phi}$. 
 Further to this, the convergence question may in fact be of little practical use since, in any case, we do not know how good an approximation the fixed point corresponding to the local moment matching conditions (LMMC) is to the fixed point corresponding to the global ones (GMMC) nor how good a proxy the latter is to the target distribution. In fact, a similar criticism can be raised for Mean Field Variational Inference: the iterations provably decrease an energy and converges but it is unclear how good a proxy it converges to. This situation is summarised at figure \ref{comp-vi-ep}.
 
 \begin{figure}[!h]
 \center
-\includegraphics[width=.75\textwidth]{figures/general/vi-ep-space}
-\caption{\label{comp-vi-ep}Toy representation of the approximating distributions obtained through MFVI or EP when targeting a distribution $p$ of interest. The starting points are denoted with a superscript $\circ$. MFVI provably converges to a point $q^{\star}_{\text{MF}}$ (solid green line) but we do not know how this point compares to a distribution $q^{\star\star}_{\text{MF}}$ that truly minimises the corresponding KL divergence.\\ By contrast, EP is not guaranteed to converge to a fixed point $q^{\star}_{\text{EP}}$ (dashed orange line) and we also do not know how it compares to $q^{\star}_{\text{EP}}$ that truly minimises the corresponding KL divergence.\\
+\includegraphics[width=.6\textwidth]{figures/general/vi-ep-space}
+\vspace*{.2cm}
+\caption{\label{comp-vi-ep}Toy representation of the approximating distributions obtained through MFVI or EP when targeting a distribution $p$ of interest. The starting points are denoted with a superscript $\circ$. MFVI provably converges to a point $q^{\star}_{\text{MF}}$ (solid green line) but we do not know how this point compares to a distribution $q^{\star\star}_{\text{MF}}$ that truly minimises the corresponding KL divergence.\\ By contrast, EP is not guaranteed to converge to a fixed point $q^{\star}_{\text{EP}}$ (dashed orange line) and we also do not know how it compares to $q^{\star}_{\text{EP}}$ that truly minimises the corresponding KL divergence. \\
 In both cases, we do not know how the minimisers compare to $p$ (dashed purple lines). }
 \end{figure}
 
 The EP framework we consider seems however particularly appropriate for the situation where compute nodes only have access to parts of the data and, in our experiments and the experiments discussed in the paper, we observed that it performed well and in a robust way even on very complex models.
 
-Finally, we note that the entirety of the EP variants discussed in this section can be re-expressed in the general framework of ``Power-EP'' \citep{minka04} where the discrepancy is more general than the basic Kullback-Leibler divergence. This, however, has very little impact to the considerations discussed in the chapter in that the only thing it changes is the definition of the projection operator $\mathbf P_{\phi}$.
+Finally, we note that the entirety of the EP variants discussed in this section can be re-expressed in the general framework of ``Power-EP'' \citep{minka04} where the discrepancy is more general than the basic Kullback-Leibler divergence. This, however, has little impact to the considerations discussed in the chapter in that the only element it changes is the definition of the projection operator $\mathbf P_{\phi}$. We focused on ``classical'' EP for this reason and also because the role of the exponent in Power-EP is poorly understood in general though it has been discussed in the literature \citep{minka04, hernandez15, li16}.
 
-\todofr{
-\begin{itemize}
-	\item pitfalls of using EP / VB for large dimensional, have to revert to diagonal gaussians in which case maybe not so interesting. As a result and since we are using a large number of points, the uncertainty recovered is often extremely small in both EP and VB and unusable in practice. One may therefore wonder whether a purely optimisation based approach effectively targeting the MAP directly is not all that we can afford etc.
-	\item mention that ``EP energy'' is somewhat misleading (not min or max really) 
-	\item Explain that just choice to go for $\omega$ vs $\lambda$ and that in fact not clear cut.\\
-	\item Explain that more advanced examples with Neural Networks presented in the paper but with Diagonal Gaussian (+ it's not your work so leave it aside)
-	\item can use power EP but blah, cite BBa - a-renyi
-\end{itemize}
-}
 
 

@@ -1,0 +1,38 @@
+% !TEX root = ../thesis.tex
+
+\section{\label{app:MDA+NG}Mirror Descent and Natural Gradient}
+
+In this part we show briefly the reasoning behind the mirror-descent algorithm focusing on the case of the KL geometry that is considered in the core document.
+
+\subsection{Classical gradient descent}
+We start from the generic problem of unconstrained minimisation of a convex function $f$. Additionally, we assume that the function has a computable gradient $\nabla f$ everywhere. The gradient descent algorithm considers the following iterative scheme:
+\eqa{		x_{k+1} &=& x_{k} - \alpha_{k}\nabla f(x_{k}),	\nn}
+which, under some conditions on the sequence of step-sizes $(\alpha_{k})_{0}^{\infty}$ will converge to a minimiser of the function i.e., an $x^{\star}$ such that $f(x^{\star})\le f(x)$ for all $x$. This scheme is equivalent to solving a sequence of optimisation problems:
+\eqa{		x_{k+1} &=& \arg\min_{x}\quad\pab{\scal{x,\nabla f(x_{k})} + {1\over \alpha_{k}}{\bnorm{x-x_{k}}^{2}\over 2}  }. 	}
+This re-formulation shows that the gradient-descent is explicitly linked to an isotropic Euclidean geometry via the distance $d(x,y)=\bnorm{x-y}^{2}/2$. Other geometries can be considered by considering other distances or divergences. In particular, when a Bregman divergence is considered we get the mirror descent algorithm as shown below.
+
+\subsection{Bregman divergences}
+Consider a smooth, strictly convex function $\varphi$. By definition, this function is such that for any couple of points $(x,z)$ in its domain with $x\neq z$, 
+\eqa{		\varphi(z) &>& \varphi(x) + \scal{z-x,\nabla \varphi(x)}.\nn	}
+We can therefore build a divergence by rearranging the previous inequality:
+\eqa{		B_{\varphi}(z,x) &:=& \varphi(z)-\varphi(x)-\scal{z-x,\nabla \varphi(x)}.	}
+Note that $B_{\varphi}(z,x)>0$ for all admissible $z\neq x$ and $B_{\varphi}(x,x)=0$ for all admissible $x$. Apart from the fact that such a \emph{Bregman divergence} is not necessarily symmetric, it has the same properties as a distance. A particular case is that of $\varphi(x)=\bnorm{x}/2$ in which case the associated Bregman divergence is nothing but the Euclidean distance.
+
+\subsection{Mirror descent algorithm}
+Let us now consider the generalised gradient descent scheme with the Bregman divergence associated with some strongly convex, smooth function $\varphi$:
+\eqa{		x_{k+1} &=& \arg\min_{x}\quad \pab{\scal{x,\nabla f(x_{k})} + {1\over \alpha_{k}}B_{\varphi}(x,x_{k})	}.	}
+Multiplying the objective function by $\alpha_{k}$, rearranging and taking the gradient in $x$ to get the first order condition leads to:
+\eqa{		\alpha_{k}\nabla f(x_{k}) + \nabla\varphi(x_{k+1}) - \nabla \varphi(x_{k})	& =& 0.\nn}
+Rearranging and using $(\nabla \varphi)^{\inv}\equiv \nabla \varphi^{\star}$ leads to:
+\eqa{	x_{k+1} & =& \nabla \varphi^{\star}\pac{ \nabla\varphi(x_{k})-\alpha_{k}\nabla f(x_{k})}.	}
+This algorithm is known as the \emph{mirror descent algorithm} \citep{beck03}. 
+
+\subsection{KL geometry and natural gradient descent}
+When considering an objective function $\mathcal J$ depending on a distribution $q_{\theta}\in\mathcal F_{\phi}$, one can consider the geometry of the natural parameters i.e., iterate from $\theta_{k}$ to $\theta_{k+1}$ using the classical gradient descent scheme. However, $\theta_{k}$ and $\theta_{k+1}$ will index two distributions $q_{\theta_{k}}$ and $q_{\theta_{k+1}}$ and it therefore makes more sense to consider a divergence between those distributions rather than between their natural parameters. 
+We consider the KL divergence with for $q,q'\in\mathcal F_{\phi}$:
+\eqa{		\KL{q',q} &=& \E_{q}[\log q-\log q'].	\nn}
+Since $q_{\theta}=\exp(\scal{\theta,\phi}-A(\theta))$, this reduces to
+\eqa{		\KL{q',q} &=& A(\theta')-A(\theta)-\scal{\theta'-\theta,A(\theta)}	\nn}
+which is the Bregman divergence associated with the log-partition function $A$. The corresponding mirror-descent algorithm reads:
+\eqa{		\theta_{k+1} &=& \nabla A^{\star}\pac{ \nabla A(\theta) - \alpha_{k}\nabla \mathcal J(\theta_{k})}	,}
+which is known as the \emph{natural gradient descent} algorithm. For a deeper analysis of the reasoning behind using the natural gradient descent in learning, we refer to the seminal paper by Amari \citep{amari98}.

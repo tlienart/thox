@@ -14,7 +14,7 @@ Techniques attempting to solve such problems rely upon exploiting at least one o
 Many discrepancy measures can be considered such as the total variation distance, the Wasserstein distance or $f$-divergences \citep{minka04, blei16, li16, bernton17}. However, most choices lead to the corresponding problem \eqref{eq:generic-abi} being computationally very expensive to solve in general especially when the space $\mathcal X$ is continuous.
 %%%%%%%%%%%%%%%%%
 \subsection{Variational inference}
-A popular discrepancy measure that has been widely considered in the literature partly because it leads to variational problems that can be solved cheaply is the Kullback-Leibler divergence. Considering the discrepancy $\KL{q,p}$ leads to the popular \emph{variational inference} algorithms \citep{blei16}. 
+A popular discrepancy measure that has been widely considered in the literature partly because it leads to variational problems that can be solved cheaply is the Kullback-Leibler divergence. Considering the discrepancy $\KL{q,p}$ leads to the popular \emph{variational inference} algorithms \citep{blei16}. \add{Recall definition KL}
 
 
 In \emph{mean-field variational inference} (MFVI), $\mathcal F$ is taken to be the class of distributions that fully factorises:

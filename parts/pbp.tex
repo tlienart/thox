@@ -2,10 +2,10 @@
 
 In this chapter, we look at ways to implement the loopy belief propagation (LBP) algorithm on an arbitrary MRF with continuous state-spaces. We concentrate in particular on the representation of the messages and the computation of message updates in the LBP algorithm. 
 
-In this chapter, we consider the \emph{nonparametric belief propagation} (NBP) algorithm of \citet{sudderth03} and the \emph{particle belief propagation} algorithm of \citet{ihler09}. We then discuss our \emph{expectation particle belief propagation} (EPBP) algorithm \citep{lienart15} and discuss how it improves upon both. \check{jul19}
+In this chapter, we consider the \emph{nonparametric belief propagation} (NBP) algorithm of \citet{sudderth03} and the \emph{particle belief propagation} algorithm of \citet{ihler09}. We then discuss our \emph{expectation particle belief propagation} (EPBP) algorithm \citep{lienart15} and discuss how it can improve upon both. \check{jul19}
 
 % !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-\section{Loopy Belief Propagation on Continuous State-Spaces}
+\section{\label{sec:LBPonCS}Loopy Belief Propagation on Continuous State-Spaces}
 At point \ref{point:LBP}, we had shown that, at iteration $n$ of the LBP algorithm, the messages are obtained by computing the following integral:
 \eqa{
 	m^{n}_{ts}(x_{s}) &=& \int \psi_{st}(x_{s},x_{t})M^{n}_{t s}(x_{t})\dx_{t}\label{eq:mess-update-2}
@@ -16,7 +16,7 @@ where the pre-messages are given by
 }
 Ultimately, we are interested in computing the beliefs obtained by multiplying message and pre-message: $B_{s}^{n}(x_{s}) = m^{n}_{ts}(x_{s})M^{n}_{st}(x_{s})$. There are a few main computational problems to tackle when attempting to run this algorithm in a continuous setting. First, the messages need to be represented in a tractable fashion. Second, the message updates need to be computable and the results easily expressible in the chosen representation system. Lastly, we need to be able to easily compute expected values with respect to the resulting estimators for the beliefs. We discuss below two existing methods attempting to tackle those issues.
 %%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Nonparametric belief propagation}
+\subsection{Nonparametric Belief Propagation}
 
 In \citet{sudderth03}, the authors suggest representing the messages in the LBP iterations as mixtures of Gaussians:
 \eqa{	
@@ -38,7 +38,7 @@ First, the node potentials $\psi_{u}$ are usually proportional to likelihoods of
 
 
 %%%%%%%%%%%%%%%%%%%%
-\subsection{\label{point:PBP}Particle belief propagation}
+\subsection{\label{point:PBP}Particle Belief Propagation}
 
 In \citet{ihler09}, the authors suggest a way to overcome the shortcomings of NBP by considering importance sampling to tackle the update of the LBP messages instead of working with mixtures of Gaussians. For a chosen proposal distribution $q_{u}$ on node $u$ and a draw of $N$ particles $X_{u}^{(i)}\simiid q_{u}$, the messages are represented via an importance sampling estimator of the corresponding integral:
 \eqa{		
@@ -70,7 +70,7 @@ which is a product of mixtures of $N$ components. As in nonparametric BP, naive 
 Alternatively the author suggest running a short MCMC simulation targeting it which reduces the complexity to order $\mathcal O {(|\partial {s}|N^{2})}$. Indeed, each MCMC iteration requires evaluating $\widehat B_{s}^{\text{PBP}}$ point-wise which has complexity $\mathcal O {(|\partial{s}|N)}$, and we need at least $\mathcal{O}(N)$ iterations of the MCMC simulation to produce the samples. Note that it is unclear how many more iterations are necessary to get $N$ \emph{good} samples. Running a short MCMC chain (to reduce computational cost) will therefore almost certainly lead to biased samples. In the code the authors shared with us, they run $N$ parallel random walk Metropolis-Hastings chains \citep[chapter 6]{robert04} for a fixed number of steps. This choice may have been motivated by a desire to control the complexity of the algorithm more accurately but it is at the expense of the quality of the samples obtained.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
-\section{Expectation Particle Belief Propagation}
+\section{\label{sec:EPBP}Expectation Particle Belief Propagation}
 As for the PBP algorithm, we consider importance sampling to build particle representations of the messages. In our method, however, we consider a \emph{sequence} of proposal distributions at each node from which one can cheaply sample particles at a given iteration of the LBP algorithm \citep{lienart15}.
 
 The novelty of the approach is to propose a principled and automated way of designing a sequence of proposals in a tractable exponential family using the expectation propagation (EP) algorithm. The resulting method, which we call \emph{Expectation Particle Belief Propagation} (EPBP), does not suffer from the restrictive integrability conditions of the NBP algorithm and sampling is done exactly unlike the PBP algorithm which implies that we obtain consistent estimators of the LBP messages.
@@ -173,7 +173,7 @@ In the description above, we used the projection $\mathbf P_{\phi}$ from \ref{eq
 Computing this projection requires computing the moments of the tilted distribution. 
 Since this is usually intractable, we have to resort to numerical quadrature. 
 In our scenario the moment computation can be performed crudely on a small number of integration points since it only concerns the updating of the importance sampling proposal. 
-Since the dimensionality of the tilted distribution in the EPBP algorithm is typically low, a simple deterministic quadrature rule can be used \citep{davis75}. \\
+Since the dimensionality of the tilted distribution in the EPBP algorithm is typically low, a simple deterministic quadrature rule can be used \citep{davis75}. 
 
 The key desired element for the projection is that the resulting updated proposal distribution captures the support of the current estimator of the belief on the node. Since this is a rather general requirement, the KL-projection $\mathbf P_{\phi}$ does not necessarily lead to the best proposals and in fact may suffer from the fact that we have to compute the projection from the mean-parameter space to the natural parameter space $\nabla A^{\star}$ associated with the exponential family of interest which may be numerically unstable.  
 This can be mitigated by damping as described at section \ref{sec:ep-for-dbi} but alternative projection schemes can be tried as well.
@@ -291,7 +291,7 @@ The speed-up offered by EPBP is very substantial as can be seen in \fig{compConv
 \includegraphics[width=.51\textwidth]{figures/epbp/compBPconv}
 %
 %\vspace*{-.4cm}
-\caption{\label{compConv} Comparison of the convergence in $L^{1}$ error with increasing number of BP iterations for the $3\times 3$ grid when using $N=30$ particles. }%(right) Comparison of the wall-clock time needed to perform PBP and EPBP on the $3\times 3$ grid example.}
+\caption{\label{compConv} (\textbf{left}) Comparison of the wall-clock time needed to perform PBP and EPBP on the $3\times 3$ grid example. (\textbf{right}) Comparison of the convergence in $L^{1}$ error with increasing number of BP iterations for the $3\times 3$ grid when using $N=30$ particles. }%(right) }
 \end{figure}
 %
 %
@@ -322,7 +322,7 @@ The \fig{compTree} compares the estimator of the beliefs obtained by all the met
 %\hspace*{-.5cm}
 	\includegraphics[width=.48\textwidth]{figures/epbp/tree_node8}
 
-	\caption{\label{compTree}Comparison of the beliefs on node $1$, $3$ and $8$ (top left, top right, bottom) as obtained by evaluating LBP on a deterministic mesh, using EPBP, PBP, EP and PBP using the results of EP as proposals. All three plots share the same legend. This is for the tree example with $N=100$ samples on each node and $20$ LBP iterations. Again, one can observe visually that EPBP outperforms the other methods. }
+	\caption{\label{compTree}Comparison of the beliefs on node $1$, $3$ and $8$ (top left, top right, bottom) as obtained by evaluating LBP on a deterministic mesh, using EPBP, PBP, EP and PBP using the results of EP as proposals. All three plots share the same legend. This is for the tree example with $N=100$ samples on each node and $20$ LBP iterations. Again, one can observe that EPBP outperforms the other methods. }
 \end{figure}
 
 \subsection{Sub-quadratic implementation and denoising application}
@@ -340,7 +340,7 @@ We apply this method to the $3\times 3$ grid example in the case where $M=\mathc
 \hspace*{-.7cm}
 \includegraphics[width=.51\textwidth]{figures/epbp/timeCompNLOGN}
 %\vspace*{-.4cm}
-\caption{\label{figCompNLOGN}Comparison of the quadratic and $\mathcal O(N log N )$ implementations. (left) Comparison of the mean L1 error, (right) comparison of the wall-clock time. The sub-quadratic implementation performs almost as well as the original implementation and offers a significant speedup.}
+\caption{\label{figCompNLOGN}Comparison of the quadratic and $\mathcal O(N log N )$ implementations. (\textbf{left}) Comparison of the mean L1 error, (\textbf{right}) comparison of the wall-clock time. The sub-quadratic implementation performs almost as well as the original implementation and offers a significant speedup.}
 \end{figure}
 
 

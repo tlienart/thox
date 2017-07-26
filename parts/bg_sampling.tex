@@ -1,6 +1,8 @@
 % !TEX root = ../thesis.tex
 
-\section{Monte Carlo and Sequential Monte Carlo}
+In this chapter, we start with a brief overview of Monte Carlo estimators and associated sampling methods focusing in particular on Sequential Monte Carlo methods for the smoothing and filtering problem on Hidden Markov Models. We also introduce an alternative class of methods relying upon Piecewise Deterministic Markov Processes and in particular the Bouncy Particle Sampler (BPS). 
+
+\section{\label{sec:MC+SMC}Monte Carlo and Sequential Monte Carlo}
 \subsection{From quadrature to sampling}
 % KEEP pi (later p is filtering/smoothing)
 We consider the problem of computing the expected value of a test function $\varphi$ with respect to a distribution $\pi\in\mathcal P(\mathcal X)$ i.e.: $I:=\E_\pi[\varphi(X)]$. Assuming it can't be computed analytically, a general approach is to consider a quadrature rule of the form:
@@ -138,8 +140,57 @@ The computation of the updated smoothing weights has complexity $\mathcal O(TN^{
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Sampling with piecewise deterministic Markov processes}
+\section{\label{point:BPS}Sampling with Piecewise Deterministic Markov Processes}
+The \emph{Bouncy Particle Sampler} (BPS) of \citet{bouchard15} is inspired from an algorithm in the physics literature \citep{peters12} and belongs to a wider class of sampling methods based on Piecewise Deterministic Markov Processes (PDMP) \citep{bierkens16, bierkens17, wu17}.
 
+The BPS algorithm considers a target distribution $\pi$ on $\R^{d}$, proportional to a non-negative function $\gamma$ which can be evaluated pointwise: $\pi(x) = Z\inv \gamma(x)$
+but the normalisation constant $Z$ is intractable. 
+The objective is again the computation of expected values of the form $\E_\pi[\varphi]$ for an arbitrary test function $\varphi:\R^{d}\to \R$. 
+
+Defining the \emph{energy} function $U$ as $U(x) = -\log \gamma(x)	$
+ and assuming it is continuously differentiable, the algorithm generates a piecewise linear path based on $\nabla U$. 
+ Each segment is specified by an initial position $x^{(i)}\in \R^{d}$, a length $\tau_{i+1}\in \R^{+}$ and a velocity $v^{(i)}$ with the recurrence $x^{(i+1)}=x^{(i)}+v^{(i)}\tau_{i+1}$. The times where the velocity changes are given by the cumulative sum, $t_i=\sum_{j=1}^{i}\tau_j$ with $t_0=0$. The continuous positions along the path are therefore given by
+\eqa{	x(t) &=& x^{(i)} + v^{(i)}(t-t_i), \quad\text{for}\quad t\in[t_i,t_{i+1}).	\label{eq:path-BPS}}
+The authors show that, if the lengths $\{\tau_{i}\}_{i\ge 1}$ are governed by a specific Inhomogenous Poisson Process (IPP) and if the speeds are modified for each segment according to a simple reflection mechanism, then the target expected values can be approximated consistently via an integral of the test function along the path given by \eqref{eq:path-BPS}.
+
+The IPP governing the lengths has intensity function $\lambda:\R^{d}\times\R^{d}\to\R^{+}$ with
+\eqa{	\lambda(x,v) &=& \max\,\{0,\scal{\nabla U(x),v}\}.	}
+At the end of each segment, the trajectory ``bounces'' and the velocity is reflected against the local level set of $U$:
+\eqa{	v' &=& R(x)v \spe v-2{\scal{\nabla U(x),v}\nabla U(x)\over \bnorm{\nabla U(x)}^{2}}.	}
+The authors show that the velocities also need to be ``refreshed'' according to the arrival times of a homogenous PP of intensity $\lambda^{\text{ref}}\ge 0$, a parameter of the BPS. The basic BPS algorithm is reproduced in \hyperref[alg:BPS1]{algorithm~\ref*{alg:BPS1}} below.
+
+\begin{algorithm}[!h]\small
+	\caption{\label{alg:BPS1}\small \idblue{Basic BPS}}
+	\begin{algorithmic}[1]
+	\State init $(x^{(0)},v^{(0)})$, set $T$, trajectory length, set $t=0$ and $i=1$
+	\While{$t < T$}
+		\State simulate first arrival time $\tau_{\text{bounce}} \sim \text{PP}(\chi(t))$  with
+		$$ \chi(t) = \lambda(x^{(i-1)}+v^{(i-1)}t,v^{(i-1)})$$
+		\State simulate $\tau_{\text{ref}}\sim \mathrm{Exp}(\lambda^{\text{ref}})$
+		\State let $\tau_{i}\leftarrow \min(\tau_{\text{bounce}},\tau_{\text{ref}})$
+		\State compute the next position $x^{(i)}\leftarrow x^{(i-1)}+v^{(i-1)}\tau_{i}$
+		\If{$\tau_{i}=\tau_{\text{ref}}$}
+			\State sample next velocity $v^{(i)}\sim \mathcal N(0,I)$		\EndIf
+		\If{$\tau_{i}=\tau_{\text{bounce}}$}
+			\State reflect the velocity $v^{(i)}\leftarrow R(x^{(i)})v^{(i-1)}$
+		\EndIf
+		\State let $t\leftarrow t_{i}\leftarrow t_{i-1}+\tau_{i}$
+		\State update $i\leftarrow i+1$
+	\EndWhile
+	\end{algorithmic}
+\end{algorithm}
+
+The expectations can then be approximated using
+\eqa{	\E_\pi[\varphi] &=& T\inv \int_0^{T} \varphi(x(t))\mathrm{d}t	\nn\\
+&\approx& T\inv \pat{\sum_{i=1}^{n-1} \int_0^{\tau_i} \varphi(x^{(i-1)}+v^{(i-1)}s)\,\mathrm{d}s + \int_0^{t_n-T}\varphi(x^{(n-1)}+v^{(n-1)}s)\mathrm{d}s}, \nn}
+where the integrals in the sum can themselves be approximated if needed by quadrature.
+
+As we saw, the algorithm requires to sample the first arrival time of an IPP of intensity $\chi(t)=\lambda(x+vt,v)$ where $\lambda(x,v)=\max\{0,\scal{\nabla U(x),v}\}$. Following existing literature, the authors suggest three possible methods which we list briefly below:
+\begin{itemize}\itsep0
+    \item \textbf{time-scale transformation}: this approach requires computing the inverse quantile of $\int_{0}^{t} \chi(s)\mathrm{d}s$ which is usually intractable. However, it can be done numerically if the target is strictly log-concave and differentiable. %This, the authors show, allows to make a connection with the Metropolis Hastings algorithm.
+    \item \textbf{adaptive thinning}: this approach requires an upper bounds $\overline{\chi}_{s}(t)$ with $\overline\chi_{s}(t)=0$ for $t<s$ and $\overline\chi_{s}(t)\ge\chi(t)$ for $s\le t\le s+\Delta(s)$ where $\Delta$ is a positive function (in the standard case, $\Delta=+\infty$). Additionally, it requires the ability to sample from the IPP corresponding to $\overline\chi_{s}$. Ideally, $\Delta$ and $\chi/\overline\chi_{s}$ are large (so that we don't have to simulate too many candidates which incurs a computational cost).
+    \item \textbf{superposition}: if the energy can be decomposed in a sum and that each term can be targeted (via one of the first two methods).
+\end{itemize}
 
 %\section{Discussion}
 %

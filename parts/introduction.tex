@@ -1,7 +1,15 @@
 % !TEX root = ../thesis.tex
 %\section{Inference on Markov Random Fields}
 
-\todofr{general statement, what are we trying to do here, structure in two parts, then what is presented in intro and follows notations from WJ08}
+In this thesis, we consider the framework of Bayesian inference where one is interested in combining prior knowledge about some parameters of interest with the likelihood of the observed data given a statistical model controlled by those parameters. This combination of prior and likelihood leads to a posterior distribution on the parameters which is the key object of interest in Bayesian inference. 
+
+We focus on the problem of estimating expected values with respect to such a posterior distribution and in particular with respect to its marginal. Further, we consider the case where the posterior factorises in a specific way and consider methods that attempt to leverage the factorisation structure to offer estimators at a reduced computational cost. The thesis concentrates on computational methods to tackle the problem in a number of important cases as well as applications and experiments. 
+
+The thesis is divided in two parts. In the first part -- \emph{Sampling Algorithms} -- we consider ``exact'' methods that attempt to produce samples from the true marginals and lead to estimators of the expected values that are exact in the limit of infinite computational power and infinite precision in representation of numbers. These methods can work well when the dimensionality of the state-space associated with the marginals of interest is not too high. 
+
+In the second part -- \emph{Approximate Bayesian Inference} -- we consider approximate methods that attempt to find proxies for the marginals in restricted probability distribution spaces. These methods can offer a viable alternative to sampling methods when the latter become too expensive to consider. 
+
+In this chapter we introduce the concept of Markov Random Fields and suggest a few popular examples.
 
 %%%%%%%%%%%
 \section{\label{subsection: mrf}Markov Random Fields}
@@ -83,7 +91,7 @@ Chain graphs where the random variables on every node take value in the same sta
 \caption{\label{fig: hmm1} HMM with states $\{x_{t}\}_{t=1}^{T}$ and observations $\{y_{t}\}_{t=1}^{T}$.}
 \end{figure}
 
-HMMs are used in a broad range of applications from modelling time series data to speech processing \citep{ghahramani01, gales07, zucchini16}.\addref In HMMs, the node potentials correspond to the likelihood of the corresponding observation and the edge potentials correspond to the \emph{transition density}:\addref
+HMMs are used in a broad range of applications from modelling time series data to speech processing \citep{ghahramani01, gales07, zucchini16}. In HMMs, the node potentials correspond to the likelihood of the corresponding observation and the edge potentials correspond to the \emph{transition density}:
 \eqa{	\psi_t (x_t) &=& p(y_t\st x_t), \quad\text{and}\quad \psi_{t-1,t}(x_{t-1},x_t) \spe p(x_t\st x_{t-1}).	\nn}
 A prior $\pi_{0}\in\mathcal P(\mathcal X)$ is assumed to be given for the first node so that we can write $p(x_1\st y_{1}) \propto \pi_{0}(x_1)p(y_1\st x_1)$. 
 
