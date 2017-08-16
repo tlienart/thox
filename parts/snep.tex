@@ -29,7 +29,7 @@ The target distribution of interest has the form $p(x)\propto \pi_0\prod_{i=1:K}
 	q(x) &=& \pi_0(x)\exp(\scal{\theta,\phi(x)}-A(\theta)) \spe \pi_0(x)\exp(-A(\theta))\prod_{i=1}^{K}\tilde t_i(x)
 }
 %
-where $\tilde t_i(x):=\exp\scal{\omega_i,\phi(x)}$, and therefore: $\sum_{i=1:K}\omega_i=\theta$. The tilted distributions associated with each of the factors are given by
+where $\tilde t_i(x):=\exp\scal{\omega_i,\phi(x)}$ for parameters $\omega_{i}$ such that $\sum_{i=1:K}\omega_i=\theta$. The tilted distributions associated with each of the factors are given by
 %
 \eqa{
 	q_i(x) &=& \pi_0(x)t_i(x)\exp(\scal{\lambda_i,\phi(x)}-A_i(\lambda_i))
@@ -224,13 +224,13 @@ Taking the gradient in $\lambda_i^{\text{new}}$ and setting it to zero then lead
 where $\kappa>0$ is a scaling factor. Taking the gradient of that approximation in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a mirror-descent-like step:
 %
 \eqa{
-	\lambda_i^{\text{new}} &=& \nabla A^{\star}\pac{\nabla A(\lambda_i)+\kappa'(\hat\mu_i-\nabla A(\theta))}
+	\lambda_i^{\text{new}} &\leftarrow& \nabla A^{\star}\pac{\nabla A(\lambda_i)+\kappa'(\hat\mu_i-\nabla A(\theta))}
 }
 %
 where $\kappa'=\eta/\kappa$ can be interpreted as a step-size and $\hat\mu_i$ is a noisy estimator of $\nabla A_i(\lambda_i)$. By analogy, we can also suggest the corresponding mechanism for an update in terms of the local parameters $\omega_i$: 
 %
 \eqa{
-	\omega_i^{\text{new}} &=& \nabla A^{\star}\pac{\nabla A(\omega_i)+\kappa''(\hat\mu_i-\nabla A(\theta))}\label{eq:snep-updates}
+	\omega_i^{\text{new}} &\leftarrow& \nabla A^{\star}\pac{\nabla A(\omega_i)+\kappa''(\hat\mu_i-\nabla A(\theta))}\label{eq:snep-updates}
 }
 %
 which resembles the damped updates in the mean-parameter space \eqref{eq:damped-update-mp} we had obtained earlier. 
@@ -302,8 +302,8 @@ Further to this, the convergence question may in fact be of little practical use
 \center
 \includegraphics[width=.6\textwidth]{figures/general/vi-ep-space}
 \vspace*{.2cm}
-\caption{\label{comp-vi-ep}Toy representation of the approximating distributions obtained through MFVI or EP when targeting a distribution $p$ of interest. The starting points are denoted with a superscript $\circ$. MFVI provably converges to a point $q^{\star}_{\text{MF}}$ (solid green line) but we do not know how this point compares to a distribution $q^{\star\star}_{\text{MF}}$ that truly minimises the corresponding KL divergence.\\ By contrast, EP is not guaranteed to converge to a fixed point $q^{\star}_{\text{EP}}$ (dashed orange line) and we also do not know how it compares to $q^{\star}_{\text{EP}}$ that truly minimises the corresponding KL divergence. \\
-In both cases, we do not know how the minimisers compare to $p$ (dashed purple lines). }
+\caption{\label{comp-vi-ep}Toy representation of the approximating distributions obtained through MFVI or EP when targeting a distribution $p$ of interest. The starting points are denoted with a superscript $\circ$. MFVI provably converges to a point $q^{\star}_{\text{MF}}$ (solid green line) but we do not know how this point compares to a distribution $q^{\star\star}_{\text{MF}}$ that truly minimises the corresponding KL divergence.\\ By contrast, EP is not guaranteed to converge to a fixed point $q^{\star}_{\text{EP}}$ (dashed orange line) and we also do not know how it compares to $q^{\star\star}_{\text{EP}}$ that truly minimises the corresponding KL divergence. \\
+In both cases, we do not really know how the minimisers obtained compare to the target distribution $p$ (dashed purple lines). }
 \end{figure}
 
 The EP framework we consider seems however particularly appropriate for the situation where compute nodes only have access to parts of the data and, in our experiments and the experiments discussed in the paper, we observed that it performed well and in a robust way even on very complex models.
