@@ -1,6 +1,6 @@
 % !TEX root = ../thesis.tex
 
-In this section we introduce the Belief Propagation (BP) algorithm for tree-structured MRF which, we show, is an iterative algorithm that can recover functions -- the beliefs -- proportional to the exact node marginals by passing ``messages'' through the graph \citep{pearl88,wainwright08}. We show how this algorithm can be related to the two-filter formula for smoothing on a HMM discussed in chapter \ref{chap:BIS}.
+In this section we introduce the Belief Propagation (BP) algorithm for tree-structured MRF which, we show, is an iterative algorithm that can recover functions -- the beliefs -- proportional to the exact node marginals by passing ``messages'' through the graph \citep{pearl88,wainwright08}. We also show how this algorithm can be related to the two-filter formula for smoothing on a HMM discussed in chapter \ref{chap:BIS}.
 
 We then introduce the Loopy Belief Propagation (LBP), an extension of the BP algorithm on graphs with cycles. This algorithm does not lead to functions proportional to the exact node marginals but recovers proxies for it which work well in practice \citep{yedidia02,sudderth03}.
 
@@ -65,7 +65,7 @@ with, for a leaf node $\alpha$, $M_{\alpha  s} \equiv \psi_\alpha$. This is the 
 \eqa{		\syst{	M_{st}(x_{s}) &=& \psi_{s}(x_{s}) \prod_{r\in\partial s\backslash t} m_{rs}(x_{s}) \\
 				m_{ts}(x_{s}) &=& \int\psi_{st}(x_{s},x_{t})M_{ts}(x_{t})\dx_{t}\\
 				B_{s}(x_{s}) &=& m_{ts}(x_{s})M_{st}(x_{s})	}.	\label{eq structure bp}}
-The $B_{s}(x_{s})$ are known as the \emph{beliefs} and are proportional to the true marginals as we showed with the development above.
+The $B_{s}(x_{s})$ are known as the \emph{beliefs} and are proportional to the true marginals as we showed with the development above. \check{aug17}
 
 \subsection{Belief propagation on a chain}
 A particular case of interest is the chain graph which is associated with Hidden Markov Models introduced at point \ref{intro:exMRF} and studied in more details at chapter \ref{chap:BIS}. On the leaf node, we have a prior $\pi_{0}(x_{1})$ and an observation with likelihood $p(y_{1}\st x_{1})$. Therefore, we have $M_{12}(x_{1})=\pi_{0}(x_{1})p(y_{1}\st x_{1})\propto p(x_{1}\st y_{1})$. Correspondingly, the message $m_{12}$ is given by
@@ -126,7 +126,7 @@ which is the two filter formula for the smoothing distribution $p(x_{t}\st y_{1:
 \subsection{\label{point:LBP}Loopy Belief Propagation}
 
 In the presence of cycles in the graph (\emph{loopy graph}), there is not a unique way to go through all nodes. 
-Propagating messages through different ordering of the nodes can therefore lead to inconsistent messages (see \ref{fig:lbp-inconsistent} for an illustration).
+Propagating messages through different orderings of the nodes can therefore lead to inconsistent messages (see \ref{fig:lbp-inconsistent} for an illustration).
  
 \begin{figure}[!h]
 \center
@@ -134,17 +134,17 @@ Propagating messages through different ordering of the nodes can therefore lead 
 \caption{\label{fig:lbp-inconsistent}A simple graph with a loop. Starting from the leaf node (blue arrow), the message can be propagated in the loop following a clock-wise ordering (green arrow) or a anti-clockwise ordering (orange arrow). The two backward messages coming back to the leaf node do not necessarily match.}
 \end{figure}
 
-A common workaround is to perform the BP algorithm multiple times on different spanning trees of the graphs corresponding to different ordering of the nodes and hope that the iteration converge to a fixed point. This is know as the \emph{loopy belief propagation} (LBP) algorithm \citep{pearl88, yedidia02}:
+A common workaround is to perform the BP algorithm multiple times on different spanning trees of the graphs corresponding to different ordering of the nodes and hope that the iterations converge to a fixed point. This is know as the \emph{loopy belief propagation} (LBP) algorithm \citep{pearl88, yedidia02}:
 %
 \eqa{		\syst{	M_{st}^{n}(x_{s}) &=& \psi_{s}(x_{s}) \prod_{r\in\partial s\backslash t} m^{n-1}_{r s}(x_{s}) \\
 				m^{n}_{ts}(x_{s}) &=& \int \psi_{ts}(x_{t},x_{s})M^{n}_{ts}(x_{t})\dx_{t}\\
 				B^{n}_{s}(x_{s}) &=& m^{n}_{ts}(x_{s})M^{n}_{s t}(x_{s})	}.	\label{eq structure lbp}
 				}
 %
-The initial messages are usually chosen among a class of simple distributions (e.g., the normal distribution) potentially incorporating prior knowledge about the steady state messages. 
-Provided the algorithm converges to a fixed point, the beliefs cannot be guaranteed to be proportional to the true marginals as in the case of a tree. However, they can provide good approximations to the marginals which makes the LBP a popular method for approximate Bayesian inference on MRF \citep{sudderth03}. The fixed points of the LBP have been shown to correspond to extrema of the Bethe free energy \cite{yedidia02} and there exist conditions under which the LBP algorithm provably converges \citep{heskes04,ihler05}.
+The initial messages are usually chosen among a class of simple distributions (e.g., the Normal distribution) potentially incorporating prior knowledge about the steady state messages. 
+Provided the algorithm converges to a fixed point, the beliefs cannot be guaranteed to be proportional to the true marginals unlike the tree case. However, the beliefs can provide good approximations to the marginals which makes the LBP a popular method for approximate Bayesian inference on MRF \citep{sudderth03}. The fixed points of the LBP have been shown to correspond to extrema of the Bethe free energy \citep{yedidia02} and there exist conditions under which the LBP algorithm provably converges \citep{heskes04,ihler05}.
 
-Note that while it is known that the LBP algorithm can lead to good proxy to the marginals, the updates may still be intractable. Indeed, the computation of messages requires an integral which may be hard (or expensive) to compute accurately (e.g., if the dimension of the random variable on a node is high).
+Note that while it is known that the LBP algorithm can lead to good proxy to the marginals, the updates may still be intractable. Indeed, the computation of messages requires an integral which may be hard (or expensive) to compute accurately (e.g., if the dimension of the random variable on a node is high).\check{aug17}
 
 
 

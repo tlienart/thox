@@ -31,7 +31,7 @@ It will also be convenient to use the following abuse of notation: for an unnorm
 
 The application of this projection operator implicitly requires the ability to perform two computations. First, it requires the ability to compute the expected value $\mu_p=\E_{p}[\phi(X)]$ which is typically intractable since we are in a context where we are trying to approximate $p$ for that very purpose. Then, provided we can compute $\mu_p$, we need to be able to apply the inverse mapping $\nabla A^{\star}(\mu_p)$ which is not tractable in general. We will introduce below contexts in which the first requirement can be approximately met. The second requirement effectively means that we are constrained to exponential families for which computing the inverse mapping $\nabla A^{\star}$ can be done explicitly or is cheap to approximate. For continuous state spaces, it is overwhelmingly the Gaussian distribution that is considered in the literature with either a diagonal or a full covariance matrix \citep{kuss05,herbrich05,herbrich06,yu06,hernandez13}.
 %\add{maybe add explicit comment here for the gaussian + discuss briefly stability}
-\check{may15,april24} 
+\check{may15,april24,aug17} 
 %
 % ----------------------------------------
 \subsection{Online Bayesian learning and Assumed Density Filtering}
@@ -42,12 +42,12 @@ In \citet{opper98}, the author considers that the exact posteriors are intractab
 Using the notations from the previous point, the algorithm corresponds to a sequence of iteration of the form
 %
 \eqa{	
-	\theta_{t+1} &=& \mathbf P_{\phi}[p(y_{t+1}\st \cdot)q_{\theta_{t}}],	\label{adfonline}
+	\theta_{t+1} &\leftarrow& \mathbf P_{\phi}[p(y_{t+1}\st \cdot)q_{\theta_{t}}],	\label{adfonline}
 }
 %
 where, at the first step, $q_{\theta_{0}}$ is replaced by the prior $\pi_{0}$. In words, the posterior up to time $t$ is approximated by the exponential family distribution $q_{\theta_{t}}$ which then serves as prior to form an approximate posterior $p(y_{t+1}\st x)q_{\theta_{t}}(x)$. 
 Given that this approximate posterior is not necessarily in the exponential family, it needs to be projected as per \eqref{adfonline}.\check{april27} 
-At time $t+1$, the distribution $q_{\theta_{t+1}}$ can be now interpreted as an approximation of the posterior distribution given all the data up to that time or 
+At time $t+1$, the distribution $q_{\theta_{t+1}}$ can now be interpreted as an approximation of the posterior distribution given all the data up to that time or 
 %
 \eqa{	q_{\theta_{t+1}}(x) \esp\approx\esp p(x) &\propto& \pi_{0}(x)\prod_{s=1}^{t+1}p(y_{s}\st x).
 }
@@ -58,7 +58,7 @@ We can therefore reinterpret the algorithm more generally as targeting a distrib
 	p(x) & \propto&  \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x) \label{eq:targetfactorises}
 }
 %
-where the factors $t_i$ are nonnegative. This is the \emph{Assumed Density Filtering} (ADF) algorithm. Note that in this case there is no ``natural ordering'' as in the original online learning case and the algorithm can be applied after any permutation of the factors.\check{april27}
+where the factors $t_i$ are nonnegative. This is the \emph{Assumed Density Filtering} (ADF) algorithm. Note that in this case there is no ``natural ordering'' as in the original online learning case and the algorithm can be applied after any permutation of the factors.\check{april27, aug17}
 
 
 \begin{algorithm}[!h]\small
@@ -79,7 +79,7 @@ Let $\omega_{i}=(\theta_{i}-\theta_{i-1})$ denote the difference between subsequ
 	q_{\theta_{K}}(x) &\propto& \pi_{0}(x)\prod_{i=1}^{K}\tilde t_{i}(x).\label{eq:approxadf}
 }
 % 
-The main issue with using ADF on an MRF is that the order in which the graph is read, or equivalently the order in which the factors $t_{i}$ are considered, will affect the final approximation $q_{\theta_{K}}$. A natural extension is therefore to perform multiple passes of ADF while considering random orderings of the factors and correct for the fact that each factor is considered multiple times. This is the core idea behind the \emph{Expectation Propagation} algorithm.\check{jul21,may14}
+The main issue with using ADF on an MRF is that the order in which the graph is read, or equivalently the order in which the factors $t_{i}$ are considered, will affect the final approximation $q_{\theta_{K}}$. A natural extension of the ADF algorithm to take this into account is to perform multiple passes of ADF while considering random orderings of the factors and correct for the fact that each factor is considered multiple times. This is the core idea behind the \emph{Expectation Propagation} algorithm.\check{jul21,may14,aug17}
 %
 % --------------------------------------
 \subsection{\label{point:EP}Expectation Propagation}
@@ -102,10 +102,10 @@ In the Expectation Propagation (EP) algorithm \citep{minka01, minka01b, seeger07
 	\end{algorithmic}
 \end{algorithm} 
 
-In Expectation Propagation, we denote by $q_{-i}\propto q_{\theta}/\tilde t_{i}$ a \emph{cavity distribution} and by $q_{i}\propto q_{-i}t_{i}$ a \emph{tilted distribution} \citep{seeger07, gelman14}. Provided the EP iterations converge, the global parameter $\theta$ is equal to $\mathbf P_\phi[q_i]$ for all $i$. Therefore, it is such that all the \emph{local moment matching conditions} (LMMC) are met:
+In Expectation Propagation, we denote by $q_{-i}\propto q_{\theta}/\tilde t_{i}$ a \emph{cavity distribution} and by $q_{i}\propto q_{-i}t_{i}$ a \emph{tilted distribution} \citep{seeger07, gelman14}. Provided the EP iterations converge, the global parameter $\theta$ is equal to $\mathbf P_\phi[q_i]$ for all $i$. Put differently, it is such that all the \emph{local moment matching conditions} (LMMC) are met:
 %
 \eqa{
 	(\text{LMMC})\qquad	\E_{q_{i}}[\phi(X)] &=& \E_{q_{\theta}}[\phi(X)], \quad i=1,\dots,K.\label{eq:LMMC}
 } 
 %
-These conditions can be interpreted as a relaxation of the GMMC \eqref{eq:GMMC} and the EP algorithm can be interpreted as a fixed point algorithm targeting the LMMC. We will expand on this in chapter \ref{chap:EPforDBI}.\check{jul21, may15}
+These conditions can be interpreted as a relaxation of the GMMC \eqref{eq:GMMC} and the EP algorithm can be interpreted as a fixed point algorithm targeting the LMMC. We will expand on this in chapter \ref{chap:EPforDBI}.\check{jul21, may15, aug17}
