@@ -1,20 +1,20 @@
 % !TEX root = ../thesis.tex
 
-In this chapter we discuss how the Expectation Propagation (EP) algorithm can be exploited when attempting to perform Bayesian inference with distributed data. 
-We focus on how different variants of the EP algorithm perform. how amenable they are to scaling and how robust they are to noisy estimations of the EP updates. \add{here or later, mention powerEP is easy to add to the game. (could be just redefined in $\P_{\phi}$}
+In this chapter we discuss how the Expectation Propagation (EP) algorithm can be exploited when attempting to perform (approximate) Bayesian inference with distributed data. 
+We focus on how different variants of the EP algorithm perform, how amenable they are to scaling and how robust they are to noisy estimations of the EP updates. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Distributed Bayesian inference}
 
 In this section we consider the problem of performing Bayesian inference when the relevant data is distributed across different compute nodes. 
-Let us assume that there are $K$ such compute nodes each holding independent parts of the data $y_i$ (with $i=1,\dots,K$) such that these parts form a partition of the complete data $y$. 
-In a Bayesian setting, we are interested in the posterior distribution over a parameter of interest $x$ given the entire data $y$. We can write this posterior as the product of $K$ terms corresponding to the parts $y_i$: \check{june8}
+Let us assume that there are $K$ such compute nodes each holding independent parts of the data $y_i$ (with $i=1,\dots,K$), such that these parts form a partition of the complete data $y$. 
+In a Bayesian setting, we are interested in the posterior distribution over a parameter of interest $x$ given the entire data $y$. We can write this posterior as the product of $K$ terms corresponding to the parts $y_i$: \check{june8, aug17}
 %
 \eqa{
 	p(x\st y) &\propto& \pi_0(x) \prod_{i=1}^{K} p(y_i\st x)\label{eq:distrposterior}
 }
 %
-where $\pi_0$ is a prior distribution. Each of the likelihood term itself factors over the individual data points of $y_i$, i.e.: $p(y_i\st x)=\prod_{j=1}^{N_i}p(y_{ij}\st x)$ with $N_i$ the number of individual data points held by the compute node $i$.
+where $\pi_0$ is a prior distribution. Each of the likelihood term itself factors over the individual data points of $y_i$, i.e.: $p(y_i\st x)=\prod_{j=1}^{N_i}p(y_{ij}\st x)$ with $N_i$ the number of individual data points held by the $i$th compute node.
 
 It is important to stress that, in the setup considered here, each compute node has access to independent subsets of the data. In \citet{hasenclever16} we explain that this situation can occur in large scale learning but also in cases when the data cannot be shared directly (e.g.: for privacy reasons). This type of context is sometimes known as divide-and-conquer or consensus inference \citep{kleiner14,battey15,zhao16}. 
 
@@ -308,7 +308,7 @@ In both cases, we do not really know how the minimisers obtained compare to the 
 
 The EP framework we consider seems however particularly appropriate for the situation where compute nodes only have access to parts of the data and, in our experiments and the experiments discussed in the paper, we observed that it performed well and in a robust way even on very complex models.
 
-Finally, we note that the entirety of the EP variants discussed in this section can be re-expressed in the general framework of ``Power-EP'' \citep{minka04} where the discrepancy is more general than the basic Kullback-Leibler divergence. This, however, has little impact to the considerations discussed in the chapter in that the only element it changes is the definition of the projection operator $\mathbf P_{\phi}$. We focused on ``classical'' EP for this reason and also because the role of the exponent in Power-EP is poorly understood in general though it has been discussed in the literature \citep{minka04, hernandez15, li16}.
+Finally, we note that the entirety of the EP variants discussed in this section can be re-expressed in the general framework of ``Power-EP'' \citep{minka04} where the discrepancy is more general than the basic Kullback-Leibler divergence. This, however, has little impact to the considerations discussed in the chapter in that the only element it changes is the definition of the projection operator $\mathbf P_{\phi}$. We focused on ``classical'' EP for this reason and also because the role of the exponent in Power-EP is poorly understood in general though it has been discussed in the literature \citep{minka04, hernandez15, li16}.\add{maybe add equation + discuss}
 
 
 
