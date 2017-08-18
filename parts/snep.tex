@@ -19,7 +19,7 @@ where $\pi_0$ is a prior distribution. Each of the likelihood term itself factor
 It is important to stress that, in the setup considered here, each compute node has access to independent subsets of the data. In \citet{hasenclever16} we explain that this situation can occur in large scale learning but also in cases when the data cannot be shared directly (e.g.: for privacy reasons). This type of context is sometimes known as divide-and-conquer or consensus inference \citep{kleiner14,battey15,zhao16}. 
 
 Defining $t_i$ to be nonnegative factors with $t_i(x)=p(y_i\st x)$, the factorised form \eqref{eq:distrposterior} reads $\pi_0(x)\prod_{i=1:K}t_i(x)$ which is the form \eqref{eq:targetfactorises} that we had used to motivate the introduction of the ADF and EP algorithms (cf.\ point \ref{s:ADF+EP}).
-In the rest of this chapter, we show how different variants of the EP algorithm can be used to perform parallel variational inference in the presence of distributed data.\check{jul25,jun8} 
+In the rest of this chapter, we show how different variants of the EP algorithm can be used to perform parallel variational inference in the presence of distributed data.\check{jul25,jun8, aug18} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{sec:ep-for-dbi}EP variants for distributed inference}
@@ -54,13 +54,14 @@ The general parallel computational framework considered iterates on the followin
 
 As we will see, there are different ways to implement this general framework.
 We will show empirically that a determining element in the performance of a particular implementation is its robustness to Monte Carlo noise. 
-Indeed, in our general setting we do not assume that computing $\E_{q_i}[\phi(X)]$ can be done exactly. Rather, we assume that it is approximated by a Monte Carlo estimator.\check{june8}
+Indeed, in our general setting we do not assume that computing $\E_{q_i}[\phi(X)]$ can be done exactly. Rather, we assume that it is approximated by a Monte Carlo estimator.\check{june8, aug18}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{Damped updates in the natural parameter space}
 In their paper, \citet{xu14} suggest a method to synchronise Monte Carlo samplers ran on independent compute nodes. They call it \emph{Sequential Moment Sharing} or SMS for short. Effectively, SMS corresponds precisely to the case mentioned at the previous point consisting of running EP across multiple physical nodes while using noisy estimates of $\E_{q_i}[\phi(X)]$, the expected value of the sufficient statistics under the tilted distribution. 
-Below, we introduce the algorithm as a damped fixed-point iteration in the natural parameter space. This will prove useful when comparing different EP-like algorithms.\check{june8,may27}
+Below, we introduce the algorithm as a damped fixed-point iteration in the natural parameter space. This will prove useful when comparing different EP-like algorithms.\check{june8,may27, aug18}
 
-We showed that the basic EP algorithm could be interpreted as a kind of fixed point iteration targeting the Local Moment Matching Conditions \eqref{eq:LMMC} (LMMC). At a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter should therefore be updated such as to verify $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
+We showed that the basic EP algorithm could be interpreted as a kind of fixed point iteration targeting the Local Moment Matching Conditions \eqref{eq:LMMC} (LMMC). At a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter should therefore be updated such as to verify $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let us define denote the moment of the local tilted distribution as $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
 %
 \eqa{	
 	\theta &\leftarrow & \nabla A^{\star}(\mu_i).	\label{eq:ep-np-update}
