@@ -22,7 +22,7 @@ Many discrepancy measures can be considered such as the total variation distance
 The KL divergence has been widely considered in the literature partly because it leads to variational problems that are amenable to gradient descent-based algorithms. 
 In particular, considering the discrepancy $\KL{q,p}$ lead to the development of the popular \emph{variational inference} algorithms \citep{hoffman13,blei16}. 
 
-In \emph{mean-field variational inference} (MFVI), the approximating family of distributions $\mathcal F$ is taken to be the class of distributions that fully factorises:
+In \emph{mean-field variational inference} (MFVI), the approximating family of distributions $\mathcal F$ is taken to be the class of distributions that fully factorises:\add{fully is not necessarily required, should probably add note, should probably also actually write the stuff down}
 %
 \eqa{
 	\mathcal F_{\text{MFVI}} &=& \pab{q \in \mathcal P(\mathcal X) \st q(x_{1},\dots,x_{d}) = \prod_{i=1}^{d}q_{i}(x_{i}) }.

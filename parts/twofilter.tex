@@ -248,7 +248,7 @@ where $s^{(j)}_{t+1}=\sum_{k=1}^{n}w^{(k)}_{t}p(\tilde X^{(j)}_{t+1}\st X^{(k)}_
 Sampling from such a mixture can be done in two steps: first, sample a pair of labels $(i^{\star},j^{\star})$ from a multinomial distributions with $N^{2}$ weights $\beta^{(i,j)}_{t}$ corresponding to the weight of the component $(i,j)$ relative to the whole mixture $q_{t}^{\text{mix}}$; second, sample from the component $(i^{\star},j^{\star})$. 
 Of course this does not simplify the problem: we still have to sample $N$ pairs of indices from a multinomial with $N^{2}$ pair which is still quadratic in $N$ and, additionally, computing the mixture component weights $\beta^{(i,j)}_{t}$ is intractable in general. \check{jul16,jul10}
 
-An approximation suggested first by \citet{briers05} in the wider context of sampling from products of mixtures and exploited by \citet{fearnhead10, taghavi12} in the context of the TFS algorithm is to approximate $i$ and $j$ independently by representing $\beta^{(i,j)}_{t}\approx \beta^{(i)}_{t}\beta^{(j)}_{t}$. The simplest form for this approximation, is to use $\beta^{(i)}_{t} = w^{(i)}_{t-1}$ and $\beta^{(j)}_{t}=\tilde w^{(j)}_{t+1}$. 
+An approximation suggested first by \citet{briers05} in the wider context of sampling from products of mixtures and exploited by \citet{fearnhead10, taghavi12} in the context of the TFS algorithm is to approximate $i$ and $j$ independently by representing $\beta^{(i,j)}_{t}\approx \beta^{(i)}_{t}\tilde\beta^{(j)}_{t}$. The simplest form for this approximation, is to use $\beta^{(i)}_{t} = w^{(i)}_{t-1}$ and $\tilde\beta^{(j)}_{t}=\tilde w^{(j)}_{t+1}$. 
 
 Since sampling from a given component $p(x_{t}\st X^{(i^{\star})}_{t-1})p(y_{t}\st x_{t})p(\tilde X^{(j^{\star})}_{t+1}\st x_{t})$ may still be intractable, we can resort to importance sampling for that term as well and compute the corresponding importance weight $\tilde w_{t}^{(j)}$ as a result.
 With this approach, sampling the indices is now an operation with linear computational complexity in the number of particles and the resulting algorithm consequently also enjoys linear complexity. 
@@ -260,7 +260,7 @@ The steps are illustrated in algorithm \ref{alg:bis-linear}. \check{jul16}
 		\State run a particle filter targeting $\{p(x_{t}\st y_{1:t})\}_{t=1}^{T}$ with $N$ particles $\{X^{(i)}_{t}, w^{(i)}_{t}\}_{t,i=1}^{T,N}$
 		\State set $\{\tilde X^{(j)}_{T},\tilde w^{(j)}_{T}\}_{j=1}^{N}\leftarrow \{X^{(i)}_{T},w^{(i)}_{T}\}_{i=1}^{N}$
 		\For{$t=T-1:2$}
-			\State sample $N$ pairs of indices with $i^{\star}_{1:N} \simiid \mathcal M(\beta^{(i)}_{t})$ and $j^{\star}_{1:N}\simiid \mathcal M(\beta^{(j)}_{t})$
+			\State sample $N$ pairs of indices with $i^{\star}_{1:N} \simiid \mathcal M(\beta^{(i)}_{t})$ and $j^{\star}_{1:N}\simiid \mathcal M(\tilde\beta^{(j)}_{t})$
 			\For{$k=1:N$}
 				\State sample $\tilde X^{(k)}_{t}\sim \tilde  q_{t} \approx \tilde q_{t}^{\text{opt}, i^{\star}_{k}, j^{\star}_{k}}(x_{t}) \propto p(x_{t}\st X^{(i^{\star}_{k})}_{t-1})p(\tilde X^{(j^{\star}_{k})}_{t+1}\st x_{t})p(y_{t}\st x_{t})$
 	    			\State compute the unnormalised weights $\tilde w^{(k)}_{t} \propto \tilde q^{\text{opt}, i^{\star}_{k},j^{\star}_{k}}_{t}(\tilde X^{(k)}_{t})/\tilde q_{t}(\tilde X^{(k)}_{t})$
