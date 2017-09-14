@@ -28,7 +28,11 @@ In \emph{mean-field variational inference} (MFVI), the approximating family of d
 	\mathcal F_{\text{MFVI}} &=& \pab{q \in \mathcal P(\mathcal X) \st q(x_{1},\dots,x_{d}) = \prod_{i=1}^{d}q_{i}(x_{i}) }.
 }
 % 
-This choice of distribution space, while rather restrictive, leads to the inference problem \eqref{eq:generic-abi} being tractable and efficient iterative schemes based on the gradient descent can be used that provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}. However, the problem is non-convex and no guarantees exist as to what these methods converge to. 
+This choice of distribution space, while rather restrictive, leads to the inference problem \eqref{eq:generic-abi} being tractable: indeed, writing $q_{\neg i}(x_{\neg i}) = \prod_{j\neq i} q_{j}(x_{j}) $, we have
+\eqa{
+	\KL{q,p} &=& \E_{q_{i}}\pac{ \log q_{i} -	\E_{q_{\neg i}}\pac{ \log p}} + \E_{q_{\neg i}}\pac{\sum_{j\neq i}\log q_{j}} 
+}
+suggesting to iterate over the components taking each time $q_{i} \equiv \exp(\E_{q\neg i} \log p) $. This scheme can be used to provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}. However, the problem is non-convex and no practical guarantees exist as to what the iterations converge to. 
 In this thesis, we focus on an alternative approximate Bayesian inference class of algorithms which exploits the factorisation structure of the target distribution $p$ directly instead of imposing a factorisation structure a priori like in MFVI.
 
 \subsection{ADF, EP and LBP}

@@ -2,17 +2,19 @@
 
 In this chapter, we start with a brief overview of Monte Carlo estimators and associated sampling methods focusing in particular on Sequential Monte Carlo methods for the smoothing and filtering problem on Hidden Markov Models. We also introduce an alternative class of methods relying upon Piecewise Deterministic Markov Processes and in particular the Bouncy Particle Sampler (BPS). 
 
-\section{\label{sec:MC+SMC}Monte Carlo and Sequential Monte Carlo}
+\section{\label{sec:MC+SMC}Monte Carlo methods}
+In this section we review briefly the foundations of Monte Carlo methods as well as a few key algorithms which will be discussed in the rest of the document.
+
 \subsection{From quadrature to sampling}
 % KEEP pi (later p is filtering/smoothing)
-We consider the problem of computing the expected value of a test function $\varphi$ with respect to a distribution $\pi\in\mathcal P(\mathcal X)$ i.e.: $I:=\E_\pi[\varphi(X)]$. Assuming it can't be computed analytically, a general approach is to consider a quadrature rule of the form:
+We consider the problem of computing the expected value of a test function $\varphi$ taking value over a space $\mathcal X$ with respect to a distribution $\pi\in\mathcal P(\mathcal X)$ i.e.: $I:=\E_\pi[\varphi(X)]$. Assuming it can't be computed analytically, a general approach is to consider a quadrature rule of the form:
 %
 \eqa{
 	I\esp\approx\esp \widehat I_N &=& \sum_{i=1}^{N} w(X^{(i)}) \varphi(X^{(i)})
 }
 %
 for some fixed points $X^{(i)}\in\mathcal X$ and corresponding weights $w(X^{(i)})\in\mathbb R_+$. 
-When the number of dimensions is low, we can consider deterministic quadrature rules such as the Gauss-Hermite quadrature \citep{davis75}. However, as the dimensionality increases, the performance of these deterministic rules becomes catastrophic even for a large number of integration points (a well-known effect related to what Bellman called the \emph{curse of dimensionality} in dynamic programming \citep{bellman57,bengtsson08}). 
+When the number of dimensions is low, we can consider deterministic quadrature rules such as the Gauss-Hermite quadrature (see e.g.: \citet{davis75}). However, as the dimensionality increases, the performance of these deterministic rules becomes catastrophic even for a large number of integration points (a well-known effect related to what Bellman called the \emph{curse of dimensionality} in dynamic programming \citep{bellman57,bengtsson08}). 
 In such cases, a broadly studied approach is the Monte Carlo integration with
 %
 \eqa{	
@@ -27,10 +29,8 @@ The strong law of large numbers then indicates that $\widehat I_N\to I$ almost s
 %
 and computing $\hat I_{N}$ amounts to taking the expected value of $\varphi(X)$ with respect to $\hat\pi$.\check{paragraph jul16}
 
-%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Sequential importance sampling}
 %%%%%%%%%%%%%%%%%%%
-\subsubsection{Importance sampling}
+\subsection{Importance sampling}
 %For this point, we refer to the note by \citet{doucet11} and also to \citet[chapter 3.3 and 14.3]{robert04}.
 In \emph{importance sampling} (IS), samples are drawn from a \emph{proposal distribution} $q\in\mathcal P(\mathcal X)$ that is easy to sample from (e.g.: a Gaussian) and is similar to the target distribution $\pi$. 
 The quadrature weights are then adjusted to reflect that the samples are not drawn from the true distribution:
@@ -63,6 +63,22 @@ where $\V_{q}(W)$ is the variance of the importance sampling ratio. Using the sa
 %
 This metric is bounded from below by $1$ -- the degenerate case where a single particle is carrying all the weight -- and from above by $N$ -- the ideal case where the samples are comparable to ideal Monte Carlo samples. \check{par jul16}
 
+\subsection{Classical sampling algorithms}
+
+In this point we mention briefly a few standard algorithms used to attempt to generate samples from a distribution.
+Later on, we will compare alternative methods to these standard algorithms.
+The list and descriptions are not meant to be exhaustive and we refer to \citep{robert04, green15} for a more complete overview.
+
+\subsubsection{Metropolis-Hasting}
+The Metropolis-Hasting algorithm belongs to the class of Markov Chain Monte Carlo methods (MCMC) where one attempts to generate a sequence of random variables $X^{(1)},X^{(2)},\dots$
+
+\subsubsection{Gibbs sampling}
+\subsubsection{Hamiltonian Monte Carlo sampling}
+
+%%%%%%%%%%%%%%%%%%%%%%
+\section{Sequential Monte Carlo methods}
+%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sequential importance sampling}
 %%%%%%%%%%%%%%%%%%%
 \subsubsection{Hidden Markov models}
 In the context of HMM, we are usually interested in estimating a sequence of target distributions $\{\pi_{t}(x_{1:t})\}_{t=1}^{T}$ which admit the following factorisation structure:
