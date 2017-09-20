@@ -70,10 +70,67 @@ Later on, we will compare alternative methods to these standard algorithms.
 The list and descriptions are not meant to be exhaustive and we refer to \citep{robert04, green15} for a more complete overview.
 
 \subsubsection{Metropolis-Hasting}
-The Metropolis-Hasting algorithm belongs to the class of Markov Chain Monte Carlo methods (MCMC) where one attempts to generate a sequence of random variables $X^{(1)},X^{(2)},\dots$
+The Metropolis-Hasting algorithm (MH) is one of the most prominent member of the class of Markov Chain Monte Carlo methods (MCMC). In MCMC methods, one considers a sequence (chain) of random variables $X^{(1)}, X^{(2)},\dots$ following a conditional probability density or \emph{transition kernel} $K$ with $X^{(n+1)} \sim K(X^{(n)}, X^{(k+1)})$. 
+The kernel is chosen in such a way that the chain admits a stationary distribution, i.e.: a distribution $\pi$ such that for $n$ large enough, $X^{(n)}\sim \pi$ implies that $X^{(n+1)}\sim\pi$. Further, the kernel is chosen in such a way that the stationary distribution corresponds to the target distribution.
+
+The MH algorithm corresponds to the transition kernel below where $q$ is a proposal distribution and $p_{u}$ is the (unnormalised) target \citep[chapter 6]{robert04}.
+
+\begin{algorithm}[!h]\small
+	\caption{\label{alg:mh-kernel}\dblue{\emph{\small Metropolis-Hasting transition}}}
+	\begin{algorithmic}[1]
+		\State generate $Y^{(n)}\sim q(\cdot | X^{(n)})$
+		\State compute the acceptance rate
+			$$ \rho \leftarrow \min\left\{ {p_{u}(Y^{(n)})\over p_{u}(X^{(n)})}{q(X^{(n)}|Y^{(n)})\over q(Y^{(n)}|X^{(n)})}, 1\right\} $$
+		\State generate $\beta\sim \mathcal B(\rho)$ (Bernoulli)
+		\State compute the new state: $X^{(n+1)} \leftarrow \beta Y^{(n)} + (1-\beta)X^{(n)} $
+	\end{algorithmic}
+\end{algorithm}
+
+In the MH algorithm, different choices of $q$ will lead to different algorithms that may be easier or harder to implement. For example taking a \emph{symmetric} proposal with $q(x|y)=q(y|x)$ leads to a simplified acceptance ratio (see \citet{green15} for a discussion).
 
 \subsubsection{Gibbs sampling}
+
+Gibbs sampling can be applied when targeting a multivariate distribution $p\in \mathcal P(\mathcal X)$ where $\mathcal X$ is $d$-dimensional and where it is possible to generate samples from the target's singleton marginals $p_{1}, \dots, p_{d}$ \citep[chapter 7]{robert04}.
+
+\begin{algorithm}[!h]\small
+	\caption{\label{alg:gibbs-alg}\dblue{\emph{\small Gibbs iteration}}}
+	\begin{algorithmic}[1]
+		\State given $x^{(n)}=(x_{1}^{(n)},\dots,x_{d}^{(n)})$
+		\For{$k=1:d$}
+			\State generate $X^{(n+1)}_{k} \sim p_{k}(x_{k}\st x^{(n)}_{-k})$ \Comment with $x_{-k}:=(x_{1},\dots,x_{k-1},x_{k+1},\dots,x_{d})$
+		\EndFor
+	\end{algorithmic}
+\end{algorithm}
+
+The potential advantage of the method is that, at any given point, it only considers uni-dimensional distributions. 
+The major disadvantage of the method is that it goes sequentially over each dimensions rendering the method extremely slow as soon as the dimensionality of the target distribution becomes substantial.
+
+
 \subsubsection{Hamiltonian Monte Carlo sampling}
+
+The Hamiltonian Monte Carlo method (HMC) generates samples along a trajectory on the the parametric surface $(x, \ell(x))$ where $\ell(x):=\log \pi_{u}(x)$ and $\pi_{u}$ is the (unnormalised) target distribution.
+The trajectory can be interpreted as the time evolution of a specific physical system described by a Hamiltonian depending on the log-likelihood (potential) and a momentum term encouraging exploration of the state-space (kinetic energy) with \emph{momentum variable} $p$. The Hamiltonian is defined as
+\eqa{
+	H(x, p) &:=& -\ell(x) + \frac12\scal{p, M\inv p} 
+}
+where $M$ is a mass matrix that can be set to the identity or adjusted depending on knowledge of the problem's geometry \citep{betancourt17, barp18}. 
+Since finding the exact trajectory of a Hamiltonian system is usually intractable, numerical integrators can be used and the leapfrog method is often used in HMC.
+
+\begin{algorithm}[!h]\small
+	\caption{\label{alg:hmc-alg}\dblue{\emph{\small HMC iteration}}}
+	\begin{algorithmic}[1]
+		\State draw a momentum variable $P^{(n)}\sim\mathcal N(0, M) $
+		\State compute one step of the numerical integrator from $(X^{(n)},P^{(n)})\rightarrow (X^{\star},P^{\star})$ 
+		\State compute the acceptance ratio
+			$$ \rho \leftarrow \min\left\{\exp\left(-H(X^{\star},P^{\star})-H(X^{(n)}, P^{(n)})\right),1\right\} $$
+		\State generate $\beta \sim\mathcal B(\rho)$
+		\State compute the new state: $X^{(n+1)} \leftarrow \beta X^{\star}+(1-\beta)X^{(n)}$
+	\end{algorithmic}
+\end{algorithm}
+
+This method generates a Markov chain with stationary distribution corresponding to the target distribution $\pi$. 
+It is a very popular method in computational Bayesian inference and tends to be preferred over approaches such as the MH algorithm \citep{green15}.
+
 
 %%%%%%%%%%%%%%%%%%%%%%
 \section{Sequential Monte Carlo methods}
