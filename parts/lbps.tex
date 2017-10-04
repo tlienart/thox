@@ -2,25 +2,26 @@
 
 In this thesis we concern ourselves with sampling or approximating distributions that factorise in a specific way. Here, we cover the Local Bouncy Particle Sampler (LBPS), a version of the BPS introduced at point \ref{point:BPS} for target distributions that factorise according to a MRF.
 
-The aim of this short chapter is to show that the LBPS algorithm can be used on high-dimensional models such as probabilistic matrix factorisation and compare favourably with the HMC algorithm. This is important because it shows the potential of PDMP samplers on complex Machine Learning models, something that had not yet been done.
+The aim of this short chapter is to show that the LBPS algorithm can be used on high-dimensional models such as probabilistic matrix factorisation and compare favourably with the HMC algorithm thereby showing the potential of PDMP samplers on complex Machine Learning models.
 
 \section{Local Bouncy Particle Sampler}
 In \cite{bouchard15}, the authors consider the case where the target distribution factorises as
 %
 \eqa{
-	\pi(x)&\propto& \prod_{f=1\in F} \gamma_{f}(x_{f})
+	\pi(x)&\propto& \prod_{f\in F} \gamma_{f}(x_{f})
 }
 %
-where $x_{f}$ is a restriction of $x$ and $F$ is an index set of \emph{factors}. In the specific case of a pairwise MRF, the factors are the edges and the restrictions are the variables on each nodes. The energy associated to $\pi$ consequently decomposes as $U\equiv \sum_{f\in F}U_{f}$.
+where $x_{f}$ is a restriction to a few elements of $x$ and $F$ is a set of \emph{factors}. In the specific case of a pairwise MRF, the factors are the edges and the restrictions are the variables on each nodes. The energy associated to $\pi$ consequently decomposes as $U\equiv \sum_{f\in F}U_{f}$.
 
 %\subsection{Local BPS: algorithm}
-For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $R_{f}$ can be defined in the same way as for the BPS except that, by convention, $\nabla U_{f}$ has zero components for all variables not affected by the factor. We can then define a collection of intensities based on $(x^{(i-1)},v^{(i-1)})$ with
+For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $R_{f}$ can be defined in the same way as for the BPS except that $\nabla U_{f}$ is set to have zero components for all variables not associated to the factor. We can then define a collection of intensities based with
 %
 \eqa{
 	\chi_{f}(t) &=& \lambda_{f}(x^{(i-1)}+v^{(i-1)}t,v^{(i-1)}). 
 }
 %
-Using the superposition principle, the next bounce time is the first arrival of a poisson process with intensity $\chi\equiv\sum_{f} \chi_{f}$. However, instead of modifying all velocity variables at a bounce as in the basic BPS, the authors suggest sampling a factor $f$ with probability $\chi_{f}(\tau)/\chi(\tau)$ and modify only the variables connected to the sampled factor. This can significantly reduce the overall computational cost associated with the algorithm and especially so when the underlying MRF has a connection structure that is not too densely connected.\add{come back suggest that if too densely connected then too large a part of the graph would have to be refreshed each time}
+The superposition principle can the be considered with $\chi\equiv\sum_{f} \chi_{f}$. Instead of modifying all velocity variables at a bounce as in the basic BPS, the method samples a factor $f$ with probability $\chi_{f}(\tau)/\chi(\tau)$ and modifies only the variables connected to the sampled factor. 
+This can significantly reduce the overall computational cost associated with the algorithm and especially so when the underlying MRF has a connection structure that is not too densely connected.\add{come back suggest that if too densely connected then too large a part of the graph would have to be refreshed each time}
 
 \section{Experiments}
 

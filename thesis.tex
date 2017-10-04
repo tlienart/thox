@@ -11,15 +11,28 @@
 \newif\ifsnep
 \newif\ifccl
 
+\def\compileall{1}
 \toctrue    \tocfalse
 \introtrue  \introfalse
-\bgstrue  	%\bgsfalse
+\bgstrue  	\bgsfalse
 \tfstrue    	\tfsfalse
-\lbpstrue 	%\lbpsfalse
+\lbpstrue 	\lbpsfalse
 \bgmtrue  	\bgmfalse
 \sneptrue 	\snepfalse
 \pbptrue   	\pbpfalse
 \ccltrue     \cclfalse
+
+\if\compileall1
+    \toctrue
+    \introtrue
+    \bgstrue
+    \tfstrue
+    \lbpstrue
+    \bgmtrue
+    \sneptrue
+    \pbptrue
+    \ccltrue
+\fi
 
 \newcommand{\itsepa}{\itsep0} % adjust all itseps in one shot
 
