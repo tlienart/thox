@@ -238,7 +238,7 @@ The authors show that the velocities also need to be ``refreshed'' according to 
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:BPS1}\small \idblue{Basic BPS}}
 	\begin{algorithmic}[1]
-	\State init $(x^{(0)},v^{(0)})$, set $T$, trajectory length, set $t=0$ and $i=1$
+	\State initialise $(x^{(0)},v^{(0)})$, set $T$, trajectory length, set $t=0$ and $i=1$
 	\While{$t < T$}
 		\State simulate first arrival time $\tau_{\text{bounce}} \sim \text{PP}(\chi(t))$  with
 		$$ \chi(t) = \lambda(x^{(i-1)}+v^{(i-1)}t,v^{(i-1)})$$

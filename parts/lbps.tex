@@ -1,8 +1,8 @@
 % !TEX root = ../thesis.tex
 
-In this thesis we concern ourselves with sampling or approximating distributions that factorise in a specific way. Here, we cover the Local Bouncy Particle Sampler (LBPS), a version of the BPS introduced at point \ref{point:BPS} for target distributions that factorise according to a MRF.
+In this thesis we consider sampling or approximating distributions that factorise in a specific way. In this chapter, we cover the Local Bouncy Particle Sampler (LBPS), a version of the BPS introduced at point \ref{point:BPS} for target distributions that factorise according to a MRF.
 
-The aim of this short chapter is to show that the LBPS algorithm can be used on high-dimensional models such as probabilistic matrix factorisation and compare favourably with the HMC algorithm thereby showing the potential of PDMP samplers on complex Machine Learning models.
+The aim of this short chapter is to show that the LBPS algorithm can be used on high-dimensional models such as probabilistic matrix factorisation and compare favourably with the HMC algorithm thereby showing the potential of PDMP samplers on complex Machine Learning models. To show this, we used our open-source package \texttt{PDMP.jl} coded in Julia.\footnote{\url{https://github.com/alan-turing-institute/PDMP.jl}} 
 
 \section{Local Bouncy Particle Sampler}
 In \cite{bouchard15}, the authors consider the case where the target distribution factorises as
@@ -11,23 +11,64 @@ In \cite{bouchard15}, the authors consider the case where the target distributio
 	\pi(x)&\propto& \prod_{f\in F} \gamma_{f}(x_{f})
 }
 %
-where $x_{f}$ is a restriction to a few elements of $x$ and $F$ is a set of \emph{factors}. In the specific case of a pairwise MRF, the factors are the edges and the restrictions are the variables on each nodes. The energy associated to $\pi$ consequently decomposes as $U\equiv \sum_{f\in F}U_{f}$.
+where $x_{f}$ is a restriction to a few elements of $x$ and $F$ is a set of \emph{factors}. In the specific case of a pairwise MRF, the factors are the edges of the graph and the restrictions are the variables corresponding to each nodes. The energy associated to $\pi$ consequently decomposes as $U\equiv \sum_{f\in F}U_{f}$.
 
 %\subsection{Local BPS: algorithm}
-For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $R_{f}$ can be defined in the same way as for the BPS except that $\nabla U_{f}$ is set to have zero components for all variables not associated to the factor. We can then define a collection of intensities based with
+For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $R_{f}$ can be defined in the same way as for the Bouncy Particle Sampler (BPS) except that $\nabla U_{f}$ is set to have zero components for all variables not associated to the factor. We can then define a collection of intensities with
 %
 \eqa{
 	\chi_{f}(t) &=& \lambda_{f}(x^{(i-1)}+v^{(i-1)}t,v^{(i-1)}). 
 }
 %
-The superposition principle can the be considered with $\chi\equiv\sum_{f} \chi_{f}$. Instead of modifying all velocity variables at a bounce as in the basic BPS, the method samples a factor $f$ with probability $\chi_{f}(\tau)/\chi(\tau)$ and modifies only the variables connected to the sampled factor. 
-This can significantly reduce the overall computational cost associated with the algorithm and especially so when the underlying MRF has a connection structure that is not too densely connected.\add{come back suggest that if too densely connected then too large a part of the graph would have to be refreshed each time}
+and consider the superposition principle with $\chi\equiv\sum_{f} \chi_{f}$.
 
-\section{Experiments}
+Instead of modifying all velocity variables at a bounce as in the basic BPS, the method samples a factor $f$ with probability $\chi_{f}(\tau)/\chi(\tau)$ and modifies only the variables connected to the sampled factor. 
+This can significantly reduce the overall computational cost associated with the algorithm and especially so when the underlying MRF has a connection structure that is not too densely connected. Indeed, when an update is triggered at a factor $f$ all factors that share a variable with $f$ are also triggered. If that corresponds to a large portion of the graph, computational gains are lost compared to simply using the full BPS. The algorithm is described in full in \citep{bouchard15}
 
-%\subsection{Smoothing}
+%\subsection{Local BPS Algorithm}
+%
+%\begin{algorithm}[!h]\small
+%	\caption{\label{alg:LBPS}\small \idblue{Local BPS with Priority Queue}}
+%	\begin{algorithmic}[1]
+%	\State initialise $(x^{(0)},v^{(0)})$, set $t_{\text{clock}}=0$
+%	\State simulate a first arrival time $\tau_{\text{bounce}}^{f}\sim \text{PP}(\chi_{f}(t))$ for each factor $f$
+%	\State initialise a priority queue $Q$ with the couples $\{(\tau_{f}, f)\}_{f\in F}$
+%	\State initialise event lists $L_{f}$ for each factor with $(x^{(0)}_{f}, v^{(0)}_{f}, 0)$
+%	\State sample $\tau_{\text{ref}}\sim\mathrm{Exp}(\lambda_{\text{ref}})$
+%	\While{more events requested}
+%		\State pop $(\tau_{f}, f)$ from $Q$ based on the smallest bounce time
+%		\If{$\tau_{f}>\tau_{\text{ref}}$} 
+%			\State $t_{\text{clock}}\leftarrow t_{\text{clock}}+\tau_{\text{ref}}$
+%			\State sample a new $v\sim \mathcal N(0, \mathbb I)$
+%			\State start a new queue $Q$ where the positions for each factor is extrapolated linearly until the refreshment time
+%		\Else
+%			\State $t_{\text{clock}}\leftarrow t_{\text{clock}}+\tau_{f}$
+%			\State extrapolate $x_{f}$ linearly until $t_{\text{clock}}$
+%			\State 
+%		\EndIf
+%	\EndWhile
+%	\end{algorithmic}
+%\end{algorithm}
 
-\subsection{Probabilistic Matrix Factorisation}
+
+
+\section{Probabilistic Matrix Factorisation}
+
+\subsection{Description of the  Model}
+
+\subsection{Local BPS for the PMF}
+
+\subsection{Other algorithms considered}
+
+\dred{Mention that Gibbs is way too slow here bc too many dimensions}
+
+\subsubsection{Singular Value Decomposition}
+
+\subsubsection{Hamiltonian Monte Carlo}
+
+\subsection{Experiments}
+
+
 
 \section{Discussion}
 
