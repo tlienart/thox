@@ -2,7 +2,7 @@
 
 In this chapter, we start with a brief overview of Monte Carlo estimators and associated sampling methods focusing in particular on Sequential Monte Carlo methods for the smoothing and filtering problem on Hidden Markov Models. We also introduce an alternative class of methods relying upon Piecewise Deterministic Markov Processes and in particular the Bouncy Particle Sampler (BPS). 
 
-\section{\label{sec:MC+SMC}Monte Carlo methods}
+\section{\label{sec:MC+SMC}Monte Carlo Methods}
 In this section we review briefly the foundations of Monte Carlo methods as well as a few key algorithms which will be discussed in the rest of the document.
 
 \subsection{From quadrature to sampling}
@@ -63,7 +63,7 @@ where $\V_{q}(W)$ is the variance of the importance sampling ratio. Using the sa
 %
 This metric is bounded from below by $1$ -- the degenerate case where a single particle is carrying all the weight -- and from above by $N$ -- the ideal case where the samples are comparable to ideal Monte Carlo samples. \check{par jul16}
 
-\subsection{Classical sampling algorithms}
+\subsection{\label{point:classical-sampling}Classical sampling algorithms}
 
 In this point we mention briefly a few standard algorithms used to attempt to generate samples from a distribution.
 Later on, we will compare alternative methods to these standard algorithms.
@@ -131,8 +131,9 @@ Since finding the exact trajectory of a Hamiltonian system is usually intractabl
 This method generates a Markov chain with stationary distribution corresponding to the target distribution $\pi$. 
 It is a very popular method in computational Bayesian inference and tends to be preferred over approaches such as the MH algorithm \citep{green15}. We will show later in chapter \ref{chapBPSMRF} than in some cases a method that exploits the factorisation structure of the target distribution explicitly may lead to better results. 
 
+\newpage
 %%%%%%%%%%%%%%%%%%%%%%
-\section{Sequential Monte Carlo methods}
+\section{Sequential Monte Carlo Methods}
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{Sequential importance sampling}
 %%%%%%%%%%%%%%%%%%%
