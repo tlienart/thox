@@ -11,7 +11,7 @@ In \cite{bouchard15}, the authors consider the case where the target distributio
 	\pi(x)&\propto& \prod_{f\in F} \gamma_{f}(x_{f})
 }
 %
-where $x_{f}$ is a restriction to a few elements of $x$ and $F$ is a set of \emph{factors}. In the specific case of a pairwise MRF, the factors are the edges of the graph and the restrictions are the variables corresponding to each nodes. The energy associated to $\pi$ consequently decomposes as $U\equiv \sum_{f\in F}U_{f}$.
+where $x_{f}$ is a restriction to a few elements of $x$, $F$ is a set of \emph{factors} and $\gamma_{f}$ is an unnormalised likelihood associated with the factor. In the specific case of a pairwise MRF, the factors are the edges of the graph and the restrictions are the variables corresponding to each nodes. The energy associated to $\pi$ consequently decomposes as $U\equiv \sum_{f\in F}U_{f}$.
 
 %\subsection{Local BPS: algorithm}
 For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $R_{f}$ can be defined in the same way as for the Bouncy Particle Sampler (BPS, see point \ref{point:BPS}) except that $\nabla U_{f}$ is set to have zero components for all variables not associated to the factor. We can then define a collection of intensities with
@@ -158,7 +158,7 @@ Since $\chi(t)$ is the positive part of a third-order polynomial, the integral c
 As a baseline, we consider the Singular Value Decomposition (SVD) algorithm. Indeed, Eckart and Young's theorem shows that for a matrix $M$, the truncated SVD is the best low-rank approximation in the sense of the Frobenius norm. In the matrix completion case, no guarantees are offered by the SVD since we only have access to a sparse mask of the real matrix \citep{srebro04}. Let $R$ denote the true matrix we are trying to reconstruct and $\hat R$ the sparse matrix containing only the observed ratings (centred). The SVD decomposition of $\hat R$ gives $\hat R = U\Sigma V^{t}$ where $U$ is an orthonormal matrix of size $n\times p$, $\Sigma$ is a diagonal matrix of size $p\times p$ and $V$ is an orthogonal matrix of size $p\times p$. Truncating $\Sigma$ to its first $d\ll p$ components leads to a rank-$d$ approximation $\tilde R$ to $\hat R$. 
 Letting $U_{\text{SVD}}:=\Sigma^{1/2}U^{t}$ and $V_{\text{SVD}}:=\Sigma^{1/2}V^{t}$ we have a first baseline factorisation $\tilde R=U_{\text{SVD}}^{t}V_{\text{SVD}}\approx R$.
 
-Note that the problem of computing a truncated SVD decomposition of a large sparse system is a well known problem in numerical linear algebra and very efficient methods exist \citep{sorensen96}.\footnote{In the experiments, we use the \texttt{svds} function from Julia 0.6 uses the implicitly restarted Lanczos iterations.}
+Note that the problem of computing a truncated SVD decomposition of a large sparse system is a well known problem in numerical linear algebra and very efficient methods exist \citep{sorensen96}.\footnote{In the experiments, we use the \texttt{svds} function from Julia 0.6 uses the implicitly restarted Lanczos iterations.} 
 
 \subsubsection{Hamiltonian Monte Carlo}
 
@@ -166,21 +166,39 @@ The negative log posterior in $U$ and $V$ of the model can be directly obtained:
 \eqa{
 	-2\log p (U, V | \hat R) &=& \sigma_{r}^{-2}\sum_{(i,j)\in\mathcal M} (r_{ij}-\scal{u_{i},v_{j}})^{2} +\sigma_{u}^{-2}\|U\|_{2}^{2} + \sigma_{v}^{-2}\|V\|_{2}^{2}.\nn
 }
-Therefore, the gradient in $u_{i}$ and $v_{j}$ can easily be computed in closed form and it is straightforward to apply HMC on this model (cf.\ algorithm \ref{alg:hmc-alg}). The main hurdle is that each gradient evaluation requires a full pass over all observed ratings. 
+Therefore, the gradient in $u_{i}$ and $v_{j}$ can easily be computed in closed form and it is straightforward to apply HMC on this model (cf.\ algorithm \ref{alg:hmc-alg}). The main hurdle is that each gradient evaluation requires a full pass over all observed ratings making iterations expensive. 
 
 \subsection{Experiments}
 
-In our experiments, we consider the MovieLens 1M dataset.\footnote{\url{https://grouplens.org/datasets/movielens/}} corresponding to 1 million ratings of 4000 movies by 6000 users. We take a random subset of 80\% of the ratings as training set using the remaining 20\% as test set.
+In our experiments, we consider the MovieLens 1M dataset.\footnote{\url{https://grouplens.org/datasets/movielens/}} corresponding to 1 million ratings of 4000 movies by 6000 users. We take a random subset of 95\% of the ratings as training set using the remaining 5\% as test set. 
+Following the literature, we use $d=30$; we set $\sigma_{R}=1$ and $\sigma_{U}=\sigma_{V}=10$. The starting point is drawn from a standard multivariate Normal centred at the solution of the SVD algorithm. The Local BPS experiments use the \texttt{PDMP.jl} package, the HMC simulations use 2 leapfrog steps, the stepsize is set to $0.01$. The reported value is the RMSE over the test set. We run each experiments ten times to account for the stochasticity of the algorithms. All results were obtained using Julia 0.6 with a 2.3GHz Intel Core i5 computer. 
 
+\newpage
+\begin{figure}
+	\center
+	\includegraphics[width=.8\textwidth]{figures/lbp/curves}
+	\caption{\label{fig:LBPSvHMC}RMSE on the test set of the MovieLens 1M dataset when using Probabilistic Matrix Factorisation with HMC and the LBPS algorithm compared to the result obtained with the Sparse SVD algorithm. The crosses indicate the range of values obtained and ranges of times for each of the 10 runs recorded for different simulation lengths. The dashed lines connects the means.}
+\end{figure}
+
+The results displayed on the figure \ref{fig:LBPSvHMC} seem to show that the LBPS does a little bit better in this case than the HMC algorithm. The improvement is not very significant but confirms that the BPS and the LBPS can perform as well or better than the HMC algorithm (a similar result had been obtained by \citep{bouchard15} on a much simpler factor graph). 
+
+Both methods underperform significantly compared to the test-RMSE obtained with the sparse SVD.  This may be a poor choice of hyper parameters though after trying a range of possible hyper parameters we did not see major differences. In this case it may just be that the SVDS algorithm performs very well and does not overfit the data rendering the regularisation that appears in the PMF model useless. 
 
 \section{Discussion}
 
+The main purpose of this chapter was to compare the HMC algorithm to the LBPS on a very high-dimensional model with a rather sparse graphical model structure. We showed in the experiments that the LBPS compares favourably with HMC in this case which gives hope for future use of the LBPS on large scale graphical models.
 
+Much remains to be explored on how to better tune Piecewise Deterministic samplers and in particular on graphical models. To the best of our knowledge, this was the first attempt to use the LBPS on a large-scale model. 
 
+\begin{figure}[!h]
+\center
+	\includegraphics[width=.7\textwidth]{figures/lbp/hist}
+	\caption{\label{fig:nratings}Histogram of the number of ratings per users.}
+\end{figure}
 
+A key element for the viability of the LBPS for a large scale graphical model is the sparsity of the graph. As we hinted at earlier, if each variable node is connected to many factors then every time a factor is triggered, every factor that shares a variable with it is also triggered. If this is a large portion of the graph, this diminishes the advantage of exploiting the factorisation structure of the model. In the figure \ref{fig:nratings}, we look at the distribution of the number of ratings per users. It shows that the distribution is heavy tailed with a significant number of users having over 250 ratings (1149 users). This along with the slow convergence we observed for the LBPS in figure \ref{fig:LBPSvHMC} suggests that the LBPS may be struggling due to the graph not being sparse enough.
 
-
-
+Future work could look at other models which offer a sparse conditional dependence structure and compare the LBPS with the BPS. We suspect that for very sparse models the LBPS will outperform the BPS but it is unclear at which point the BPS starts outperforming the LBPS. 
 
 
 
