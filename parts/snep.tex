@@ -58,7 +58,7 @@ Indeed, in our general setting we do not assume that computing $\E_{q_i}[\phi(X)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Damped updates in the natural parameter space}
-In their paper, \citet{xu14} suggest a method to synchronise Monte Carlo samplers ran on independent compute nodes. They call it \emph{Sequential Moment Sharing} or SMS for short. Effectively, SMS corresponds precisely to the case mentioned at the previous point consisting of running EP across multiple physical nodes while using noisy estimates of $\E_{q_i}[\phi(X)]$, the expected value of the sufficient statistics under the tilted distribution. 
+In their paper, \citet{xu14} suggest a method to synchronise Monte Carlo samplers ran on independent compute nodes. They call it \emph{Sequential Moment Sharing} or SMS for short. It was originally proposed to scale up MCMC methods and as such it assumes that MCMC chains can be run for many iterations to convergence in between communications with the master. Effectively, SMS corresponds precisely to the case mentioned at the previous point consisting of running EP across multiple physical nodes while using noisy estimates of $\E_{q_i}[\phi(X)]$, the expected value of the sufficient statistics under the tilted distribution. 
 Below, we introduce the algorithm as a damped fixed-point iteration in the natural parameter space. This will prove useful when comparing different EP-like algorithms.\check{june8,may27, aug18}
 
 We showed that the basic EP algorithm could be interpreted as a kind of fixed point iteration targeting the Local Moment Matching Conditions \eqref{eq:LMMC} (LMMC). At a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter should therefore be updated such as to verify $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let us define denote the moment of the local tilted distribution as $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
@@ -67,7 +67,7 @@ We showed that the basic EP algorithm could be interpreted as a kind of fixed po
 	\theta &\leftarrow & \nabla A^{\star}(\mu_i).	\label{eq:ep-np-update}
 }
 %
-In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}.\add{would be good to come back further to this when considering the gaussian case (inversion of noisy matrix), mention it in discussion, cf also earlier in example} In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \citep{heskes03}. Damping \eqref{eq:ep-np-update} leads to the modified update:\check{may11}
+In the case where one is considering a Monte Carlo estimator for $\mu_i$, these updates are inexact and it is crucial to mitigate the effect of the noise by considering \emph{damped updates}. In fact, even when one uses the exact $\mu_i$, it can be beneficial to the overall convergence of the algorithm to consider damped updates \citep{heskes03}. Damping \eqref{eq:ep-np-update} leads to the modified update:\check{may11}
 %
 \eqa{
 	\theta &\leftarrow & (1-\kappa)\theta + \kappa \nabla A^{\star}(\hat\mu_i),\label{eq:damped-update-np}
@@ -80,7 +80,7 @@ The damped update \eqref{eq:damped-update-np} can also be expressed in terms of 
 	\omega_i &\leftarrow& \omega_i + \kappa(\nabla A^{\star}(\hat\mu_i)-\lambda_i).\label{eq:damped-update-np-w}
 }
 %
-One can also swap the role of $\lambda_i$ and $\omega_i$ and obtain another valid damped update mechanism. Both forms are amenable to parallelisation since they can be expressed solely in terms of local parameters attached to the $i$th compute node.\add{review statement after experiments, potentially in lambdai less stable because cavity collapse but should check if can explain why}\check{june8,may27}
+One can also swap the role of $\lambda_i$ and $\omega_i$ and obtain another valid damped update mechanism. Both forms are amenable to parallelisation since they can be expressed solely in terms of local parameters attached to the $i$th compute node.%\add{review statement after experiments, potentially in lambdai less stable because cavity collapse but should check if can explain why}\check{june8,may27}
 
 The basic SMS algorithm operates synchronous updates.
 At step $k$, each node receives the current global parameter $\theta$ and computes the parameter corresponding to the current tilted distribution $q_i$ i.e.: $\lambda_i=(\theta-\omega_i)$. Each node then forms a Monte Carlo estimator $\hat\mu_i$ of $\E_{q_i}[\phi(X)]$, computes the damped step \eqref{eq:damped-update-np-w} and returns the updated local parameter $\omega_i$ to the master node. 
@@ -114,7 +114,7 @@ It is easy to see how this algorithm can be altered to accommodate asynchronous 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Damped updates in the mean parameter space}
 
-The main issue with the SMS algorithm which we will expose in more details in the experiments\add{link} is that it performs the projection of the noisy estimator $\hat\mu_{i}$ \emph{before} the damping step. Since this projection operator is in general non-linear and potentially numerically unstable (in the Gaussian case, for example, it requires a matrix inversion) this can hinder the performances of the algorithm. In the case of the Gaussian distribution for instance, the projection effectively requires the inversion of a noisy matrix (see \eqref{proj-mp-np-gauss}). It seems therefore sensible to suggest damping the estimator \emph{before} it gets projected. This leads to going from \eqref{eq:damped-update-np} to\check{june11}
+The main issue with the SMS algorithm which we will expose in more details in the experiments (see section \ref{dist-ep-exps}) is that it performs the projection of the noisy estimator $\hat\mu_{i}$ \emph{before} the damping step. Since this projection operator is in general non-linear and potentially numerically unstable (in the Gaussian case, for example, it requires a matrix inversion) this can hinder the performances of the algorithm. In the case of the Gaussian distribution for instance, the projection effectively requires the inversion of a noisy matrix (see \eqref{proj-mp-np-gauss}). It seems therefore sensible to suggest damping the estimator \emph{before} it gets projected. This leads to going from \eqref{eq:damped-update-np} to\check{june11}
 %
 \eqa{
 \nabla A(\theta) &\leftarrow& (1-\kappa)\nabla A(\theta) + \kappa \hat\mu_{i}
@@ -136,7 +136,7 @@ These updates can also be expressed in terms of updates of the local parameters:
 }
 %
 As in \eqref{eq:damped-update-np-w} the role of $\omega_{i}$ and $\lambda_{i}$ can be swapped to obtain another valid damped update mechanism. 
-The update \eqref{eq:damped-update-mp} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the mean-parameter variant which we will call \emph{MP-SMS}.\add{nomenclature for EP algorithms? (cavity/local, parallel/serial, synch/asynch, MP/NP)}
+The update \eqref{eq:damped-update-mp} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the mean-parameter variant which we will call \emph{MP-EP} to refer to the fact that the updates are done in the Mean Parameter space by contrast to \emph{NP-EP} (SMS) where the updates are done in the Natural Parameter space. 
 
  
 %We will show below how similar updates can be obtained by considering the so-called \emph{EP-Energy} running a Newton-Raphson-like update. 
@@ -195,7 +195,7 @@ Therefore the gradient of the complete right hand side of \eqref{eq:decomposeKL}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsubsection*{Looking for a stationary point of the EP energy}
 %\todofr{Think first about how you want to present information and in particular what you want to say. Could just present the min max problem. Say that if torture the problem you can get to a double loop that looks like SNEP. Would be good not to go along the crappy road of the dev a la Teh, just showing that we're actually doing some kind of Newton's method would already be quite nice use for this \url{http://homes.soic.indiana.edu/classes/spring2012/csci/b553-hauserk/newtons_method.pdf} and probably ``Information geometry of mirror descent'' \citep{raskutti15}}
-In \citet{heskes05}, the authors show that the energy \eqref{EP-energy} is in fact equivalent to their \emph{Expectation Consistent free energy}. Further, they indicate that several stationary points can exist and that the framework does not provide a criterion to pick an optimal one. Lastly, they remind the reader that since the energy is neither convex nor concave with respect to the parameters $\lambda_i$, it does not tell whether stationary points are minimum, maximum or saddle points. \check{june21}\add{should probably emphasise that ``energy'' is a bit misnomer}
+In \citet{heskes05}, the authors show that the energy \eqref{EP-energy} is in fact equivalent to their \emph{Expectation Consistent free energy}. Further, they indicate that several stationary points can exist and that the framework does not provide a criterion to pick an optimal one. Lastly, they remind the reader that since the energy is neither convex nor concave with respect to the parameters $\lambda_i$, it does not tell whether stationary points are minimum, maximum or saddle points.\footnote{So in fact, \emph{energy} is a bit of an unfortunate misnomer here.} %\check{june21}\add{should probably emphasise that ``energy'' is a bit misnomer}
 %However, since the first term is concave in $\theta$ while each of the terms in the sum is convex in $\lambda_i$, \citet{minka01c} suggests writing the EP stationary points as corresponding to the following min-max problem 
 %%
 %\eqa{	\min	_\theta\max_{\{\lambda_i\}} \quad(K-1)A(\theta)-\sum_{i=1}^{K}A_i(\lambda_i), \quad \text{s.t.}\quad \theta = (K-1)\inv\sum_{i=1}^{K}\lambda_i.}
@@ -234,9 +234,10 @@ where $\kappa'=\eta/\kappa$ can be interpreted as a step-size and $\hat\mu_i$ is
 	\omega_i^{\text{new}} &\leftarrow& \nabla A^{\star}\pac{\nabla A(\omega_i)+\kappa''(\hat\mu_i-\nabla A(\theta))}\label{eq:snep-updates}
 }
 %
-which resembles the damped updates in the mean-parameter space \eqref{eq:damped-update-mp} we had obtained earlier. 
-More importantly, the updates \eqref{eq:snep-updates} form the core of the \emph{Stochastic Natural gradient Expectation Propagation} (SNEP) algorithm we suggested in \citet{hasenclever16}.\add{Here add small discussion where you pre-announce results from experimental section}\check{june21}
-The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the first ``SNEP'' variant which we will call \emph{SNEP-a}. \add{come back to this probably if you compare call SNEP-a, SNEP, etc.}
+which resembles the damped updates in the mean-parameter space \eqref{eq:damped-update-mp} we had obtained earlier (we will show in the experiments section \ref{dist-ep-exps} that it also underperforms compared to the updates \eqref{eq:damped-update-mp}). 
+More importantly, the updates \eqref{eq:snep-updates} form the core of the \emph{Stochastic Natural gradient Expectation Propagation} (SNEP) algorithm we suggested in \citet{hasenclever16}.
+%\add{Here add small discussion where you pre-announce results from experimental section}\check{june21}
+The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the ``SNEP'' variant we use in the experiments.
 %Note that the complete algorithm presented in \citet{hasenclever16} includes a few additional elements in order to be a fully asynchronous algorithm.
  
 
@@ -259,42 +260,141 @@ The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{a
 %Key point is that the $\mathcal E_{BBA}$ is bounded from below for $\alpha\le N$ (see BBA) therefore convergence or something.
 
 %%%%%%%%%%%%%%%%%%%%%
-\section{Experiments}
-In this section we compare SNEP against 
-\emph{Sampling via Moment Sharing} (SMS) \citep{xu14}, a related algorithm for distributed Bayesian learning whereby each worker has a separate MCMC sampler and coordination across workers is achieved using plain EP. SMS was originally proposed to scale up MCMC methods and as such it assumes that MCMC chains can be run for many iterations to convergence in between communications with the master.  SMS uses the MCMC iterates to estimate the moments required for EP updates and so, as discussed earlier, requires a large number of iterations to produce the low Monte Carlo noise for EP updates to work properly.
+\section{\label{dist-ep-exps}Experiments}
+%# EP exps
 
-We illustrate below the differing dynamics of SMS and SNEP when applied to a Bayesian logistic regression model with simulated data.  We took a  similar setup as in the SMS paper \citep{xu14}, generating a dataset $\mathcal D=\{( z_{c},y_{c})\}_{c=1}^{N}$ where covariates $ z_{c}\in\mathbb R^{d}$ and response $y_{c}\in\{0,1\}$. The conditional distribution of $y_{c}$ given $ z_{c}$ and weights $ x$ is
-\begin{align}
-	p(y_{c}=1 \mid  z_{c}, x) &= \sigma( z_{c}^{\top} x)	
-\end{align}
-where $\sigma$ denotes the logistic function. 
+In this section, we compare the three main versions of EP algorithms discussed in the chapter: NP-EP where the updates are done in the natural parameter space,\footnote{This corresponds to the SMS algorithm described earlier.} MP-EP and SNEP where updates are done in the mean parameter space. For the purpose of the experiments, all algorithms are ran in a synchronous fashion. 
 
-We used a Gaussian prior $p_{0}( x)=\mathcal N( x; 0_{d},10 I_{d})$ on $ x$ and the aim is to construct an approximation to the posterior $p( x \mid \mathcal D)$. We generated $N=50000$ data points  with $d=50$ using iid draws for the covariates, $z_c\sim \mathcal N(\mu,\Sigma)$ where $\mu\in[0,1]^{d}$ and $\Sigma=PP^{\top}$ with $P\in[-1,1]^{d\times d}$, with entries drawn uniformly at random for both $P$ and $\mu$. The generating weight vector $ x^*$ is drawn from the prior $\mathcal N( x; 0_{d},10 I_{d})$. The labels $y_{c}$ are then sampled according to the model. 
+\subsection{Description of the experiments}
 
+The model considered is a simple bayesian logistic regression model. Whilst this model is not of moderate interest in itself, it has the nice property of being well behaved making the analysis of the behaviour of different inference algorithms easier. This is a similar setup than the one considered in the SMS paper \citep{xu14}, generating a dataset $\mathcal D=\{(z_c, y_c)\}_{c=1}^N$ with covariates $z_c\in\mathbb R^d$ and response $y_c\in\{0,1\}$. The conditional distribution of $y_c$ given $z_c$ and weights $x\in\mathbb R^d$  is 
+\begin{eqnarray}
+    p(y_c=1|z_c, x) &=& \sigma(\langle z_c, x\rangle )
+\end{eqnarray}
+where $\sigma$ denotes the logistic function: $\sigma(s)\equiv (1+\exp(-s))^{-1}$. A Gaussian prior $p_0(x) = \mathcal N(x; 0_d, 10\mathbb I_d)$ is set on $x$ and the aim is to construct an approximation to the posterior $p(x|\mathcal D)$. We generate $N=5000$ data points with $d=10$ using iid draws for the covariates, $z_c\sim\mathcal N(\mu, \Sigma)$ where the $d$ components of $\mu$ are drawn iid from a Uniform $\mathcal U[0,1]$ and $\Sigma=PP^T$ where the components of $P$ are drawn from a Uniform $\mathcal U[-1,1]$. The generating weight vector $x^\star$ is drawn from the prior $p_0$. The labels $y_c$ are then sampled according to the model.
+
+The data is sharded across five factors (corresponding to 5 compute nodes) each with one fifth of the data. To compute expected values against the tilted distribution, an importance sampling estimator is constructed with a varying number of samples (5, 10, 50) as shown in \ref{fig-res-snep}. The proposal used is the last global approximation shared with the compute node. Note that more involved samplers can be used (as is done in \citet{hasenclever16} which uses a stochastic gradient MCMC method) but the purpose here is primarily to explore the robustness of the algorithms to Monte Carlo noise so that a simple sampler is adequate. 
+
+All algorithms use a fixed damping throughout the iterations and different dampings were used to exhibit the behaviour of the algorithm (see \ref{fig-res-snep}). All experiments were run 5 times and averaged over those runs to account for the inherent stochasticity of the algorithms. 
+
+As the base exponential family, we use a full-covariance Gaussian. We compare the predictive RMSE $\sqrt{\sum_c |\hat y_c-y_c|^2/N}$ obtained with $\hat y_c = \sigma(\langle z_c, \overline x\rangle)$ where $\overline x$ is the currently estimated posterior mean of the global approximation. As a reference point, we also show the RMSE corresponding to $x^\star$.
+
+\subsection{Results}
+
+We show at figure \ref{fig-res-snep} the evolution of the predictive RMSE with increasing number of iterations for the three algorithms considered when varying the number of iteration per samples (corresponding to the amount of Monte Carlo noise) and the damping parameter (indicated by $d=$ in the legends). Note that the computational complexity of the iteration for each of the three algorithm is very similar, the main difference residing in the ordering of operations.\footnote{In all the runs, an iteration of MP-EP is around 5\% faster than an iteration of NP-EP and around 20\% faster than an iteration of SNEP but that is negligible compared to the factor of 2 speedup obtained by the much faster convergence of the algorithm.} As a baseline, the predictive RMSE corresponding to $x^{\star}$ (the generating set of weights) is drawn as a black line on each graph.
+
+A range of damping parameters is selected to illustrate the behaviour of the algorithm. The range is always taken with the largest damping parameter being on the verge of numerical instability for the algorithm. Indeed, when using a full-covariance Gaussian as base exponential family, going from the mean-parameter space to the natural parameter space or vice versa requires the inversion of a matrix. Doing the update in the mean parameter space helps the numerical stability of this step as does increasing the damping (reducing the step-size).
+
+It is clear from the results that the best performing algorithm is the MP-EP algorithm which converges much faster than SNEP and is much more stable than NP-EP. It is also the algorithm that offers the most robust performance in the presence of Monte Carlo noise. Finally, this algorithm corresponds to a simpler mathematical development than SNEP by being simply a mirror-descent version of the NP-EP updates. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\begin{landscape}
+\begin{figure}[ht]
+\vspace{-\marginparsep}
+\vspace{-\marginparwidth}
+\vspace*{1.7cm}
+\center
+%\hspace*{-2.5cm}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/snep/rms-npep-nis05}
+		\caption{NP-EP, 5 samples per iter.}
+		\label{res-npep-5}
+	\end{subfigure}
+	%\hspace*{-.5cm}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/snep/rms-npep-nis10}
+		\caption{NP-EP, 10 samples per iter.}
+		\label{res-npep-10}
+	\end{subfigure}
+	%\hspace*{-.5cm}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/snep/rms-npep-nis50}
+		\caption{NP-EP, 50 samples per iter.}
+		\label{res-npep-50}
+	\end{subfigure}
+%	
+%\hspace*{-2.5cm}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/snep/rms-mpep-nis05}
+		\caption{MP-EP, 5 samples per iter.}
+		\label{res-mpep-5}
+	\end{subfigure}
+%	\hspace*{-.5cm}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/snep/rms-mpep-nis10}
+		\caption{MP-EP, 10 samples per iter.}
+		\label{res-mpep-10}
+	\end{subfigure}
+%	\hspace*{-.5cm}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/snep/rms-mpep-nis50}
+		\caption{MP-EP, 50 samples per iter.}
+		\label{res-mpep-50}
+	\end{subfigure}
+
+%\hspace*{-2.5cm}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/snep/rms-snep-nis05}
+		\caption{SNEP, 5 samples per iter.}
+		\label{res-snep-5}
+	\end{subfigure}
+%	\hspace*{-.5cm}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/snep/rms-snep-nis10}
+		\caption{SNEP, 10 samples per iter.}
+		\label{res-snep-10}
+	\end{subfigure}
+%	\hspace*{-.5cm}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\includegraphics[width=\textwidth]{figures/snep/rms-snep-nis50}
+		\caption{SNEP, 50 samples per iter.}
+		\label{res-snep-50}
+	\end{subfigure}		
 %
-%
-Both algorithms were run with three workers, each with one third of the data. SNEP is run with 1 inner loop iteration per synchronisation with the master (for the purpose of comparing against SMS).  Varying numbers of MCMC samples per inner loop iteration were used for both algorithms, to investigate the effect of Monte Carlo noise on the performances of the algorithms (low number of samples meaning high noise and both lower performance and lower computational cost).   The damping for SMS and the learning rate for SNEP were tuned for best performances. As the base exponential family, we used a full-covariance Gaussian.  
-We compared the predictive RMSE $\sqrt{\sum_{c}|\hat{p}_{c}- y_{c}|^{2}/N}$ obtained with both methods over time where $\hat{p}_{c}=\sigma( z_{c}^{T}\overline{ x})$ where $\overline{ x}$ is the currently estimated posterior mean. We also compared the relative difference between the estimated posterior mean and that estimated from a long run of the No-U-Turn sampler \citep{hoffman14} as implemented in Stan \citep{carpenter16} with 4 chains and 50000 iterations.
-
-The \fig{fig:sms-vs-snep} illustrates the performances of both algorithms and how they are influenced by the number of MCMC samples used per iteration. It can be observed that SNEP is more robust and better performing than SMS in the presence of noise.
-In general, we found that the number of samples needed for SMS to perform well grows with the dimensionality of the problem. In models with very high dimensionality and multi-modality (e.g., neural networks), the number of samples needed per step is very large leading to iterations that are computationally impractical, whereas SNEP can afford to use many fewer samples.\\
-
-%%This can be explained by the fact that the updates in SNEP are done in the mean-parameter space and the noise is thus directly damped whereas in SMS the noisy updates are first projected in the natural-parameter space (which requires the inversion of a noisy covariance matrix) and then damped which can lead to unstable updates. 
-%%We consider the least favourable case for SNEP where only a single inner loop step is done per iteration (update \eqref{eq:meandamped}). This allows to compare fairly the number of iterations executed by SNEP and SMS since the computational cost of each iteration is similar. The results are illustrated at the figure \ref{fig:sms-vs-ep} below.
-
-\begin{figure}[!h]
-	\center
-	\includegraphics[width=0.65\textwidth]{figures/snep/SMSvSNEP_RMSE}
-	\includegraphics[width=0.65\textwidth]{figures/snep/SMSvSNEP_DIFF.pdf}
-	\caption{\label{fig:sms-vs-snep}(\textbf{top}) Comparison of the predictive RMSE obtained with SMS (dashed-lines) and SNEP (full lines) versus the time on the master node when varying the number of MCMC samples per iteration (numbers reported in the legend). When too few samples are used for the moment estimates, SMS becomes unstable whilst SNEP does not suffer from this. SNEP is also consistently faster and more accurate than SMS. The accuracy obtained with the posterior mean estimated with a long run of Stan/NUTS is also displayed as comparison (horizontal line). (\textbf{bottom}) Relative difference between the posterior means estimated using Stan/NUTS and using SMS (dashed lines) or SNEP (full lines). Each coloured line corresponds to an average over several runs (represented in light grey).}
+\caption{\label{fig-res-snep}Results of the EP experiments (best seen in colours).}
 \end{figure}
+\end{landscape}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\subsection{OLD}
+%In this section we compare SNEP against 
+%\emph{Sampling via Moment Sharing} (SMS) \citep{xu14}, a related algorithm for distributed Bayesian learning whereby each worker has a separate MCMC sampler and coordination across workers is achieved using plain EP. SMS was originally proposed to scale up MCMC methods and as such it assumes that MCMC chains can be run for many iterations to convergence in between communications with the master.  SMS uses the MCMC iterates to estimate the moments required for EP updates and so, as discussed earlier, requires a large number of iterations to produce the low Monte Carlo noise for EP updates to work properly.
+%
+%We illustrate below the differing dynamics of SMS and SNEP when applied to a Bayesian logistic regression model with simulated data.  We took a  similar setup as in the SMS paper \citep{xu14}, generating a dataset $\mathcal D=\{( z_{c},y_{c})\}_{c=1}^{N}$ where covariates $ z_{c}\in\mathbb R^{d}$ and response $y_{c}\in\{0,1\}$. The conditional distribution of $y_{c}$ given $ z_{c}$ and weights $ x$ is
+%\begin{align}
+%	p(y_{c}=1 \mid  z_{c}, x) &= \sigma( z_{c}^{\top} x)	
+%\end{align}
+%where $\sigma$ denotes the logistic function. 
+%
+%We used a Gaussian prior $p_{0}( x)=\mathcal N( x; 0_{d},10 I_{d})$ on $ x$ and the aim is to construct an approximation to the posterior $p( x \mid \mathcal D)$. We generated $N=50000$ data points  with $d=50$ using iid draws for the covariates, $z_c\sim \mathcal N(\mu,\Sigma)$ where $\mu\in[0,1]^{d}$ and $\Sigma=PP^{\top}$ with $P\in[-1,1]^{d\times d}$, with entries drawn uniformly at random for both $P$ and $\mu$. The generating weight vector $ x^*$ is drawn from the prior $\mathcal N( x; 0_{d},10 I_{d})$. The labels $y_{c}$ are then sampled according to the model. 
+%
+%%
+%%
+%Both algorithms were run with three workers, each with one third of the data. SNEP is run with 1 inner loop iteration per synchronisation with the master (for the purpose of comparing against SMS).  Varying numbers of MCMC samples per inner loop iteration were used for both algorithms, to investigate the effect of Monte Carlo noise on the performances of the algorithms (low number of samples meaning high noise and both lower performance and lower computational cost).   The damping for SMS and the learning rate for SNEP were tuned for best performances. As the base exponential family, we used a full-covariance Gaussian.  
+%We compared the predictive RMSE $\sqrt{\sum_{c}|\hat{p}_{c}- y_{c}|^{2}/N}$ obtained with both methods over time where $\hat{p}_{c}=\sigma( z_{c}^{T}\overline{ x})$ where $\overline{ x}$ is the currently estimated posterior mean. We also compared the relative difference between the estimated posterior mean and that estimated from a long run of the No-U-Turn sampler \citep{hoffman14} as implemented in Stan \citep{carpenter16} with 4 chains and 50000 iterations.
+%
+%The \fig{fig:sms-vs-snep} illustrates the performances of both algorithms and how they are influenced by the number of MCMC samples used per iteration. It can be observed that SNEP is more robust and better performing than SMS in the presence of noise.
+%In general, we found that the number of samples needed for SMS to perform well grows with the dimensionality of the problem. In models with very high dimensionality and multi-modality (e.g., neural networks), the number of samples needed per step is very large leading to iterations that are computationally impractical, whereas SNEP can afford to use many fewer samples.\\
+%
+%%%This can be explained by the fact that the updates in SNEP are done in the mean-parameter space and the noise is thus directly damped whereas in SMS the noisy updates are first projected in the natural-parameter space (which requires the inversion of a noisy covariance matrix) and then damped which can lead to unstable updates. 
+%%%We consider the least favourable case for SNEP where only a single inner loop step is done per iteration (update \eqref{eq:meandamped}). This allows to compare fairly the number of iterations executed by SNEP and SMS since the computational cost of each iteration is similar. The results are illustrated at the figure \ref{fig:sms-vs-ep} below.
+%
+%\begin{figure}[!h]
+%	\center
+%	\includegraphics[width=0.65\textwidth]{figures/snep/SMSvSNEP_RMSE}
+%	\includegraphics[width=0.65\textwidth]{figures/snep/SMSvSNEP_DIFF.pdf}
+%	\caption{\label{fig:sms-vs-snep}(\textbf{top}) Comparison of the predictive RMSE obtained with SMS (dashed-lines) and SNEP (full lines) versus the time on the master node when varying the number of MCMC samples per iteration (numbers reported in the legend). When too few samples are used for the moment estimates, SMS becomes unstable whilst SNEP does not suffer from this. SNEP is also consistently faster and more accurate than SMS. The accuracy obtained with the posterior mean estimated with a long run of Stan/NUTS is also displayed as comparison (horizontal line). (\textbf{bottom}) Relative difference between the posterior means estimated using Stan/NUTS and using SMS (dashed lines) or SNEP (full lines). Each coloured line corresponds to an average over several runs (represented in light grey).}
+%\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%
 \section{Discussion}
 
 In this chapter we showed that Expectation Propagation could be used as the backbone of a distributed approximate Bayesian inference mechanism. 
 We showed that different variant of the EP algorithm could be used and that, in our experiments, performing updates in the mean parameter space can outperform updates in the natural parameter space. 
-In particular we showed that updates in the mean parameter space can be much more robust to noise introduced by following inexact EP updates when the moments of the tilted distribution are computed via Monte Carlo estimators. This is particularly important for complex models like Bayesian Neural Networks where the tilted distributions are complex and sampling is very expensive so that cheap Monte Carlo estimators based on a few sampling points are favoured. \add{see references in confirmation with MC estimators in EP}
+In particular we showed that updates in the mean parameter space can be much more robust to noise introduced by following inexact EP updates when the moments of the tilted distribution are computed via Monte Carlo estimators. This is particularly important for complex models where the tilted distributions are complex and sampling is very expensive so that cheap Monte Carlo estimators based on a few sampling points are favoured (e.g.: graphical models \citep{heess13, eslami14, jitkrittum15}, hierarchical Bayesian models \citep{gelman14} and approximate Bayesian computation \citep{barthelme11}). %\add{see references in confirmation with MC estimators in EP}
+
+Since \cite{minka01}, there have been a substantial number of extensions and alternatives to EP proposed. Stochastic EP \citep{li15} and averaged EP \citep{dehaene15} assume that all factors can be well approximated by the \emph{same} exponential family factor via parameter tying. This saves memory storage and was shown to work well when a lot of samples are available. This is an orthogonal idea to our work, and it is possible to apply it to SNEP and MP-EP as well although in the distributed learning setting considered, each worker must keep a copy of the parameters anyway which means it would not reduce memory requirements. Convergent EP \citep{heskes03} is a similar algorithm with (idealised) convergence guarantees but it is extremely slow to run in practice. 
 
 A critique often raised against EP is that the algorithm does not offer convergence guarantees. In fact, Minka addresses this in his paper \citep{minka01} indicating that when EP does not converge it is usually a sign of a poor choice of approximating family $\mathcal F_{\phi}$. 
 Further to this, the convergence question may in fact be of little practical use since, in any case, we do not know how good an approximation the fixed point corresponding to the local moment matching conditions (LMMC) is to the fixed point corresponding to the global ones (GMMC) nor how good a proxy the latter is to the target distribution. In fact, a similar criticism can be raised for Mean Field Variational Inference: the iterations provably decrease an energy and converges but it is unclear how good a proxy it converges to. This situation is summarised at figure \ref{comp-vi-ep}.
@@ -307,9 +407,7 @@ Further to this, the convergence question may in fact be of little practical use
 In both cases, we do not really know how the minimisers obtained compare to the target distribution $p$ (dashed purple lines). }
 \end{figure}
 
-The EP framework we consider seems however particularly appropriate for the situation where compute nodes only have access to parts of the data and, in our experiments and the experiments discussed in the paper, we observed that it performed well and in a robust way even on very complex models.
-
-Finally, we note that the entirety of the EP variants discussed in this section can be re-expressed in the general framework of ``Power-EP'' \citep{minka04} where the discrepancy is more general than the basic Kullback-Leibler divergence. This, however, has little impact to the considerations discussed in the chapter in that the only element it changes is the definition of the projection operator $\mathbf P_{\phi}$. We focused on ``classical'' EP for this reason and also because the role of the exponent in Power-EP is poorly understood in general though it has been discussed in the literature \citep{minka04, hernandez15, li16}.\add{maybe add equation + discuss}
+Finally, we note that the entirety of the EP variants discussed in this section can be re-expressed in the general framework of ``Power-EP'' \citep{minka04} where the discrepancy is more general than the basic Kullback-Leibler divergence \citep{hernandez15, li16}. This, however, has little impact to the considerations discussed in the chapter in that the only element it changes is the definition of the projection operator $\mathbf P_{\phi}$. We focused on ``classical'' EP for this reason and also because the role of the exponent in Power-EP is poorly understood in general.%\add{maybe add equation + discuss}
 
 
 

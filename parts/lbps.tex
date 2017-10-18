@@ -2,7 +2,7 @@
 
 In this thesis we consider sampling or approximating distributions that factorise in a specific way. In this chapter, we cover the Local Bouncy Particle Sampler (LBPS), a version of the BPS introduced at point \ref{point:BPS} for target distributions that factorise according to a MRF.
 
-The aim of this short chapter is to show that the LBPS algorithm can be used on high-dimensional models such as probabilistic matrix factorisation and performances are not far those of the HMC algorithm thereby showing the potential of PDMP samplers on complex Machine Learning models. For this, we used our open-source package \texttt{PDMP.jl} coded in Julia.\footnote{\url{https://github.com/alan-turing-institute/PDMP.jl}} 
+The aim of this short chapter is to show that the LBPS algorithm can be used on high-dimensional models such as probabilistic matrix factorisation and performances are not far those of the HMC algorithm thereby showing the potential of PDMP samplers on complex Machine Learning models. For this, we used our open-source package \texttt{PDSampler.jl} coded in Julia.\footnote{\url{https://github.com/alan-turing-institute/PDSampler.jl}} 
 
 \section{Local Bouncy Particle Sampler}
 In \cite{bouchard15}, the authors consider the case where the target distribution factorises as
@@ -171,7 +171,7 @@ Therefore, the gradient in $u_{i}$ and $v_{j}$ can easily be computed in closed 
 \subsection{Experiments}
 
 In our experiments, we consider the MovieLens 1M dataset.\footnote{\url{https://grouplens.org/datasets/movielens/}} corresponding to 1 million ratings of 4000 movies by 6000 users. We take a random subset of 95\% of the ratings as training set using the remaining 5\% as test set. 
-Following the literature, we use $d=30$; we set $\sigma_{R}=1$ and $\sigma_{U}=\sigma_{V}=10$. The starting point is drawn from a standard multivariate Normal centred at the solution of the SVD algorithm. The Local BPS experiments use the \texttt{PDMP.jl} package, the HMC simulations use 2 leapfrog steps, the stepsize is set to $0.01$. The reported value is the RMSE over the test set. We run each experiments ten times to account for the stochasticity of the algorithms. All results were obtained using Julia 0.6 with a 2.3GHz Intel Core i5 computer. 
+Following the literature, we use $d=30$; we set $\sigma_{R}=1$ and $\sigma_{U}=\sigma_{V}=10$. The starting point is drawn from a standard multivariate Normal centred at the solution of the SVD algorithm. The Local BPS experiments use the \texttt{PDSampler.jl} package, the HMC simulations use 2 leapfrog steps, the stepsize is set to $0.01$. The reported value is the RMSE over the test set. We run each experiments ten times to account for the stochasticity of the algorithms. All results were obtained using Julia 0.6 with a 2.3GHz Intel Core i5 computer. 
 
 \newpage
 \begin{figure}

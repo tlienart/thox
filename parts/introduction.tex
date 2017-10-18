@@ -13,11 +13,11 @@ The thesis is divided in two parts. In the first part -- \emph{Sampling Algorith
 
 In the second part -- \emph{Approximate Bayesian Inference} -- we consider approximate methods that attempt to find proxies for the marginals in restricted probability distribution spaces. These methods can offer a viable alternative to sampling methods when the latter become too expensive to consider. 
 
-In this chapter we introduce the concept of Markov Random Fields and suggest a few classical examples.
+In this introductory chapter we introduce the concept of Markov Random Fields and suggest a few classical examples.
 
 %%%%%%%%%%%
 \section{\label{subsection: mrf}Markov Random Fields}
-A \margnote{MRF}\emph{Markov random field} (MRF) is a graph structure that allows to represent joint distributions functions that factorise in a specific way or, in other words, to represent a set of conditional dependences between a set of random variables. In this report, we consider graphs determined by a finite index set $\mathcal V$, a set of edges $\mathcal E\subseteq \mathcal V\times \mathcal V$ connecting those nodes and \emph{potential functions} on its cliques (fully connected components of the graph). Each node $i\in\mathcal V$ corresponds to one random variable taking values in a sample space $\mathcal X_i \subseteq\mathbb R^{d_i}$ for some dimension $d_i\in\mathbb N$. 
+A \margnote{MRF}\emph{Markov random field} (MRF) is a graph structure that allows to represent joint distributions functions that factorise in a specific way or, in other words, to represent a set of conditional dependences between a set of random variables. In this document, we consider graphs determined by a finite index set $\mathcal V$, a set of edges $\mathcal E\subseteq \mathcal V\times \mathcal V$ connecting those nodes and \emph{potential functions} on its cliques (fully connected components of the graph). Each node $i\in\mathcal V$ corresponds to one random variable taking values in a sample space $\mathcal X_i \subseteq\mathbb R^{d_i}$ for some dimension $d_i\in\mathbb N$. 
 
 We restrict ourselves to graphs with pairwise interactions i.e., uniquely determined by potential functions on their nodes and edges.\footnote{Considering only pairwise MRF is not too constraining since any MRF can be expressed as a pairwise MRF by the introduction of auxiliary variables although this may lead to a very complex graph \citet{wainwright08}.}
 We write\check{sep14,jun22}
@@ -64,12 +64,12 @@ We also illustrate one specific type of loopy graph: the \emph{grid graph}.
 
 %%%%%%%%%%%
 \section{\label{intro:exMRF}Examples of MRF}
-In this point, we present a brief overview of three examples of graph structures on which we will focus most of our effort throughout this document. 
+In this section, we present a brief overview of three examples of graph structures on which we will focus most of our effort throughout this document. 
 We also present the type of applications they are connected with. 
 
 %%%%%%%%%%%%%%
 \subsection{Hidden Markov Models}
-Chain graphs where the random variables on every node take value in the same state-space $\mathcal X$ form the underlying structure of \emph{Hidden Markov Models} (HMM)\margnote{HMM}. These can be illustrated as follows:
+Chain graphs, where the random variables on every node take value in the same state-space $\mathcal X$, form the underlying structure of \emph{Hidden Markov Models} (HMM)\margnote{HMM} an important class of models. These can be illustrated as follows:
 \begin{figure}[!h]
 \center
 \begin{tikzpicture}[-,minimum size=1.1cm,scale=.1,node distance=2cm, thick]
@@ -188,4 +188,21 @@ In image processing, grid graphs can be used to model interaction between the pi
 In the case of image denoising for example, for each pixel $k$ a noisy value $y_k$ is observed and we can have a model for the likelihood of $y_k$ given the true pixel value $x_k$ in the form $p(y_k\st x_k)$. These  form the node potentials. 
 Additionally, we may have a similarity measure which can be used to penalise neighbouring pixels being very dissimilar. These form the edge potentials.\\
 The problem of finding or approximating the singleton marginals then corresponds to finding the likelihood of a particular pixel taking a specific value given all the noisy observations available. We consider the problem of approximating marginals on such loopy graphs in chapter \ref{chap:EPBP}. \check{sep14, jul24,jun21}
+
+\section{Exact vs Inexact Methods and Structure of the Thesis}
+
+While the unifying theme of this thesis is the inference problem on Markov Random Fields, we consider two rather different approaches forming the two main parts of the thesis. In the first approach -- \emph{sampling methods} -- we consider methods to produce samples from the target densities (marginals of an MRF) from which Monte Carlo estimators can be computed. These methods take the form of stochastic processes which, at the equilibrium, are guaranteed to generate samples from the target distribution. These methods are considered ``exact'' because, assuming the generating process is at equilibrium, they yield samples from the correct distribution. The difficulty of course is to assess whether the generating process is at equilibrium in the context of finite compute time and finite precision arithmetics. 
+
+In the second approach -- \emph{approximated Bayesian inference} -- we consider methods to produce proxies to the target densities and compute expected values with respect to these proxies. These methods are considered ``inexact'' because even in the limit of infinite computational power or infinite precision arithmetic they do not lead to the correct expected values. 
+
+Formally, let us denote $p$ a target distribution of interest and $\varphi$ a test function and put ourselves in the realistic context of finite computational power and precision. The aim is to compute the expected value of $\varphi$ with respect to $p$ or $\E_{p}[\varphi(X)]$. The first class of methods generates incorrect samples $\{\hat x_{1},\dots,\hat x_{n}\}$ which are hopefully statistically not too far from a correct (but inaccessible) sample $\{x_{1},\dots,x_{n}\}$ drawn iid from $p$. As will be covered in section \ref{sec:MC+SMC}, the expected value of interest will be approximated as $\E_{p}[\varphi(X)]\approx n\inv \sum_{i=1:n}\varphi(\hat x_{i})$. The second class of methods attempts to find a simple distribution $q$ which is close in some sense to the target distribution $p$, the expected value of interest is consequently approximated as $\E_{p}[\varphi(X)]\approx \E_{q}[\varphi(X)]$. 
+
+These two approaches rely on different set of tools. The first one relies more on Markov Chain Monte Carlo methods while the second relies more on optimisation tools. To simplify the presentation of the thesis, we therefore have two background chapters beginning each of the two parts. Each part is then formed of two chapters covering a specific method and discussing applications.
+
+
+%The two approaches consider fairly different tools as 
+%
+%For both hard to assess qual... 
+
+
 
