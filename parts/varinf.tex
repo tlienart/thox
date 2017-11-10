@@ -32,7 +32,7 @@ This choice of distribution space, while rather restrictive, leads to the infere
 \eqa{
 	\KL{q,p} &=& \E_{q_{i}}\pac{ \log q_{i} -	\E_{q_{\neg i}}\pac{ \log p}} + \E_{q_{\neg i}}\pac{\sum_{j\neq i}\log q_{j}} 
 }
-suggesting to iterate over the components taking each time $q_{i} \equiv \exp(\E_{q\neg i} \log p) $. This scheme can be used to provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}. However, the problem is non-convex and no practical guarantees exist as to what the iterations converge to. 
+suggesting to iterate over the components taking each time $q_{i} \propto \exp(\E_{q\neg i} \log p) $. This scheme can be used to provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}. However, the problem is non-convex and no practical guarantees exist as to what the iterations converge to. 
 In this thesis, we focus on an alternative approximate Bayesian inference class of algorithms which exploits the factorisation structure of the target distribution $p$ directly instead of imposing a factorisation structure a priori like in MFVI.
 
 \subsection{ADF, EP and LBP}
