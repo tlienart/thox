@@ -10,9 +10,18 @@ Michaelmas 2017\\[1.5cm]
 
 {\large\bfseries Abstract}
 \begin{flushleft}
-This thesis considers the problem of performing inference on undirected graphical models with a continuous state space. These models represent conditional independence structures that can appear in Machine Learning applications. In the thesis, we focus on computational methods and applications. The aim of the thesis is to demonstrate that the factorisation structure corresponding to the conditional independence structure present in high-dimensional models can be exploited to decrease the computational complexity of inference algorithms.
-First, we consider the smoothing problem on Hidden Markov Models (HMM) and discuss novel algorithms that have sub-quadratic computational complexity. We show they perform on par with existing state-of-the-art algorithms with a quadratic complexity. Further, a novel class of rejection free samplers for graphical models known as the Local Bouncy Particle Sampler (LBPS) is explored and applied on a very large instance of the Probabilistic Matrix Factorisation (PMF) problem. We show the method performs slightly better than Hamiltonian Monte Carlo methods (HMC). It is also the first such practical application of the method to a model with hundreds of thousands of dimensions. 
-
-In a second part of the thesis, we consider approximate Bayesian inference methods and in particular the Expectation Propagation (EP) algorithm. We show it can be applied as the backbone of a novel distributed Bayesian inference mechanism. Further, we discuss novel variants of the EP algorithms and show that a specific type of update mechanism relying on the Mirror Descent algorithm outperforms all existing variants and is robust to Monte Carlo noise. Lastly, we show that EP can be used in Particle Belief Propagation (PBP) in order to form cheap and adaptive proposals and significantly outperform PBP. 
+This thesis considers the problem of performing inference on undirected graphical models with continuous state spaces. 
+These models represent conditional independence structures that can appear in the context of Bayesian Machine Learning. 
+In the thesis, we focus on computational methods and applications. 
+The aim of the thesis is to demonstrate that the factorisation structure corresponding to the conditional independence structure present in high-dimensional models can be exploited to decrease the computational complexity of inference algorithms.
+First, we consider the smoothing problem on Hidden Markov Models (HMM) and discuss novel algorithms that have sub-quadratic computational complexity. 
+We show they perform on par with existing state-of-the-art algorithms with a quadratic complexity. 
+Further, a novel class of rejection free samplers for graphical models known as the Local Bouncy Particle Sampler (LBPS) is explored and applied on a very large instance of the Probabilistic Matrix Factorisation (PMF) problem. 
+We show the method performs slightly better than Hamiltonian Monte Carlo methods (HMC). 
+It is also the first such practical application of the method to a statistical model with hundreds of thousands of dimensions. 
+In a second part of the thesis, we consider approximate Bayesian inference methods and in particular the Expectation Propagation (EP) algorithm. 
+We show it can be applied as the backbone of a novel distributed Bayesian inference mechanism. 
+Further, we discuss novel variants of the EP algorithms and show that a specific type of update mechanism, analogous to the mirror descent algorithm outperforms all existing variants and is robust to Monte Carlo noise. 
+Lastly, we show that EP can be used to help the Particle Belief Propagation (PBP) algorithm in order to form cheap and adaptive proposals and significantly outperform classical PBP. 
 \end{flushleft}
 \end{center}
