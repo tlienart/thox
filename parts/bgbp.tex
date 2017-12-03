@@ -131,7 +131,7 @@ Propagating messages through different orderings of the nodes can therefore lead
 \begin{figure}[!h]
 \center
 \includegraphics[width=.7\textwidth]{figures/lbp/loopy1}
-\caption{\label{fig:lbp-inconsistent}A simple graph with a loop. Starting from the leaf node (blue arrow), the message can be propagated in the loop following a clock-wise ordering (green arrow) or a anti-clockwise ordering (orange arrow). The two backward messages coming back to the leaf node do not necessarily match.}
+\caption{\label{fig:lbp-inconsistent}A simple graph with a loop. Starting from the leaf node (blue arrow), the message can be propagated in the loop following a clock-wise ordering (green arrow) or a anti-clockwise ordering (orange arrow). The two backward messages coming back to the leaf node do not necessarily match. (This graph is best seen in colours.)}
 \end{figure}
 
 A common workaround is to perform the BP algorithm multiple times on different spanning trees of the graphs corresponding to different ordering of the nodes and hope that the iterations converge to a fixed point. This is know as the \emph{loopy belief propagation} (LBP) algorithm \citep{pearl88, yedidia02}:

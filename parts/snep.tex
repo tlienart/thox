@@ -23,10 +23,14 @@ In the rest of this chapter, we show how different variants of the EP algorithm 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{sec:ep-for-dbi}EP variants for Distributed Inference}
-The target distribution of interest has the form $p(x)\propto \pi_0\prod_{i=1:K}t_i(x)$ where the evaluation of one of the $t_i$ requires access to the compute node $i$. The aim is to construct an approximation $q\in\mathcal F_\phi$ parametrised by a vector $\theta$ with
+The target distribution of interest has the form $p(x)\propto \pi_0\prod_{i=1:K}t_i(x)$ where the evaluation of one of the $t_i$ requires access to the compute node $i$. The aim is to construct an approximation $q\in\mathcal F_\phi$ parametrised by a vector $\theta$ with\footnote{we included a prior here unlike in \eqref{eq-log-partition}, the log-partition function is therefore implicitly understood to consider the prior as well with
+$$
+	A(\theta) \esp=\esp \log \int \pi_{0}(x)\exp\scal{\theta,\phi(x)}\nudx
+.
+$$}
 %
 \eqa{
-	q(x) &=& \pi_0(x)\exp(\scal{\theta,\phi(x)}-A(\theta)) \spe \pi_0(x)\exp(-A(\theta))\prod_{i=1}^{K}\tilde t_i(x)
+	q_{\theta}(x) &=& \pi_0(x)\exp(\scal{\theta,\phi(x)}-A(\theta)) \spe \pi_0(x)\exp(-A(\theta))\prod_{i=1}^{K}\tilde t_i(x)
 }
 %
 where $\tilde t_i(x):=\exp\scal{\omega_i,\phi(x)}$ for parameters $\omega_{i}$ such that $\sum_{i=1:K}\omega_i=\theta$. The tilted distributions associated with each of the factors are given by
@@ -183,7 +187,7 @@ The first part, denoted by $\mathcal E$ defines the \emph{EP energy} with
 %
 under the constraint that $\theta=(K-1)\inv \sum_{i=1}^{K}\lambda_i$. Note that its gradient in $\lambda_i$ is simply $\nabla_{\lambda_i}\mathcal E = (\mu_i-\nabla A(\theta))$. 
 The stationary points of $\mathcal E$ in $\lambda_i$ therefore correspond to the LMMC \eqref{eq:LMMC} that the EP algorithm attempts to satisfy.
-It is also interesting to briefly look at the remainder of the right-hand side of \eqref{eq:decomposeKL}. Discarding the terms that don't depend on $\lambda_i$, we have
+It is also interesting to briefly look at the remainder of the right-hand side of \eqref{eq:decomposeKL}. Discarding the terms that do not depend on $\lambda_i$, we have
 %
 \eqa{
 	\nabla_{\lambda_i}\E_p[\log q_i/q] &=& \nabla_{\lambda_i}\E_p\pac{\scal{\lambda_i,\phi}-A_i(\lambda_i)  - \scal{(K-1)\inv\sum_i\lambda_i,\phi}+A(\theta)}\nn\\
@@ -215,7 +219,7 @@ where $\theta_{-i}:=\eta\sum_{j\neq i}\lambda_j$ and $\eta=(K-1)\inv$. A common 
 && \qquad{\eta^{2}\over 2}\scal{\lambda_i^{\text{new}}-\lambda_i, \nabla^{2} \mathcal G_i(\lambda_i)(\lambda_i^{\text{new}}-\lambda_i)} .\label{ep-energy-newton}
 }
 %
-Taking the gradient in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a Newton-like step. However, this requires the inversion of the Hessian of $\mathcal G_i$ which may be expensive and numerically unstable to compute. An alternative can be obtained by observing that, if $\nabla^{2}\mathcal G_i(\lambda_i)$ is positive definite,\add{an argument can probably be made that this will likely be the case since if variance of q does not encompass that of qi we're in trouble (could test this), could in fact explain problems towards ``end'' of algorithm} then the quadratic term in the approximation is simply a measure of discrepancy between $\lambda_i^{\text{new}}$ and $\lambda_i$. As in the mirror-descent algorithm \citep{nemirovski83, beck03} we could therefore try to replace it by a Bregman divergence.\footnote{The Mirror Descent algorithm and the Natural Gradient algorithm are briefly covered in the appendix \ref{app:MDA+NG})}. In our case, it is convenient to consider the Bregman divergence induced by the log-partition function $A$ itself;\footnote{Recall that $B_A(\lambda_i^{\text{new}},\lambda_i):=A(\lambda_i^{\text{new}})-A(\lambda_i)-\scal{\lambda_i^{\text{new}},\nabla A(\lambda_i)}$.} this leads to the alternative approximation:
+Taking the gradient in $\lambda_i^{\text{new}}$ and setting it to zero then leads to a Newton-like step. However, this requires the inversion of the Hessian of $\mathcal G_i$ which may be expensive and numerically unstable to compute. An alternative can be obtained by observing that, if $\nabla^{2}\mathcal G_i(\lambda_i)$ is positive definite,\add{an argument can probably be made that this will likely be the case since if variance of q does not encompass that of qi we're in trouble (could test this), could in fact explain problems towards ``end'' of algorithm} then the quadratic term in the approximation is simply a measure of discrepancy between $\lambda_i^{\text{new}}$ and $\lambda_i$. As in the mirror-descent algorithm \citep{nemirovski83, beck03} we could therefore try to replace it by a Bregman divergence.\footnote{The Mirror Descent algorithm and its connection with the Natural Gradient algorithm is briefly covered in the appendix \ref{app:MDA+NG})} In our case, it is convenient to consider the Bregman divergence induced by the log-partition function $A$ itself;\footnote{Recall that $B_A(\lambda_i^{\text{new}},\lambda_i):=A(\lambda_i^{\text{new}})-A(\lambda_i)-\scal{\lambda_i^{\text{new}},\nabla A(\lambda_i)}$.} this leads to the alternative approximation:
 %
 \eqa{
 	\mathcal G_i(\lambda_i^{\text{new}}) &\approx&
@@ -267,13 +271,13 @@ In this section, we compare the three main versions of EP algorithms discussed i
 
 \subsection{Description of the experiments}
 
-The model considered is a simple bayesian logistic regression model. Whilst this model is not of moderate interest in itself, it has the nice property of being well behaved making the analysis of the behaviour of different inference algorithms easier. This is a similar setup than the one considered in the SMS paper \citep{xu14}, generating a dataset $\mathcal D=\{(z_c, y_c)\}_{c=1}^N$ with covariates $z_c\in\mathbb R^d$ and response $y_c\in\{0,1\}$. The conditional distribution of $y_c$ given $z_c$ and weights $x\in\mathbb R^d$  is 
+The model considered is a simple Bayesian logistic regression model. Whilst this model is of moderate interest in itself, it has the nice property of being well behaved making the analysis of the behaviour of different inference algorithms easier. This is a similar setup than the one considered in the SMS paper \citep{xu14}, generating a dataset $\mathcal D=\{(z_c, y_c)\}_{c=1}^N$ with covariates $z_c\in\mathbb R^d$ and response $y_c\in\{0,1\}$. The conditional distribution of $y_c$ given $z_c$ and weights $x\in\mathbb R^d$  is 
 \begin{eqnarray}
     p(y_c=1|z_c, x) &=& \sigma(\langle z_c, x\rangle )
 \end{eqnarray}
 where $\sigma$ denotes the logistic function: $\sigma(s)\equiv (1+\exp(-s))^{-1}$. A Gaussian prior $p_0(x) = \mathcal N(x; 0_d, 10\mathbb I_d)$ is set on $x$ and the aim is to construct an approximation to the posterior $p(x|\mathcal D)$. We generate $N=5000$ data points with $d=10$ using iid draws for the covariates, $z_c\sim\mathcal N(\mu, \Sigma)$ where the $d$ components of $\mu$ are drawn iid from a Uniform $\mathcal U[0,1]$ and $\Sigma=PP^T$ where the components of $P$ are drawn from a Uniform $\mathcal U[-1,1]$. The generating weight vector $x^\star$ is drawn from the prior $p_0$. The labels $y_c$ are then sampled according to the model.
 
-The data is sharded across five factors (corresponding to 5 compute nodes) each with one fifth of the data. To compute expected values against the tilted distribution, an importance sampling estimator is constructed with a varying number of samples (5, 10, 50) as shown in \ref{fig-res-snep}. The proposal used is the last global approximation shared with the compute node. Note that more involved samplers can be used (as is done in \citet{hasenclever16} which uses a stochastic gradient MCMC method) but the purpose here is primarily to explore the robustness of the algorithms to Monte Carlo noise so that a simple sampler is adequate. 
+The data is sharded across five factors (corresponding to 5 compute nodes) each with one fifth of the data. To compute expected values against the tilted distribution, an importance sampling estimator is constructed with a varying number of samples (5, 10, 50) as shown in figure \ref{fig-res-snep}. The proposal used is the last global approximation shared with the compute node. Note that more involved samplers can be used (as is done in \citet{hasenclever16} which uses a stochastic gradient MCMC method) but the purpose here is primarily to explore the robustness of the algorithms to Monte Carlo noise so that a simple sampler is adequate. 
 
 All algorithms use a fixed damping throughout the iterations and different dampings were used to exhibit the behaviour of the algorithm (see \ref{fig-res-snep}). All experiments were run 5 times and averaged over those runs to account for the inherent stochasticity of the algorithms. 
 
@@ -281,7 +285,7 @@ As the base exponential family, we use a full-covariance Gaussian. We compare th
 
 \subsection{Results}
 
-We show at figure \ref{fig-res-snep} the evolution of the predictive RMSE with increasing number of iterations for the three algorithms considered when varying the number of iteration per samples (corresponding to the amount of Monte Carlo noise) and the damping parameter (indicated by $d=$ in the legends). Note that the computational complexity of the iteration for each of the three algorithm is very similar, the main difference residing in the ordering of operations.\footnote{In all the runs, an iteration of MP-EP is around 5\% faster than an iteration of NP-EP and around 20\% faster than an iteration of SNEP but that is negligible compared to the factor of 2 speedup obtained by the much faster convergence of the algorithm.} As a baseline, the predictive RMSE corresponding to $x^{\star}$ (the generating set of weights) is drawn as a black line on each graph.
+We show in figure \ref{fig-res-snep} the evolution of the predictive RMSE with increasing number of iterations for the three algorithms considered when varying the number of iteration per samples (corresponding to the amount of Monte Carlo noise) and the damping parameter (indicated by $d=$ in the legends). Note that the computational complexity of the iteration for each of the three algorithm is very similar, the main difference residing in the ordering of operations.\footnote{In all the runs, an iteration of MP-EP is around 5\% faster than an iteration of NP-EP and around 20\% faster than an iteration of SNEP but that is negligible compared to the factor of 2 speedup obtained by the much faster convergence of the algorithm.} As a baseline, the predictive RMSE corresponding to $x^{\star}$ (the generating set of weights) is drawn as a black line on each graph.
 
 A range of damping parameters is selected to illustrate the behaviour of the algorithm. The range is always taken with the largest damping parameter being on the verge of numerical instability for the algorithm. Indeed, when using a full-covariance Gaussian as base exponential family, going from the mean-parameter space to the natural parameter space or vice versa requires the inversion of a matrix. Doing the update in the mean parameter space helps the numerical stability of this step as does increasing the damping (reducing the step-size).
 
@@ -397,7 +401,7 @@ In particular we showed that updates in the mean parameter space can be much mor
 Since \cite{minka01}, there have been a substantial number of extensions and alternatives to EP proposed. Stochastic EP \citep{li15} and averaged EP \citep{dehaene15} assume that all factors can be well approximated by the \emph{same} exponential family factor via parameter tying. This saves memory storage and was shown to work well when a lot of samples are available. This is an orthogonal idea to our work, and it is possible to apply it to SNEP and MP-EP as well although in the distributed learning setting considered, each worker must keep a copy of the parameters anyway which means it would not reduce memory requirements. Convergent EP \citep{heskes03} is a similar algorithm with (idealised) convergence guarantees but it is extremely slow to run in practice. 
 
 A critique often raised against EP is that the algorithm does not offer convergence guarantees. In fact, Minka addresses this in his paper \citep{minka01} indicating that when EP does not converge it is usually a sign of a poor choice of approximating family $\mathcal F_{\phi}$. 
-Further to this, the convergence question may in fact be of little practical use since, in any case, we do not know how good an approximation the fixed point corresponding to the local moment matching conditions (LMMC) is to the fixed point corresponding to the global ones (GMMC) nor how good a proxy the latter is to the target distribution. In fact, a similar criticism can be raised for Mean Field Variational Inference: the iterations provably decrease an energy and converges but it is unclear how good a proxy it converges to. This situation is summarised at figure \ref{comp-vi-ep}.
+Further to this, the convergence question may in fact be of little practical use since, in any case, we do not know how good an approximation the fixed point corresponding to the local moment matching conditions (LMMC) is to the fixed point corresponding to the global ones (GMMC) nor how good a proxy the latter is to the target distribution. In fact, a similar criticism can be raised for Mean Field Variational Inference: the iterations provably decrease an energy and converge but it is unclear how good a proxy it converges to. This situation is summarised in a conceptual manner in figure \ref{comp-vi-ep}.
 
 \begin{figure}[!h]
 \center

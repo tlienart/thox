@@ -203,7 +203,7 @@ We explored this idea and showed that it significantly outperforms the default c
 %
 Note that this choice also suffers from a tractability issue in a system with dynamic that is more complex than the linear and Gaussian one considered in \citep{fearnhead10} where, in any case, the optimal Kalman smoother should be preferred. We show in the appendix (point \ref{app:normalising-density-fearnhead-lg}) how this normalising density can be obtained in the case of a simple linear Gaussian dynamic.\check{jul16}
 
-Upon selecting $\gamma_{t}$ to be the approximation of the predictive density \eqref{eq PDhat} based entirely on a a particle estimator of the filtering density, we get what Taghavi calls the \emph{backward informations smoothing} (BIS) algorithm \citet{taghavi12}. This choice verifies the support condition \eqref{eq: tech condition normalisation density} provided the support  of $p(x\st z)$ covers the support of the BIF. Typically, the support of $p(x\st z)$ is the whole space $\mathcal X$ which guarantees this.
+Upon selecting $\gamma_{t}$ to be the approximation of the predictive density \eqref{eq PDhat} based entirely on a a particle estimator of the filtering density, we get what Taghavi calls the \emph{backward informations smoothing} (BIS) algorithm \citet{taghavi12}. This choice verifies the support condition \eqref{eq: tech condition normalisation density} provided the support  of the transition density covers the support of the BIF. Typically, the support of the transition density is the whole space $\mathcal X$ which guarantees this.
 
 The optimal importance function for targeting the corresponding normalised BIF is obtained by considering \eqref{recursion joint BIF} with this specific choice of normalising density:\check{jul16, jul2}
 \eqa{		\tilde q^{\text{opt}}_{t}(x_{t}\st \tilde X^{(j)}_{t+1}) &\propto & {\hpd_{t}(x_{t})\over \hpd_{t+1}(\tilde X^{(j)}_{t+1})} p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t}),\label{eq:opt-prop-bif}}
@@ -225,7 +225,7 @@ where the $\{\tilde X_{t+1}^{(j)}\}_{j=1}^{N}$ are the particles from the previo
 \end{algorithm}
 %
 
-At each step $t$ and for each particle $j$, the algorithm \ref{alg:bisquad} ideally requires sampling a particle from $\hpd_{t}(x_{t})p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t})$ which is a mixture of $N$ terms. Additionally, computing the updating factors for the weights requires computing a sum of $N$ terms $\hpd_{t+1}(\tilde X_{t+1}^{(j)})$. Provided we use $N$ particles to target the BIF, the complexity of the BIS algorithm is therefore inherently quadratic in the number of particles. This is the same computational complexity as that of the FFBS algorithm.\check{jul16, jul5}
+At each step $t$ and for each particle $j$, Algorithm \ref{alg:bisquad} ideally requires sampling a particle from $\hpd_{t}(x_{t})p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t})$ which is a mixture of $N$ terms. Additionally, computing the updating factors for the weights requires computing a sum of $N$ terms $\hpd_{t+1}(\tilde X_{t+1}^{(j)})$. Provided we use $N$ particles to target the BIF, the complexity of the BIS algorithm is therefore inherently quadratic in the number of particles. This is the same computational complexity as that of the FFBS algorithm.\check{jul16, jul5}
 
 As it is not trivial in general to sample from $p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t})$, let alone when it is combined with $\hpd_{t}(x_{t})$, a possibility akin to the bootstrap proposal for the particle filter is to simply sample from $\hpd_{t}(x_{t})$. The disadvantage is that this choice doesn't take into account all the information available (contained in $\tilde X^{(j)}_{t}$ and $y_{t}$). Assuming we can sample easily from the transition distribution, sampling from $\hpd_{t}$ can be done easily in two steps: first sample an index $i^{\star}\sim \mathcal M(w^{(1)}_{t-1}, \dots, w^{(N)}_{t-1})$ where $\mathcal M$ denotes a multinomial distribution and then sample from the corresponding term $p(x_{t}\st X^{(i^{\star})}_{t-1})$. The update factor is then given by
 %
@@ -250,7 +250,7 @@ Of course this does not simplify the problem: we still have to sample $N$ pairs 
 
 An approximation suggested first by \citet{briers05} in the wider context of sampling from products of mixtures and exploited by \citet{fearnhead10, taghavi12} in the context of the TFS algorithm is to approximate $i$ and $j$ independently by representing $\beta^{(i,j)}_{t}\approx \beta^{(i)}_{t}\tilde\beta^{(j)}_{t}$. The simplest form for this approximation, is to use $\beta^{(i)}_{t} = w^{(i)}_{t-1}$ and $\tilde\beta^{(j)}_{t}=\tilde w^{(j)}_{t+1}$. 
 
-Since sampling from a given component $p(x_{t}\st X^{(i^{\star})}_{t-1})p(y_{t}\st x_{t})p(\tilde X^{(j^{\star})}_{t+1}\st x_{t})$ may still be intractable, we can resort to importance sampling for that term as well and compute the corresponding importance weight $\tilde w_{t}^{(j)}$ as a result.
+Since sampling from a density proportional to $p(x_{t}\st X^{(i^{\star})}_{t-1})p(y_{t}\st x_{t})p(\tilde X^{(j^{\star})}_{t+1}\st x_{t})$ may still be intractable, we can resort to importance sampling for that term as well and compute the corresponding importance weight $\tilde w_{t}^{(j)}$ as a result.
 With this approach, sampling the indices is now an operation with linear computational complexity in the number of particles and the resulting algorithm consequently also enjoys linear complexity. 
 The steps are illustrated in algorithm \ref{alg:bis-linear}. \check{jul16}
 %
@@ -316,7 +316,8 @@ However, we can sample a vector $r$ of $M$ indices following a multinomial with 
 w^{(i)}_{t\st T} &\propto& w^{(i)}_{t}\sum_{j=1}^{M}{w^{(r_{j})}_{t+1\st T}\pac{p(X^{(r_{j})}_{t+1}\st X^{(i)}_{t})\over \sum_{k=1}^{N}w^{(k)}_{t}p(X^{(r_{j})}_{t+1}\st X^{(k)}_{t})}}
 }
 %
-where $M$ is sub-linear in $N$. The complexity of the corresponding algorithm is then $\mathcal O(MN)$. We show in the comparisons that this algorithm compares favourably with the full complexity FFBS. \check{jul16}
+where $M$ is sub-linear in $N$. The complexity of the corresponding algorithm is then $\mathcal O(MN)$. 
+We show in the experimental section that this algorithm compares favourably with the full complexity FFBS. \check{jul16}
 
 \section{\label{sec:TFSexp}Experiments}
 
@@ -337,7 +338,7 @@ The dynamic is defined as follows:
 %
 \eqa{\syst{ x_{t+1} &=& A x_{t} + \epsilon_{t}\\
 		 y_{t+1} &=& B x_{t+1} + \eta_{t+1}
-}.
+}
 }
 %
 where $\epsilon_{t}\sim \mathcal N(0,Q)$ and $\eta_{t}\sim\mathcal N(0,R)$. The matrices are defined as follows:
@@ -358,7 +359,7 @@ We compare the average RMSE across the time steps computed as:
 }
 %
 where $j$ indicates the experiment run ($j=1,\dots,J$), the superscript $a$ indicates the algorithm, $x_{j}$ denotes the ground truth for the $j$th experiment and $\hat\mu^{a}_{j}$ the recovered mean from the algorithm. 
-This is a crude measure of quality but is enough to show how the different algorithms compare (and, in particular, that the BIS outperforms Fearnhead's algorithm); \citet{arulampalam02} in their widely cited paper mention that the RMSE is widely used in the literature and facilitates quantitative comparison.  
+This is a crude measure of quality but is enough to show how the different algorithms compare (and, in particular, that the BIS outperforms Fearnhead's algorithm); \citet{arulampalam02} in their highly cited paper mention that the RMSE is widely used in the literature and facilitates quantitative comparison.  
 
 In the figures below, \emph{KF} and \emph{KS} refer to the Kalman filter and smoother, \emph{PF} to a bootstrap particle filter, \emph{FFBS} to the forward filtering backward smoothing algorithm applied after the PF and \emph{FFBS$_{\text{L}}$} to the sub-quadratic implementation (with $M=25$). The \emph{BIS} symbols refer to the (bootstrap) backward information smoothers and the subscript indicates the version: Q for quadratic, L for linear, S for sub-quadratic (with $M=25$). Finally, FH refers to Fearnhead's algorithm (the full description of Fearnhead's algorithm for this model is available in the appendix \ref{app:fearnhead-lg}).\add{link to reproducible code sims, SMC.jl}\check{jul13}
 
@@ -422,7 +423,7 @@ This model is drawn from the paper of \citet{arulampalam02} with the dimensional
 \eqa{\syst{
 	f_{t}(x) &=& x/2 + 25x(1+x^{2})\inv + 8\cos(1.2t)\\
 	g_{t}(x)&=& x^{2}/20\\
-},\,\,\text{and}\,\, Q=10,\,\, R=1.
+}\,\,\text{and}\,\, Q=10,\,\, R=1.
 }
 %
 We call this model NL-1-1 for further reference. We use $N=50$ particles and for $K=100$ time step (as in the original paper) and run the experiments $50$ times with $M=15$ for the sub-quadratic algorithms.
@@ -444,7 +445,7 @@ In this chapter we suggested and discussed three algorithms with sub-quadratic c
 Two are approximations to the backward information smoother (BIS$_{\text{L}}$, BIS$_{\text{S}}$) using the two filter smoothing algorithm while taking the normalising densities to be approximations of the predictive densities based on a particle filter. 
 The last one (FFBS$_{\text{S}}$) is an approximation to the forward filtering backward smoothing algorithm. 
 
-A criticism of the FFBS is that the smoothing step does not sample new particles and just reweighs existing particles which can harm the performance of the resulting estimator. In our experiments however, the FFBS and, more interestingly, its sub-quadratic approximation typically perform well compared to other algorithms. 
+A criticism of the FFBS is that the smoothing step does not sample new particles and just reweights existing particles which can harm the performance of the resulting estimator. In our experiments however, the FFBS and, more interestingly, its sub-quadratic approximation typically perform well compared to other algorithms. 
 
 The BIS does perform a resampling step in the backward step and uses normalisation densities that are more sensible and typically outperform the default choice suggested in \citep{briers10,fearnhead10}.
 However, the optimal backward sampling step is intractable in general and one may have to resort to the bootstrap-BIS as we have in the experiments thereby potentially reducing the advantage of this additional sampling step.

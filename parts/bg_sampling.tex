@@ -7,7 +7,7 @@ In this section we review briefly the foundations of Monte Carlo methods as well
 
 \subsection{From quadrature to sampling}
 % KEEP pi (later p is filtering/smoothing)
-We consider the problem of computing the expected value of a test function $\varphi$ taking value over a space $\mathcal X$ with respect to a distribution $\pi\in\mathcal P(\mathcal X)$ i.e.: $I:=\E_\pi[\varphi(X)]$. Assuming it can't be computed analytically, a general approach is to consider a quadrature rule of the form:
+We consider the problem of computing the expected value of a test function $\varphi$ taking value over a space $\mathcal X$ with respect to a distribution $\pi\in\mathcal P(\mathcal X)$ i.e.: $I:=\E_\pi[\varphi(X)]$. Assuming it cannot be computed analytically, a general approach is to consider a quadrature rule of the form:
 %
 \eqa{
 	I\esp\approx\esp \widehat I_N &=& \sum_{i=1}^{N} w(X^{(i)}) \varphi(X^{(i)})
@@ -21,7 +21,7 @@ In such cases, a broadly studied approach is the Monte Carlo integration with
 	X^{(i)}\esp \simiid\esp \pi,\quad\text{and}\quad w(X^{(i)})\spe N\inv. 	
 \label{eq:mcsampling}}
 %
-The strong law of large numbers then indicates that $\widehat I_N\to I$ almost surely with approximation error scaling like $\mathcal O(N^{-1/2})$ independently of the dimensionality of the problem. This is to be compared with deterministic rules which typically have approximation error scaling like $\mathcal O(N^{-\alpha/d})$ for a fixed $\alpha>0$ depending on the quadrature rule \citep{caflisch98}. The problem then becomes one of drawing iid.\ samples from $\pi$ which is often also an intractable problem. Note that \eqref{eq:mcsampling} in fact defines an \emph{empirical density} $\hat \pi$ with
+The strong law of large numbers then indicates that $\widehat I_N\to I$ almost surely with approximation error scaling like $\mathcal O(N^{-1/2})$ independently of the dimensionality of the problem. This is to be compared with deterministic rules which typically have approximation error scaling like $\mathcal O(N^{-\alpha/d})$ for a fixed $\alpha>0$ depending on the quadrature rule \citep{caflisch98}. The problem then becomes one of drawing iid samples from $\pi$ which is often also an intractable problem. Note that \eqref{eq:mcsampling} in fact defines an \emph{empirical measure} $\hat \pi$ with
 %
 \eqa{
 	\hat \pi(x) &:=& N\inv\sum_{i=1}^{N} \delta_{X^{(i)}}(x),
@@ -36,29 +36,31 @@ In \emph{importance sampling} (IS), samples are drawn from a \emph{proposal dist
 The quadrature weights are then adjusted to reflect that the samples are not drawn from the true distribution:
 %
 \eqa{
-	X^{(i)}\esp \simiid\esp q(\cdot), \quad\text{and}\quad w(X^{(i)})\esp\propto\esp {\pi(X^{(i)})\over q(X^{(i)})}.\label{eq:impsampling}
+	X^{(i)}\esp \simiid\esp q(\cdot), \quad\text{and}\quad w(X^{(i)})\esp\propto\esp W(X^{(i)})\spe {\pi(X^{(i)})\over q(X^{(i)})},\label{eq:impsampling}
 } 
 %
-Provided the support of $q$ includes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$, the resulting \emph{importance sampling estimator} is consistent. Further, the estimator of the expected value of a specific test function $\varphi$ is finite provided $\E_{\pi}[\varphi(X)^{2}w(x)]<\infty$ \citep[chapter 3.3]{robert04}. Note that \eqref{eq:impsampling} also defines an empirical density $\hat\pi$ with
+where the weights $w(X^{(i)})$ are normalised to sum up to one.
+
+Provided the support of $q$ includes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$, the resulting \emph{importance sampling estimator} is consistent. Further, the estimator of the expected value of a specific test function $\varphi$ is finite provided $\E_{\pi}[\varphi(X)^{2}w(x)]<\infty$ \citep[chapter 3.3]{robert04}. Note that \eqref{eq:impsampling} also defines an empirical measure $\hat\pi$ with
 %
 \eqa{
-	\hat\pi(x) &=& \sum_{i=1}^{N} w(X^{(i)})\delta_{X^{(i)}}(x)
+	\hat\pi(x) &\propto& \sum_{i=1}^{N} W(X^{(i)})\delta_{X^{(i)}}(x).
 }
 %
-with the weights $w(X^{(i)})$ summing to one. 
+ 
 
 %%%%%%%%%%%%%%%%%%%
 \subsubsection{Effective sample size}
 One way to assess the quality of an importance sampling estimator is to consider the ratio of the variance of the corresponding Monte Carlo estimator and the variance of the IS estimator. The general ratio is hard to handle and depends upon the test function with respect to which the expected value is computed. \citet{kong92} suggested considering the following proxy known as the \emph{effective sample size}:
 %
 \eqa{
-	\text{ESS} &=& {N\over 1+\V_{q}(W)},
+	\text{ESS} &=& {N\over 1+\V_{q}[W(X)]},
 }
 %
-where $\V_{q}(W)$ is the variance of the importance sampling ratio. Using the sample variance of the normalised weights and simplifying the expression, the proxy that is usually considered for the ESS nowadays is
+where $\V_{q}[W(X)]$ is the variance of the importance sampling weights. Using the sample variance of the normalised weights and simplifying the expression, the proxy that is usually considered for the ESS nowadays is
 %
 \eqa{
-	\text{ESS} &=& \pat{\sum_{i=1}^{N}w(X^{(i)})^{2}}^{-1}\label{eq:ESS}
+	\text{ESS} &=& \pat{\sum_{i=1}^{N}w(X^{(i)})^{2}}^{-1}\label{eq:ESS}.
 }
 %
 This metric is bounded from below by $1$ -- the degenerate case where a single particle is carrying all the weight -- and from above by $N$ -- the ideal case where the samples are comparable to ideal Monte Carlo samples. \check{par jul16}
@@ -70,7 +72,7 @@ Later on, we will compare alternative methods to these standard algorithms.
 The list and descriptions are not meant to be exhaustive and we refer to \citep{robert04, green15} for a more complete overview.
 
 \subsubsection{Metropolis-Hasting}
-The Metropolis-Hasting algorithm (MH) is one of the most prominent member of the class of Markov Chain Monte Carlo methods (MCMC). In MCMC methods, one considers a sequence (chain) of random variables $X^{(1)}, X^{(2)},\dots$ following a conditional probability density or \emph{transition kernel} $K$ with $X^{(n+1)} \sim K(X^{(n)}, X^{(k+1)})$. 
+The Metropolis-Hasting algorithm (MH) is one of the most prominent member of the class of Markov Chain Monte Carlo methods (MCMC). In MCMC methods, one considers a sequence (chain) of random variables $X^{(1)}, X^{(2)},\dots$ following a conditional probability density or \emph{transition kernel} $K$ with $X^{(n+1)} \sim K(X^{(n)}, \,\cdot\,)$. 
 The kernel is chosen in such a way that the chain admits a stationary distribution, i.e.: a distribution $\pi$ such that for $n$ large enough, $X^{(n)}\sim \pi$ implies that $X^{(n+1)}\sim\pi$. Further, the kernel is chosen in such a way that the stationary distribution corresponds to the target distribution.
 
 The MH algorithm corresponds to the transition kernel below where $q$ is a proposal distribution and $p_{u}$ is the (unnormalised) target \citep[chapter 6]{robert04}.
@@ -90,14 +92,14 @@ In the MH algorithm, different choices of $q$ will lead to different algorithms 
 
 \subsubsection{Gibbs sampling}
 
-Gibbs sampling can be applied when targeting a multivariate distribution $p\in \mathcal P(\mathcal X)$ where $\mathcal X$ is $d$-dimensional and where it is possible to generate samples from the target's singleton marginals $p_{1}, \dots, p_{d}$ \citep[chapter 7]{robert04}.
+Gibbs sampling can be applied when targeting a multivariate distribution $p\in \mathcal P(\mathcal X)$ where $\mathcal X$ is $d$-dimensional and where it is possible to generate samples from the target's full conditionals $p_{1}, \dots, p_{d}$ \citep[chapter 7]{robert04}.
 
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:gibbs-alg}\dblue{\emph{\small Gibbs iteration}}}
 	\begin{algorithmic}[1]
 		\State given $x^{(n)}=(x_{1}^{(n)},\dots,x_{d}^{(n)})$
 		\For{$k=1:d$}
-			\State generate $X^{(n+1)}_{k} \sim p_{k}(x_{k}\st x^{(n)}_{-k})$ \Comment with $x_{-k}:=(x_{1},\dots,x_{k-1},x_{k+1},\dots,x_{d})$
+			\State generate $X^{(n+1)}_{k} \sim p_{k}(x_{k}\st x^{(n)}_{-k})$ \,\,with $x_{-k}^{(n)}:=(x_{1}^{(n+1)},\dots,x_{k-1}^{(n+1)},x_{k+1}^{(n)},\dots,x_{d}^{(n)})$
 		\EndFor
 	\end{algorithmic}
 \end{algorithm}
@@ -108,10 +110,10 @@ The major disadvantage of the method is that it goes sequentially over each dime
 
 \subsubsection{Hamiltonian Monte Carlo sampling}
 
-The Hamiltonian Monte Carlo method (HMC) generates samples along a trajectory on the the parametric surface $(x, \ell(x))$ where $\ell(x):=\log \pi_{u}(x)$ and $\pi_{u}$ is the (unnormalised) target distribution.
-The trajectory can be interpreted as the time evolution of a specific physical system described by a Hamiltonian depending on the log-likelihood (potential) and a momentum term encouraging exploration of the state-space (kinetic energy) with \emph{momentum variable} $p$. The Hamiltonian is defined as
+The Hamiltonian Monte Carlo method (HMC) generates samples along a trajectory on the the parametric surface $(x, -U(x))$ where $-U(x):=\log \pi_{u}(x)$ and $\pi_{u}$ is the (unnormalised) target distribution.
+The trajectory can be interpreted as the time evolution of a specific physical system described by a Hamiltonian depending on the target distribution (potential) and a momentum term encouraging exploration of the state-space (kinetic energy) with \emph{momentum variable} $p$. The Hamiltonian is defined as
 \eqa{
-	H(x, p) &:=& -\ell(x) + \frac12\scal{p, M\inv p} 
+	H(x, p) &:=& U(x) + \frac12\scal{p, M\inv p} 
 }
 where $M$ is a mass matrix that can be set to the identity or adjusted depending on knowledge of the problem's geometry \citep{betancourt17, barp18}. 
 Since finding the exact trajectory of a Hamiltonian system is usually intractable, numerical integrators can be used and the leapfrog method is often used in HMC.
@@ -120,7 +122,7 @@ Since finding the exact trajectory of a Hamiltonian system is usually intractabl
 	\caption{\label{alg:hmc-alg}\dblue{\emph{\small HMC iteration}}}
 	\begin{algorithmic}[1]
 		\State draw a momentum variable $P^{(n)}\sim\mathcal N(0, M) $
-		\State compute one step of the numerical integrator from $(X^{(n)},P^{(n)})\rightarrow (X^{\star},P^{\star})$ 
+		\State compute $L$ steps of the leapfrog integrator from $(X^{(n)},P^{(n)})\rightarrow (X^{\star},P^{\star})$ 
 		\State compute the acceptance ratio
 			$$ \rho \leftarrow \min\left\{\exp\left(-H(X^{\star},P^{\star})-H(X^{(n)}, P^{(n)})\right),1\right\} $$
 		\State generate $\beta \sim\mathcal B(\rho)$
@@ -129,7 +131,7 @@ Since finding the exact trajectory of a Hamiltonian system is usually intractabl
 \end{algorithm}
 
 This method generates a Markov chain with stationary distribution corresponding to the target distribution $\pi$. 
-It is a very popular method in computational Bayesian inference and tends to be preferred over approaches such as the MH algorithm \citep{green15}. We will show later in chapter \ref{chapBPSMRF} than in some cases a method that exploits the factorisation structure of the target distribution explicitly may lead to better results. 
+It is a very popular method in computational Bayesian inference and tends to be preferred over approaches such as the MH algorithm \citep{neal11}. We will show later in chapter \ref{chapBPSMRF} than in some cases a method that exploits the factorisation structure of the target distribution explicitly may lead to better results. 
 
 \newpage
 %%%%%%%%%%%%%%%%%%%%%%
@@ -141,16 +143,16 @@ It is a very popular method in computational Bayesian inference and tends to be 
 In the context of HMM, we are usually interested in estimating a sequence of target distributions $\{\pi_{t}(x_{1:t})\}_{t=1}^{T}$ which admit the following factorisation structure:
 %
 \eqa{
-	\pi_{t}(x_{1:t}) &=& \pi_{t}(x_{t}\st x_{1:t-1})\pi_{t-1}(x_{1:t-1}).\nn
+	\pi_{t}(x_{1:t}) &\propto& \pi_{t}(x_{t}\st x_{1:t-1})\pi_{t-1}(x_{1:t-1}).\nn
 }
 %
 This lead to the development of \emph{sequential Monte Carlo} (SMC) methods \citep[chapter 14.3]{robert04}. The underlying principle of sequential importance sampling is the same as that of importance sampling except that a different proposal is considered at every step $t$ taking into account the previous draw of particles and the evolution of the system:
 %
 \eqa{
-	q_{t}(x_{1:t}) &=& q_{t}(x_{t}\st x_{1:t-1})q_{t-1}(x_{1:t-1}).	\nn
+	q_{t}(x_{1:t}) &\propto& q_{t}(x_{t}\st x_{1:t-1})q_{t-1}(x_{1:t-1}).	\nn
 }
 %
-Following this form, new samples or \emph{particles} $X^{(i)}_t$ can be drawn from $q_{t}(x_{t}\st X^{(i)}_{1:t-1})$ and the weights corresponding to the trajectories $\{X^{(i)}_{1:t}\}$ then need to be updated by a factor $\alpha^{(i)}_{t}$ with\check{jul16, jun24}
+Following this form, new samples or \emph{particles} $X^{(i)}_t$ can be drawn from $q_{t}(x_{t}\st X^{(i)}_{1:t-1})$ and the weights corresponding to the trajectories $\{X^{(i)}_{1:t}\}$ then need to be multiplied by a factor $\alpha^{(i)}_{t}$ with\check{jul16, jun24}
 %
 \eqa{
 	\alpha^{(i)}_{t} := {\pi_{t}(X^{(i)}_{1:t} )\over \pi_{t-1}(X^{(i)}_{1:t-1}) q_{t}(X^{(i)}_{t}\st X^{(i)}_{1:t-1})}.
@@ -158,7 +160,7 @@ Following this form, new samples or \emph{particles} $X^{(i)}_t$ can be drawn fr
 %
 The variance of an IS estimator is directly related to the variance of the associated importance weights. In order to counter the increase of variance induced by the sequential IS procedure, the proposal at step $t$ should be such that the variance of the update factors $\alpha_t$ is as small as possible. In particular, the \emph{optimal proposal} \citep{doucet11} keeps it at zero with
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{1:t-1}) &:=& \pi_{t}(x_{t}\st x_{1:t-1}).	\label{optimal proposal}}
-Note that "optimality" here is understood in terms of the variance of the estimator. Additionally, since we can't typically sample easily from the optimal proposal, we have to resort to approximating distributions.\check{jul16, jun24}
+Additionally, since we can't typically sample easily from the optimal proposal, we have to resort to approximating distributions.\check{jul16, jun24}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Particle filtering}
@@ -214,7 +216,7 @@ The computation of the updated smoothing weights has complexity $\mathcal O(TN^{
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{point:BPS}Sampling with Piecewise Deterministic Markov Processes}
-The \emph{Bouncy Particle Sampler} (BPS) of \citet{bouchard15} is inspired from an algorithm in the physics literature \citep{peters12} and belongs to a wider class of sampling methods based on Piecewise Deterministic Markov Processes (PDMP) \citep{bierkens16, bierkens17, wu17}.
+The \emph{Bouncy Particle Sampler} (BPS) of \citet{bouchard15} is inspired from an algorithm in the physics literature \citep{peters12} and belongs to a wider class of sampling methods based on Piecewise Deterministic Markov Processes (PDMP) \citep{bierkens16, bierkens17, wu17, vanetti17}.
 
 The BPS algorithm considers a target distribution $\pi$ on $\R^{d}$, proportional to a non-negative function $\gamma$ which can be evaluated pointwise: $\pi(x) = Z\inv \gamma(x)$
 but the normalisation constant $Z$ is intractable. 
@@ -229,9 +231,10 @@ The authors show that, if the lengths $\{\tau_{i}\}_{i\ge 1}$ are governed by a 
 In the BPS algorithm, the IPP governing the lengths of the trajectory segments has intensity function $\lambda:\R^{d}\times\R^{d}\to\R^{+}$ with
 %
 \eqa{
-	\lambda(x,v) &=& \max\,\{0,\scal{\nabla U(x),v}\}.	
+	\lambda(x,v) &=& \scal{\nabla U(x),v}^{+},	
 }
 %
+where $z^{+}$ is defined to be $\max \{0, z\}$.\\
 At the end of each segment, the trajectory ``bounces'' and the velocity is reflected against the local level set of the energy $U$:
 \eqa{	v' &=& R(x)v \spe v-2{\scal{\nabla U(x),v}\nabla U(x)\over \bnorm{\nabla U(x)}^{2}}.	}
 The authors show that the velocities also need to be ``refreshed'' according to the arrival times of a homogenous Poisson process (PP) of intensity $\lambda^{\text{ref}}\ge 0$, a parameter of the BPS. This ensures the algorithm explores the entirety of the space. The basic BPS algorithm is reproduced in \hyperref[alg:BPS1]{algorithm~\ref*{alg:BPS1}} below.
@@ -267,7 +270,7 @@ As we saw, the algorithm requires to sample the first arrival time of an IPP of 
     \emph{Time-scale transformation}: this approach requires computing the inverse quantile of $\Xi(t):=\int_{0}^{t} \chi(s)\mathrm{d}s$ which is usually intractable but it can computed numerically if the target is strictly log-concave and differentiable. Given $V$ drawn from a Uniform on $[0,1]$, the first arrival time of the IPP is given by $\Xi^{\inv}(-\log(V))$.
 %This, the authors show, allows to make a connection with the Metropolis Hastings algorithm.
     
-    \emph{Adaptive thinning}: this approach requires an upper bounds $\overline{\chi}_{s}(t)$ with $\overline\chi_{s}(t)=0$ for $t<s$ and $\overline\chi_{s}(t)\ge\chi(t)$ for $s\le t\le s+\Delta(s)$ where $\Delta$ is a positive function (in the standard case, $\Delta=+\infty$). Additionally, it requires the ability to sample from the IPP corresponding to $\overline\chi_{s}$. Let $\tau$ be such a sample with $\tau\le s+\Delta$, there is then an accept-reject step with rate $\chi(\tau)/\overline\chi(\tau)$. Ideally, $\Delta$ and $\chi/\overline\chi_{s}$ are large (so that we don't have to simulate too many candidates which incurs a computational cost).
+    \emph{Adaptive thinning}: this approach requires an upper bounds $\overline{\chi}_{s}(t)$ with $\overline\chi_{s}(t)=0$ for $t<s$ and $\overline\chi_{s}(t)\ge\chi(t)$ for $s\le t\le s+\Delta(s)$ where $\Delta$ is a positive function (in the standard case, $\Delta=+\infty$). Additionally, it requires the ability to sample from the IPP corresponding to $\overline\chi_{s}$. Let $\tau$ be such a sample with $\tau\le s+\Delta$, there is then an accept-reject step with rate $\chi(\tau)/\overline\chi(\tau)$. Ideally, $\Delta$ and $\chi/\overline\chi_{s}$ are large (so that we do not have to simulate too many candidates which incurs a computational cost).
  
     \emph{Superposition}: if the energy $U$ can be decomposed in a sum $U(x)=\sum_{j=1}^{m}U^{[j]}(x)$ and that each term can be targeted (via one of the first two methods), then we can use the thinning method with bound $\sum_{j=1}^{m}\chi^{[j]}(t)$.
 

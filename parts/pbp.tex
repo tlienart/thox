@@ -86,7 +86,7 @@ We therefore have both pre-messages $\widehat M_{st}$ and $\widehat M_{ts}$ of t
 	\widehat M_{st}(x_{s}) &\propto& \psi_{s}(x_{s}) \prod_{r\in \partial s \backslash t} \widehat m_{rs}(x_{s}).
 }
 %
-This is illustrated at figure \ref{representation-edge-pbp}. 
+This is illustrated in figure \ref{representation-edge-pbp}. 
 
 \begin{figure}[!h]
 \center
@@ -118,7 +118,7 @@ We can then define an empirical distribution for it:
 Marginalising this approximation over $x_{t}$ leads to
 %
 \eqa{
-	\widehat{B}_{st}(x_{s}) &\propto& \sum_{i=1}^{N} {\widehat M_{st}(X_{s}^{(i)}) \widehat { m}_{ts}(X_{s}^{(i)}) \over q_{s}(X_{s}^{(i)})} \delta_{X_{s}^{(i)}}(x_{s}). \label{eq:pbb-particle-joint-belief-marg}
+	\widehat{B}_{st}(x_{s}) &\propto& \sum_{i=1}^{N} {\widehat M_{st}(X_{s}^{(i)}) \widehat { m}_{ts}(X_{s}^{(i)}) \over q_{s}(X_{s}^{(i)})} \delta_{X_{s}^{(i)}}(x_{s}), \label{eq:pbb-particle-joint-belief-marg}
 }
 %
 where $\widehat{m}_{ts}$ is the importance sampling estimator for $ m_{ts}$ using $q_{t}$ as proposal. Of course, marginalising \eqref{eq:pbp-particle-joint-belief} over $x_{s}$ leads to an expression analogous to \eqref{eq:pbb-particle-joint-belief-marg}. Focusing on node $s$, the expression \eqref{eq:pbb-particle-joint-belief-marg} indicate that the proposals should be given by
@@ -142,7 +142,7 @@ Using the framework of expectation propagation (EP) that we discussed in point \
 
 For each $r\in\partial s$, we update the $\eta_{rs}$ following the EP framework. We start by forming the \emph{cavity} $q^{\backslash r}_{s}=q_{s}/\eta_{rs}$ and the corresponding \emph{tilted distribution} proportional to $\widehat m_{rs} q_{s}^{\backslash r}$.  The updated distribution is then the projection of the tilted distribution onto the exponential family manifold:
 \eqa{ q_{s} &\leftarrow& \mathbf P_{\phi}[\widehat m_{rs}q_{s}^{\backslash r}],}	
-where $\mathbf P_{\phi}$ is the projection operator defined at \ref{eq:def-proj-operator-ep}. Consequently, the factor $\eta_{rs}$ is updated: $\eta_{rs} \leftarrow  q_{s}/ q_{s}^{\backslash r}$. Note that other projection mechanisms than projecting with respect to the Kullback-Leibler divergence can be considered as well. 
+where $\mathbf P_{\phi}$ is the projection operator defined in section \ref{eq:def-proj-operator-ep}. Consequently, the factor $\eta_{rs}$ is updated: $\eta_{rs} \leftarrow  q_{s}/ q_{s}^{\backslash r}$. Note that other projection mechanisms than projecting with respect to the Kullback-Leibler divergence can be considered as well. 
 
 In the algorithm as we have described it so far, the EP steps for each incoming message into $s$ and for the node potential are performed first in order to fit the proposal to the current estimated belief at $s$. Then, this estimated belief is used to draw $N$ particles which can be used to form the particle approximated messages from $s$ to each of its neighbours. 
 Alternatively, once each particle approximated message $\widehat{m}_{st}(x_t)$ is formed, we can update their exponential family projections $\eta_{st}(x_t)$ immediately. This is the scheme described in algorithm \ref{alg:epbp-node-update}.
@@ -155,7 +155,7 @@ Alternatively, once each particle approximated message $\widehat{m}_{st}(x_t)$ i
 		\State evaluate the approximate representation of the belief: $$\widehat B_{s}(X_{s}^{(i)}) = \psi_{s}(X_{s}^{(i)})\prod_{r\in\partial {s}}\widehat m_{rs}(X_{s}^{(i)})$$% $q_{u}(x_{u}^{(i)})$
 		\For{$v\in \partial {u}$}
 			\State evaluate the approximate representation of the pre-message: $$\widehat M_{st}(X_{s}^{(i)}) :=\widehat B_{s}(X_{s}^{(i)})/\widehat m_{ts}(X_{s}^{(i)})$$
-			\State compute the corresponding normalised weights $$ w_{st}^{(i)}\propto \widehat M_{st}(X_{s}^{(i)})/q_{s}(X_{s}^{(i)})$$
+			\State compute the corresponding normalised weights: $$ w_{st}^{(i)}\propto \widehat M_{st}(X_{s}^{(i)})/q_{s}(X_{s}^{(i)})$$
 			\State update the estimator of the outgoing message: $$\widehat m_{st}(x_{t})=\sum_{i=1}^{N}w^{(i)}_{st}\psi_{st}(X_{s}^{(i)},x_{v})$$
 			\State update $\eta_{\circ t}$ to match the update $q_{t} \leftarrow \mathbf P_{\phi}[\psi_{t}q_{t}/\eta_{\circ t}]$ 
 			\State update $\eta_{st}$ to match the update $q_{t}\leftarrow \mathbf P_{\phi}[\widehat m_{st}q_{t}/\eta_{st}]$% and update $\eta_{uv}$ correspondingly %compute the cavity distribution $q^{\backslash u}_{v}\propto q_{v}/\eta_{uv}$, get $\eta^{+}_{uv}$ in the exponential family such that $\eta^{+}_{uv}q_{v}^{\backslash u}$ approximates $\widehat m_{uv}q_{v}^{\backslash u}$, update $q_{v}\propto \eta_{uv}^{+}$ and let $\eta_{uv}\leftarrow \eta_{uv}^{+}$
@@ -207,7 +207,7 @@ We start by comparing EPBP to PBP as implemented by \citet{ihler09} on a $3\time
 			\psi_{u}(x_{u}) &=& \alpha_{1}\mathcal N(x_{u}-y_{u}; \mu_{1},\sigma_{1})+\alpha_{2}\mathcal G(x_{u}-y_{u};\mu_{2},\beta)\\
 			\psi_{uv}(x_{u},x_{v}) &=& \mathcal L(x_{u}-x_{v};\mu_{3},\sigma_{3})
 		\end{array}
-	\right.,
+	\right.
 }
 %-2, 1, 2, 1.3, 0, 2
 where $y_{u}$ denotes the observation at node $u$, $\mathcal N(x;\mu,\sigma)\propto \exp(-x^{2}/2\sigma^{2})$ (density of a Normal distribution), $\mathcal G(x;\mu,\beta)\propto \exp(-[(x-\mu)/\beta+\exp(-(x-\mu)/\beta)])$ (density of a Gumbel distribution) and $\mathcal L(x;\mu,\beta)\propto \exp(-|x-\mu|/\beta)$ (density of a Laplace distribution). The parameters were set in an arbitrary fashion to:
@@ -220,7 +220,7 @@ We then repeated the experiments on a tree with 8 nodes (\fig{fig:grids} (right)
 			\psi_{u}(x_{u}) &=& \alpha_{1}\mathcal N(x_{u}-y_{u}; \mu_{1},\sigma_{1})+\alpha_{2}\mathcal N(x_{u}-y_{u};1\mu_{2},\sigma_{2})\\
 			\psi_{uv}(x_{u},x_{v}) &=& \mathcal L(x_{u}-x_{v};\mu_{3},\sigma_{3})
 		\end{array}
-	\right.,
+	\right.
 }
 with the parameters also set in an arbitrary fashion to:
 $$\alpha_{1}=0.3,\,\,\alpha_{2}=0.7,\,\,\mu_{1}=-2,\,\,\mu_{2}=1,\,\,\mu_{3}=0,\,\,\sigma_{1}=1,\,\,\sigma_{2}=0.5,\,\,\sigma_{3}=1.$$
@@ -254,7 +254,7 @@ The \fig{figCompGrid} compares the performances of both methods. The error is co
 \caption{\label{figCompGrid}Comparison of the mean $L^{1}$ error for PBP and EPBP for the $3\times 3$ grid example. EPBP is more accurate for the same number of samples.} %(right) Comparison of the mean $L^{1}$ error for ``PBP after EP'' and EPBP for the tree example. In both cases, EPBP is more accurate for the same number of samples. }
 \end{figure}
 
-The \fig{compEstBelGrid} compares the estimator of the beliefs obtained by the two methods for three representative nodes (node $1$, $5$ and $9$ as illustrated in \fig{fig:grids} (left)). The figure also illustrates the last proposals constructed with our approach and one can notice that their supports match closely the support of the true beliefs.
+Figure \ref{compEstBelGrid} compares the estimator of the beliefs obtained by the two methods for three representative nodes (node $1$, $5$ and $9$ as illustrated in \fig{fig:grids} (left)). The figure also illustrates the last proposals constructed with our approach and one can notice that their supports match closely the support of the true beliefs.
 
 \begin{figure}[!h]
 %\vspace*{-.5cm}
@@ -272,7 +272,7 @@ The \fig{compEstBelGrid} compares the estimator of the beliefs obtained by the t
 \caption{\label{compEstBelGrid}Comparison of the beliefs on node $1$, $5$ and $9$ (top left, top right, bottom) as obtained by evaluating LBP on a deterministic mesh (\emph{true belief}), with PBP and with EPBP for the $3\times 3$ grid example. All three plots share the same legend. The proposal used by EPBP in the last step is also illustrated. The results are obtained with $N=100$ samples on each node and $20$ BP iterations. One can observe visually that EPBP outperforms PBP.}
 \end{figure}
 
-The speed-up offered by EPBP is very substantial as can be seen in \fig{compConv} (left). Hence, although it would be possible (and sensible) to use more MCMC iterations within PBP to improve its accuracy, it would make the method prohibitively expensive to use compared to EPBP. The \fig{compConv} (right) illustrates how the estimated beliefs converge as compared to the true beliefs with increasing number of loopy belief propagation iterations. One can observe that PBP converges more slowly and that the results display more variability which is likely also due to the MCMC runs being too short. %Making them longer is unpractical however as the computational complexity is already higher than that of EPBP.
+The speed-up offered by EPBP is very substantial as can be seen in \fig{compConv} (left). Hence, although it would be possible (and sensible) to use more MCMC iterations within PBP to improve its accuracy, it would make the method prohibitively expensive to use compared to EPBP. Figure \ref{compConv} (right) illustrates how the estimated beliefs converge as compared to the true beliefs with increasing number of loopy belief propagation iterations. One can observe that PBP converges more slowly and that the results display more variability which is likely also due to the MCMC runs being too short. %Making them longer is unpractical however as the computational complexity is already higher than that of EPBP.
 
 %
 %

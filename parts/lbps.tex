@@ -1,6 +1,7 @@
 % !TEX root = ../thesis.tex
 
-In this thesis we consider sampling or approximating distributions that factorise in a specific way. In this chapter, we cover the Local Bouncy Particle Sampler (LBPS), a version of the BPS introduced at point \ref{point:BPS} for target distributions that factorise according to a MRF.
+%In this thesis we consider sampling or approximating distributions that factorise in a specific way. 
+In this chapter, we cover the Local Bouncy Particle Sampler (LBPS), a version of the BPS introduced in chapter \ref{chap:BGsampling}, section \ref{point:BPS} for target distributions that factorise according to a MRF.
 
 The aim of this short chapter is to show that the LBPS algorithm can be used on high-dimensional models such as probabilistic matrix factorisation and performances are not far those of the HMC algorithm thereby showing the potential of PDMP samplers on complex Machine Learning models. For this, we used our open-source package \texttt{PDSampler.jl} coded in Julia.\footnote{\url{https://github.com/alan-turing-institute/PDSampler.jl}} 
 
@@ -188,7 +189,7 @@ Both methods underperform significantly compared to the test-RMSE obtained with 
 
 The main purpose of this chapter was to compare the HMC algorithm to the LBPS on a very high-dimensional model with a rather sparse graphical model structure. We showed in the experiments that the LBPS compares favourably with HMC in this case which gives hope for future use of the LBPS on large scale graphical models.
 
-Much remains to be explored on how to better tune Piecewise Deterministic samplers and in particular on graphical models. To the best of our knowledge, this was the first attempt to use the LBPS on a large-scale model. 
+Much remains to be explored on how to better tune Piecewise Deterministic samplers and in particular on graphical models. To the best of our knowledge, this was the first attempt to use the LBPS on a large-scale model in statistics or machine learning. 
 
 \begin{figure}[!h]
 \center
@@ -196,9 +197,10 @@ Much remains to be explored on how to better tune Piecewise Deterministic sample
 	\caption{\label{fig:nratings}Histogram of the number of ratings per users.}
 \end{figure}
 
-A key element for the viability of the LBPS for a large scale graphical model is the sparsity of the graph. As we hinted at earlier, if each variable node is connected to many factors then every time a factor is triggered, every factor that shares a variable with it is also triggered. If this is a large portion of the graph, this diminishes the advantage of exploiting the factorisation structure of the model. In the figure \ref{fig:nratings}, we look at the distribution of the number of ratings per users. It shows that the distribution is heavy tailed with a significant number of users having over 250 ratings (1149 users). This along with the slow convergence we observed for the LBPS in figure \ref{fig:LBPSvHMC} suggests that the LBPS may be struggling due to the graph not being sparse enough.
+A key element for the viability of the LBPS for a large scale graphical model is the sparsity of the graph. As we hinted at earlier, if each variable node is connected to many factors then every time a factor is triggered, every factor that shares a variable with it is also triggered. If this is a large portion of the graph, the advantage of exploiting the factorisation structure of the model is severely diminished. 
+In the figure \ref{fig:nratings}, we look at the distribution of the number of ratings per users. It shows that the distribution is heavy tailed with a significant number of users having over 250 ratings (1149 users). This along with the slow convergence we observed for the LBPS in figure \ref{fig:LBPSvHMC} suggests that the LBPS may be struggling due to the graph not being sparse enough.
 
-Future work could look at other models which offer a sparse conditional dependence structure and compare the LBPS with the BPS. We suspect that for very sparse models the LBPS will outperform the BPS but it is unclear at which point the BPS starts outperforming the LBPS. 
+Future work could look at other models which offer a sparse conditional dependence structure and compare the LBPS with the BPS. We suspect that for very sparse models the LBPS will outperform the BPS as observed experimentally for Gaussian Random Fields in \citep{bouchard15}. %but it is unclear at which point the BPS starts outperforming the LBPS. 
 
 
 

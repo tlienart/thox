@@ -1,19 +1,22 @@
 % !TEX root = ../thesis.tex
 %\section{Inference on Markov Random Fields}
 
-In this thesis, we consider the framework of Bayesian inference where one is interested in combining prior knowledge about some parameters of interest with the likelihood of the observed data given a statistical model controlled by those parameters. This combination of prior and likelihood leads to a posterior distribution on the parameters which is the key object of interest in Bayesian inference. This can be written
+In this thesis, we consider the framework of Bayesian inference in Machine Learning where one is interested in combining prior knowledge about the parameters of a given model with the likelihood of the observed data given the model. 
+This combination of prior and likelihood leads to a posterior distribution on the parameters which is the key object of interest in Bayesian inference. This can be written
 \eqa{
 	p(\theta\st\mathcal D) &\propto& p(\mathcal D\st  \theta) p(\theta)
 } 
 where $p(\theta)$ is the prior distribution function over the parameter of interest $\theta$, $p(\mathcal D\st \theta)$ denotes the likelihood of the data $\mathcal D$ for a given model parameter and $p(\theta\st \mathcal D)$ is the posterior distribution over the parameters. 
 
-We focus on the problem of estimating expected values with respect to such a posterior distribution and in particular with respect to its marginals. Further, we consider the case where the posterior factorises in a specific way and consider methods that attempt to leverage the factorisation structure to offer estimators at a reduced computational cost. The thesis concentrates on computational methods to tackle the problem in a number of important cases as well as applications and experiments. 
+We focus on the problem of estimating expected values with respect to such a posterior distribution and in particular with respect to its marginals. 
+Further, we consider the case where the posterior factorises in a specific way and consider methods that attempt to leverage the factorisation structure to offer estimators at a reduced computational cost. 
+The thesis concentrates on computational methods to tackle the problem in a number of important cases as well as applications and experiments. 
 
-The thesis is divided in two parts. In the first part -- \emph{Sampling Algorithms} -- we consider ``exact'' methods that attempt to produce samples from the true marginals and lead to estimators of the expected values that are exact in the limit of infinite computational power and infinite precision in the representation of numbers. These methods can work well when the dimensionality of the state-space associated with the marginals of interest is not too high. 
+The thesis is divided in two parts. In the first part -- \emph{Sampling Methods} -- we consider ``exact'' methods that attempt to produce samples from the true marginals and lead to estimators of expectations of interest that are exact in the limit of infinite computational power and infinite precision in the representation of numbers. These methods can work well when the dimensionality of the state-space associated with the marginals of interest is not too high. 
 
 In the second part -- \emph{Approximate Bayesian Inference} -- we consider approximate methods that attempt to find proxies for the marginals in restricted probability distribution spaces. These methods can offer a viable alternative to sampling methods when the latter become too expensive to consider. 
 
-In this introductory chapter we introduce the concept of Markov Random Fields and suggest a few classical examples.
+In this introductory chapter we introduce the concept of Markov Random Fields and present a few classical examples.
 
 %%%%%%%%%%%
 \section{\label{subsection: mrf}Markov Random Fields}
@@ -53,8 +56,8 @@ A simple pairwise MRF is illustrated in \fig{fig:simple-MRF}.\\
 %\eqa{ \psi_i(x_i) &=& p_i(y_i\st x_i),	\nn	}
 %for some likelihood model $p_i$.
 In this work, we are mainly concerned in determining or approximating  \emph{marginals}\margnote{marginals} on the MRF i.e. the distributions $p_{\mathcal I}(x_{\mathcal I})$ for $\mathcal I\subseteq\mathcal V$  with
-\eqa{		p_{\mathcal I}(x_{\mathcal I}) &:=& \int p(x_{\mathcal V\backslash \mathcal I})\dx_{\mathcal V\backslash\mathcal I}	\label{eq:marginals}.}
-A particular case of interest is $\mathcal I=\{r\}$ corresponding to the case of singleton marginals \citep[section 2.3]{wainwright08}. The integrals of the form \eqref{eq:marginals} are typically intractable but exploiting the underlying factorisation structure can lead to good approximation methods.\check{sep14, sep14, jun22}
+\eqa{		p_{\mathcal I}(x_{\mathcal I}) &:=& \int p(x)\dx_{\mathcal V\backslash\mathcal I}	\label{eq:marginals}.}
+A particular case of interest is\, $\mathcal I=\{r\}$ corresponding to the case of singleton marginals \citep[section 2.3]{wainwright08}. The integrals of the form \eqref{eq:marginals} are typically intractable but exploiting the underlying factorisation structure can lead to good approximation methods.\check{sep14, sep14, jun22}
 
 We distinguish between two classes of undirected graph structures: the connected acyclic ones (\emph{trees}) and the rest (\emph{loopy graphs}). As we will show, computing marginals on a tree is relatively simple in comparison to doing so on loopy graphs. 
 Among the trees, two graph structures are of particular interest in this document: the \emph{chain graph} and the \emph{star graph}. 
@@ -105,7 +108,7 @@ A related problem is the \emph{filtering problem}\margnote{filtering} where one 
 The filtering densities are written $p(x_t\st y_{1:t})$. Correspondingly, we are often interested in representing the prediction density obtained by integrating the filtering densities with the transition density: 
 %
 \eqa{
-	p(x_{t+1}\st x_{t}) &\propto& \int p(x_{t+1}\st x_{t}) p(x_{t}\st y_{1:t})\dx_{t}.
+	p(x_{t+1}\st y_{1:t}) &\propto& \int p(x_{t+1}\st x_{t}) p(x_{t}\st y_{1:t})\dx_{t}.
 	}
 %
 %A related problem is to approximate the smoothing densities: $p(x_{t}\st y_{1:T}$). We will explore this in more details in chapter \ref{chap:BIS}. \check{jul24,june22}
@@ -118,7 +121,7 @@ The \emph{linear-Gaussian} case is a particular instance of HMM, usually express
 			p(y_t\st x_t) 		&=& \mathcal N(y_t; B_t x_t+b_t, R_t)
 		}
 	\nn}
-where $\mu_0$ as well as the $Q_i$, $R_i$, $A_i$, $a_i$, $B_i$ and the $b_i$ are fixed and deterministic. In such a case, an analytical expression for both the filtering and the smoothing densities can be obtained through the well-known \emph{Kalman filter} and \emph{Kalman smoother} \citep{anderson79}. \check{sep14}
+where $\mu_0$ as well as the $Q_t$, $R_t$, $A_t$, $a_t$, $B_t$ and the $b_t$ are fixed and deterministic. In such a case, an analytical expression for both the filtering and the smoothing densities can be obtained through the well-known \emph{Kalman filter} and \emph{Kalman smoother} \citep{anderson79}. \check{sep14}
 
 However, in the general case where the transition is nonlinear and/or non-Gaussian, the marginals are typically intractable. Approximation algorithms such as \emph{Sequential Monte Carlo methods} (SMC) have been developed in order to generate approximate samples from these marginals and consequently be able to form Monte Carlo estimators. We introduce these methods in more detail in chapter \ref{chap:BGsampling}.
 %We will show in this document a novel method to exploit a variational method known as \emph{expectation propagation} to help the performances of SMC smoothing algorithms. \dred{ADD SECTION NUMBER}
@@ -184,20 +187,23 @@ The examples listed above do not exhibit cycles. An example of a common MRF stru
 \caption{\label{fig:grid1} Generic structure of a grid graph.}
 \end{figure}
 
-In image processing, grid graphs can be used to model interaction between the pixels of an image  \citep{blake11}. 
+In image processing, grid graphs can be used to model interactions between the pixels of an image  \citep{blake11}. 
 In the case of image denoising for example, for each pixel $k$ a noisy value $y_k$ is observed and we can have a model for the likelihood of $y_k$ given the true pixel value $x_k$ in the form $p(y_k\st x_k)$. These  form the node potentials. 
 Additionally, we may have a similarity measure which can be used to penalise neighbouring pixels being very dissimilar. These form the edge potentials.\\
 The problem of finding or approximating the singleton marginals then corresponds to finding the likelihood of a particular pixel taking a specific value given all the noisy observations available. We consider the problem of approximating marginals on such loopy graphs in chapter \ref{chap:EPBP}. \check{sep14, jul24,jun21}
 
 \section{Exact vs Inexact Methods and Structure of the Thesis}
 
-While the unifying theme of this thesis is the inference problem on Markov Random Fields, we consider two rather different approaches forming the two main parts of the thesis. In the first approach -- \emph{sampling methods} -- we consider methods to produce samples from the target densities (marginals of an MRF) from which Monte Carlo estimators can be computed. These methods take the form of stochastic processes which, at the equilibrium, are guaranteed to generate samples from the target distribution. These methods are considered ``exact'' because, assuming the generating process is at equilibrium, they yield samples from the correct distribution. The difficulty of course is to assess whether the generating process is at equilibrium in the context of finite compute time and finite precision arithmetics. 
+While the unifying theme of this thesis is the inference problem on Markov Random Fields, we consider two rather different approaches forming the two main parts of the thesis. In the first approach -- \emph{sampling methods} -- we consider methods to produce samples from the target densities (marginals of an MRF) from which Monte Carlo estimators can be computed. These methods take the form of stochastic processes which, asymptotically, are guaranteed to generate samples from the target distribution. These methods are considered ``exact'' because, asymptotically, they yield samples from the correct distribution. The difficulty of course is to assess whether the generating process has converged in the context of finite compute time and finite precision arithmetics. 
 
 In the second approach -- \emph{approximated Bayesian inference} -- we consider methods to produce proxies to the target densities and compute expected values with respect to these proxies. These methods are considered ``inexact'' because even in the limit of infinite computational power or infinite precision arithmetic they do not lead to the correct expected values. 
 
-Formally, let us denote $p$ a target distribution of interest and $\varphi$ a test function and put ourselves in the realistic context of finite computational power and precision. The aim is to compute the expected value of $\varphi$ with respect to $p$ or $\E_{p}[\varphi(X)]$. The first class of methods generates incorrect samples $\{\hat x_{1},\dots,\hat x_{n}\}$ which are hopefully statistically not too far from a correct (but inaccessible) sample $\{x_{1},\dots,x_{n}\}$ drawn iid from $p$. As will be covered in section \ref{sec:MC+SMC}, the expected value of interest will be approximated as $\E_{p}[\varphi(X)]\approx n\inv \sum_{i=1:n}\varphi(\hat x_{i})$. The second class of methods attempts to find a simple distribution $q$ which is close in some sense to the target distribution $p$, the expected value of interest is consequently approximated as $\E_{p}[\varphi(X)]\approx \E_{q}[\varphi(X)]$. 
+Formally, let us denote $p$ a target distribution of interest and $\varphi$ a test function and put ourselves in the realistic context of finite computational power and precision. The aim is to compute the expected value of $\varphi$ with respect to $p$ or $\E_{p}[\varphi(X)]$. The first class of methods generates incorrect samples $\{\hat x_{1},\dots,\hat x_{n}\}$ which are hopefully statistically not too far from exact (but inaccessible) samples $\{x_{1},\dots,x_{n}\}$ drawn iid from $p$. 
+As will be covered in section \ref{sec:MC+SMC}, the expected value of interest will be approximated as $\E_{p}[\varphi(X)]\approx n\inv \sum_{i=1:n}\varphi(\hat x_{i})$. The second class of methods attempts to find a simple distribution $q$ which is close in some sense to the target distribution $p$, the expected value of interest is consequently approximated as $\E_{p}[\varphi(X)]\approx \E_{q}[\varphi(X)]$. 
 
-These two approaches rely on different set of tools. The first one relies more on Markov Chain Monte Carlo methods while the second relies more on optimisation tools. To simplify the presentation of the thesis, we therefore have two background chapters beginning each of the two parts. Each part is then formed of two chapters covering a specific method and discussing applications.
+These two approaches rely on different set of tools. 
+The first one relies primarily on particle methods while the second relies more heavily on optimisation tools. 
+To simplify the presentation of the thesis, we therefore have two background chapters beginning each of the two parts. Each part is then formed of two chapters covering a specific method and discussing applications.
 
 
 %The two approaches consider fairly different tools as 

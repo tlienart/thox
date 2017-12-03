@@ -16,7 +16,7 @@ with respect to a base measure $\nu$ on $\mathcal X$. The \emph{log partition} f
 %
 \eqa{
 	A(\theta) &=& \log \int \exp\scal{\theta,\phi(x)}\nudx
-.
+.\label{eq-log-partition}
 }
 %
 The set of \emph{natural parameters} $\Omega \subseteq \mathbb R^{d}$ is defined as the set of parameters $\theta$ such that $A(\theta)$ is bounded (and, therefore, $q_\theta$ is a proper distribution):\check{jul16 may15, april16}
@@ -42,7 +42,7 @@ In a regular exponential family, it is well known \citep[theorem 2.2]{brown86} t
 An important consequence is that, for a minimal exponential family, the covariance matrix $\V_{q_\theta}[\phi(X)]$ is positive definite which in turns implies that $A$ is strictly convex on $\Omega$. Indeed, take any nonzero vector $a\in\mathbb R^{d}$ then by definition, $\scal{a,\phi(X)}$ cannot be constant $\nu$-almost everywhere so that $\mathbb V_{q_{\theta}}[\scal{a,\phi(X)}] > 0$ for any $\theta\in\Omega$ and therefore:
 \eqa{	0 &<& \scal{a ,\mathbb V_{q_{\theta}}[\phi(X)] a}, 	}
 so that $\mathbb V_{q_{\theta}}[\phi(X)]$ is positive definite.\check{may15, april 16} 
-Let $\mathcal M^{\star}$ denote the image of $\Omega$ under the gradient mapping $\nabla A$ or $\mathcal M^{\star}=\nabla A(\Omega)$. Since $A$ is strictly convex, $\nabla A$ is a strictly monotone map, and it forms a bijection between $\Omega$ and $\mathcal M^{\star}$. Let $\theta^{\star}$ be the image of a point $\mu^{\star}\in\mathcal M^{\star}$ through the inverse map $(\nabla A)\inv$. 
+Let $\mathcal M^{\star}$ denote the image of $\Omega$ under the gradient mapping $\nabla A$ or $\mathcal M^{\star}=\nabla A(\Omega)$. Since $A$ is strictly convex, $\nabla A$ is a strictly monotone map and forms a bijection between $\Omega$ and $\mathcal M^{\star}$. Let $\theta^{\star}$ be the image of a point $\mu^{\star}\in\mathcal M^{\star}$ through the inverse map $(\nabla A)\inv$. 
 This can be written as
 %
 \eqa{
