@@ -139,7 +139,7 @@ It is a very popular method in computational Bayesian inference and tends to be 
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{Sequential importance sampling}
 %%%%%%%%%%%%%%%%%%%
-\subsubsection{Hidden Markov models}
+%\subsubsection{Hidden Markov models}
 In the context of HMM, we are usually interested in estimating a sequence of target distributions $\{\pi_{t}(x_{1:t})\}_{t=1}^{T}$ which admit the following factorisation structure:
 %
 \eqa{
@@ -170,7 +170,17 @@ In the filtering problem on a HMM, the target densities are $\pi_{t}(x_{1:t})=p(
 	&\propto& {p(y_t\st x_t)p(x_t\st x_{t-1}) \over q_t(x_t\st x_{1:t-1})},}
 where we exploited the conditional dependence structure of a HMM. Consequently, the optimal proposal is
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{t-1}) &\propto& p(y_{t}\st x_{t})p(x_{t}\st x_{t-1})	, \label{particle filter OID}}
-which could also have obtained from applying \eqref{optimal proposal}. A skeleton of a particle filter algorithm is given below.\check{jun24}
+which could also have obtained from applying \eqref{optimal proposal}.\\
+Beyond simply corresponding to sequential importance sampling for the filtering problem, the particle filter adds an extra step: resampling. 
+This step permits to alleviate the problem of weight degeneracy incurring growth of variance over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. 
+The resampling step consists of resampling particles with replacement depending upon their weights.
+This, in practice, is done when the ESS comes under a pre-assigned threshold \citep{delmoral06}.
+Several schemes exist with the simplest one being the \emph{Multinomial Resampling} where $n$ particle indices are drawn from a Multinomial with weights corresponding to the $n$ weights of the initial particles.
+Resampling is a crucial step needed to make SMC methods viable \citep{hol06, doucet11}. However, the methods discussed in this thesis do not depend upon the resampling scheme and therefore we will assume in the sequel that a resampling scheme is applied without discussing it further. In the experiments we use the standard multinomial resampling.
+
+%We have omitted the \emph{resampling step} in algorithm \ref{alg:particle-filter}. That step resamples particles with replacement based on their weights if the ESS comes under a pre-assigned threshold \citep{delmoral06}. In practice, this alleviates the problem of weight degeneracy incurring growth of variance over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. Although this step is a key aspect of particle filters, it is not an aspect that plays an important role in the issues we consider in this document; in the sequel we will therefore assume that a standard multinomial resampling is applied \citep{hol06,doucet11}. 
+
+A skeleton of a particle filter algorithm is given below.\check{jun24}
 %
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:particle-filter}\dblue{\emph{\small Particle filter}}}
@@ -181,6 +191,7 @@ which could also have obtained from applying \eqref{optimal proposal}. A skeleto
 		\For{$t=2:T$}
 			\State sample $X^{(i)}_{t}\simiid q_{t}( \cdot \st X^{(i)}_{t-1}, y_{t})$ with $q_{t}\approx q_{t}^{\text{opt}}$ for $i=1,\dots,N$
 			\State update and normalise the weights $w^{(i)}_{t}\propto\alpha^{(i)}_{t}w^{(i)}_{t-1}$
+			\State resample the particles if necessary
 		\EndFor\\
 		\Return weighted set of particles $\{X^{(i)}_{1:T},w^{(i)}_{1:T}\}_{i=1}^{N}$
 	\end{algorithmic}
@@ -193,7 +204,7 @@ Sampling directly from the optimal proposal is often an intractable problem by i
 \eqa{q^{\text{bs}}(x_{t}\st x_{t-1})&:=&p(x_{t}\st x_{t-1}),}
 which is often easier to sample from. In that case, the update factor simply reduces to $\alpha^{(i)}_t \propto p(y_t\st X^{(i)}_t)$. However, since the likelihood and the transition density may not be well aligned, those update factors can vary a lot incurring an increase in the variance of the resulting estimator.\check{jul16,jun29}
 
-We have omitted the \emph{resampling step} in algorithm \ref{alg:particle-filter}. That step resamples particles with replacement based on their weights if the ESS comes under a pre-assigned threshold \citep{delmoral06}. In practice, this alleviates the problem of weight degeneracy incurring growth of variance over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. Although this step is a key aspect of particle filters, it is not an aspect that plays an important role in the issues we consider in this document; in the sequel we will therefore assume that a standard multinomial resampling is applied \citep{hol06,doucet11}.\check{jul16}
+%\check{jul16}
 
 \subsection{\label{bg:particle-smoothing}Particle smoothing}
 

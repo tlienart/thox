@@ -217,6 +217,7 @@ where the $\{\tilde X_{t+1}^{(j)}\}_{j=1}^{N}$ are the particles from the previo
 		\For{$t=T-1:2$}
 			\State sample $\tilde X^{(j)}_{t}\simiid \tilde q_{t}(\cdot\st \tilde X^{(j)}_{t+1})$ with $\tilde q_{t}\approx \tilde q_{t}^{\text{opt}}$ for $j=1,\dots,N$
 			\State update and normalise the weights $\tilde w^{(j)}_{t}\propto \tilde\alpha^{(j)}_{t}\tilde w^{(j)}_{t+1}$
+			\State resample the particles if necessary
 		\EndFor
 		\State same operations for $t=1$ but with $\tilde q^{\text{opt},i,j}_{1} \propto \pi_{0}(x_{1})p(\tilde X^{(j)}_{2}\st x_{1})p(y_{1}\st x_{1})/\hpd_{2}(\tilde X^{(j)}_{2})$\\
 

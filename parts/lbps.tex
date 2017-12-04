@@ -24,32 +24,39 @@ For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $
 and consider the superposition principle with $\chi\equiv\sum_{f} \chi_{f}$.
 
 Instead of modifying all velocity variables at a bounce as in the basic BPS, the method samples a factor $f$ with probability $\chi_{f}(\tau)/\chi(\tau)$ and modifies only the variables connected to the sampled factor. 
-This can significantly reduce the overall computational cost associated with the algorithm and especially so when the underlying MRF has a connection structure that is not too densely connected. Indeed, when an update is triggered at a factor $f$ all factors that share a variable with $f$ are also triggered. If that corresponds to a large portion of the graph, computational gains are lost compared to simply using the full BPS. The algorithm is described in full in \citep[chapter 3.3]{bouchard15}.
+This can significantly reduce the overall computational cost associated with the algorithm and especially so when the underlying MRF has a connection structure that is not too densely connected. Indeed, when an update is triggered at a factor $f$ all factors that share a variable with $f$ are also triggered. If that corresponds to a large portion of the graph, computational gains are lost compared to simply using the full BPS. The skeleton of the algorithm is shown below.
+
+
 
 %\subsection{Local BPS Algorithm}
 %
-%\begin{algorithm}[!h]\small
-%	\caption{\label{alg:LBPS}\small \idblue{Local BPS with Priority Queue}}
-%	\begin{algorithmic}[1]
-%	\State initialise $(x^{(0)},v^{(0)})$, set $t_{\text{clock}}=0$
-%	\State simulate a first arrival time $\tau_{\text{bounce}}^{f}\sim \text{PP}(\chi_{f}(t))$ for each factor $f$
-%	\State initialise a priority queue $Q$ with the couples $\{(\tau_{f}, f)\}_{f\in F}$
-%	\State initialise event lists $L_{f}$ for each factor with $(x^{(0)}_{f}, v^{(0)}_{f}, 0)$
-%	\State sample $\tau_{\text{ref}}\sim\mathrm{Exp}(\lambda_{\text{ref}})$
-%	\While{more events requested}
-%		\State pop $(\tau_{f}, f)$ from $Q$ based on the smallest bounce time
-%		\If{$\tau_{f}>\tau_{\text{ref}}$} 
-%			\State $t_{\text{clock}}\leftarrow t_{\text{clock}}+\tau_{\text{ref}}$
-%			\State sample a new $v\sim \mathcal N(0, \mathbb I)$
-%			\State start a new queue $Q$ where the positions for each factor is extrapolated linearly until the refreshment time
-%		\Else
-%			\State $t_{\text{clock}}\leftarrow t_{\text{clock}}+\tau_{f}$
-%			\State extrapolate $x_{f}$ linearly until $t_{\text{clock}}$
-%			\State 
-%		\EndIf
-%	\EndWhile
-%	\end{algorithmic}
-%\end{algorithm}
+\begin{algorithm}[!h]\small
+	\caption{\label{alg:LBPS}\small \idblue{Local BPS with Priority Queue}}
+	\begin{algorithmic}[1]
+	\State initialise $(x^{(0)},v^{(0)})$, set $t_{\text{clock}}=0$
+	\State simulate a first arrival time $\tau_{\text{bounce}}^{f}\sim \text{PP}(\chi_{f}(t))$ for each factor $f$
+	\State initialise a priority queue $Q$ with the couples $\{(\tau_{f}, f)\}_{f\in F}$
+	\State initialise event lists $L_{f}$ for each factor with $(x^{(0)}_{f}, v^{(0)}_{f}, 0)$
+	\State sample $\tau_{\text{ref}}\sim\mathrm{Exp}(\lambda_{\text{ref}})$
+	\While{more events requested}
+		\State pop $(\tau_{f}, f)$ from $Q$ based on the smallest bounce time
+		\If{$\tau_{f}>\tau_{\text{ref}}$} 
+			\State $t_{\text{clock}}\leftarrow t_{\text{clock}}+\tau_{\text{ref}}$
+			\State sample a new $v\sim \mathcal N(0, \mathbb I)$
+			\State start a new queue $Q$ where the positions for each factor is extrapolated linearly until the refreshment time
+		\Else
+			\State $t_{\text{clock}}\leftarrow t_{\text{clock}}+\tau_{f}$
+			\State extrapolate $x_{f}$ linearly until $t_{\text{clock}}$
+			\State add $x_{f}$ to the list $L_{f}$
+			\For{all neighbouring factors $f'$}
+				\State extrapolate $x_{f}'$ linearly until $t_{\text{clock}}$
+				\State simulate the first arrival time $\tau_{f'}$ of a PP with intensity $\lambda_{f'}(x_{f'}+tv_{f'}, v_{f'})$
+				\State update $Q$ with these candidate bounce times
+			\EndFor
+		\EndIf
+	\EndWhile
+	\end{algorithmic}
+\end{algorithm}
 
 
 
@@ -68,7 +75,16 @@ Further, the model assumes spherical Gaussian priors on all $u_{i}$ and $v_{j}$ 
 	v_{j} &\sim& \mathcal N(\,\cdot\, ; 0_{d}, \sigma_{v}\mathbb I_{d}), \qquad j\in 1,\dots,p\nn
 \end{eqnarray}
 %
-where $\mathcal M$ denotes the entries which are available, $0_{d}$ and $\mathbb I_{d}$ denote the zero vector in $\mathbb R^{d}$ and the $d\times d$ identity matrix respectively. In our experiments, we assume $\sigma_{r}, \sigma_{u}$ and $\sigma_{v}$ are fixed,\footnote{In practice, we compute sensible estimates from the data following the authors' original code available at \url{http://www.cs.toronto.edu/~rsalakhu/BPMF.html}.} more involved models exist including hyper-priors which we will not consider here since our aim is primarily to compare Local BPS and HMC on a large scale model rather than produce the best performing PMF method.\footnote{In \citep{mnih08} also suggest doing a few steps of Gibbs sampling for the hyperparameters. We do not do this in order to simplify the computations and the comparisons.}
+where $\mathcal M$ denotes the entries which are available, $0_{d}$ and $\mathbb I_{d}$ denote the zero vector in $\mathbb R^{d}$ and the $d\times d$ identity matrix respectively. 
+The negative log-posterior of interest is therefore:
+%
+\eqa{
+- \log p(U, V|\hat R) &=& {1\over 2\sigma_{r}^{2}}\sum_{(i, j)\in\mathcal M} (r_{ij}-\scal{u_{i}, v_{j}})^{2} +
+{1\over2\sigma_{u}^{2}}\|U\|_{2}^{2} +
+{1\over2\sigma_{v}^{2}}\|V\|_{2}^{2}
+}
+%
+In our experiments, we assume $\sigma_{r}, \sigma_{u}$ and $\sigma_{v}$ are fixed,\footnote{In practice, we compute sensible estimates from the data following the authors' original code available at \url{http://www.cs.toronto.edu/~rsalakhu/BPMF.html}.} more involved models exist including hyper-priors which we will not consider here since our aim is primarily to compare the local BPS and HMC on a large scale model rather than produce the best performing PMF method.\footnote{In \citep{mnih08} also suggest doing a few steps of Gibbs sampling for the hyperparameters. We do not do this in order to simplify the computations and the comparisons.}
 
 Finally, note that the full dimensionality of the model is $n\times d + p\times d$. Below we consider an example where $d=10$, $n=6000$, $p=4000$ and $|\mathcal M|=10^{6}$ meaning that the full dimensionality of the model is $100 000$ with 1 million factors. For that kind of scale, a method such as naive Gibbs sampling (see point \ref{point:classical-sampling}) is impractical. 
 
@@ -148,6 +164,14 @@ Using the inversion method, sampling from the IPP can be done in two steps: gene
 	\lambda \spe \Xi(t(\lambda)) &=& \int_{0}^{t(\lambda)} \chi(s)\ds.
 }
 Since $\chi(t)$ is the positive part of a third-order polynomial, the integral can be computed exactly and the inversion to obtain $t(\lambda)$ amounts to finding a root of a fourth-order polynomial which can be done efficiently using a numerical solver. 
+The situation is illustrated in a case where $t_{-}>0$ in figure \ref{fig-lbps-plot} below.
+%
+\begin{figure}[!h]
+\centering
+	\includegraphics[width=.7\textwidth]{figures/lbp/pmf_plot}
+	\caption{\label{fig-lbps-plot} The intensity $\chi$ (blue) is the positive part of a third-order polynomial, its integral $\Xi$ (red) is represented and is a piecewise fourth-order polynomial. For $\lambda$ drawn from an $\mathrm{Exp}(1)$, we can find $t(\lambda)$ corresponding to the first arrival time of interest. (Best seen in colours.)}
+\end{figure}
+%
 
 %\mathcal{}
 
@@ -163,7 +187,7 @@ Note that the problem of computing a truncated SVD decomposition of a large spar
 
 \subsubsection{Hamiltonian Monte Carlo}
 
-The negative log posterior in $U$ and $V$ of the model can be directly obtained:
+We had already shown that the negative log posterior in $U$ and $V$ of the model can be directly obtained:
 \eqa{
 	-2\log p (U, V | \hat R) &=& \sigma_{r}^{-2}\sum_{(i,j)\in\mathcal M} (r_{ij}-\scal{u_{i},v_{j}})^{2} +\sigma_{u}^{-2}\|U\|_{2}^{2} + \sigma_{v}^{-2}\|V\|_{2}^{2}.\nn
 }
@@ -174,7 +198,7 @@ Therefore, the gradient in $u_{i}$ and $v_{j}$ can easily be computed in closed 
 In our experiments, we consider the MovieLens 1M dataset.\footnote{\url{https://grouplens.org/datasets/movielens/}} corresponding to 1 million ratings of 4000 movies by 6000 users. We take a random subset of 95\% of the ratings as training set using the remaining 5\% as test set. 
 Following the literature, we use $d=30$; we set $\sigma_{R}=1$ and $\sigma_{U}=\sigma_{V}=10$. The starting point is drawn from a standard multivariate Normal centred at the solution of the SVD algorithm. The Local BPS experiments use the \texttt{PDSampler.jl} package, the HMC simulations use 2 leapfrog steps, the stepsize is set to $0.01$. The reported value is the RMSE over the test set. We run each experiments ten times to account for the stochasticity of the algorithms. All results were obtained using Julia 0.6 with a 2.3GHz Intel Core i5 computer. 
 
-\newpage
+%\newpage
 \begin{figure}
 	\center
 	\includegraphics[width=.8\textwidth]{figures/lbp/curves}
@@ -183,7 +207,11 @@ Following the literature, we use $d=30$; we set $\sigma_{R}=1$ and $\sigma_{U}=\
 
 The results displayed in figure \ref{fig:LBPSvHMC} seem to show that the LBPS does a little bit better in this case than the HMC algorithm. The improvement is not very significant but confirms that the BPS and the LBPS can perform as well or better than the HMC algorithm (a similar result had been obtained by \citep{bouchard15} on a much simpler factor graph). 
 
-Both methods underperform significantly compared to the test-RMSE obtained with the sparse SVD.  This may be a poor choice of hyper parameters though after trying a range of possible hyper parameters we did not see major differences. In this case it may just be that the SVDS algorithm performs very well and does not overfit the data rendering the regularisation that appears in the PMF model useless. 
+Both methods underperform compared to the test-RMSE obtained with the sparse SVD.  
+This may be a poor choice of hyper parameters though after trying a range of possible hyper parameters we did not see major differences. In this case it may just be that the SVDS algorithm performs very well and does not overfit the data rendering the regularisation that appears in the PMF model useless. \\
+In \citep{mnih08}, the authors obtain results with the Bayesian PMF that outperform the SVD significantly but it is unclear what SVD algorithm they use and whether they use it on appropriately re-scaled data. 
+Further they do not discuss the time taken by the algorithms, in our experiments, the SVDS runs several orders of magnitude faster than the LBPS or HMC algorithm though, of course, the SVD does not provide uncertainty estimates. 
+Further, their code does not show the SVD step but suggests a scaling of the ratings on the $[0, 1]$ range for the Bayesian PMF. If the SVD algorithm is also applied on such ratings, it should be expected to perform worse as it will not be able to exploit the sparsity of the data well.
 
 \section{Discussion}
 
