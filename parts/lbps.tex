@@ -15,7 +15,7 @@ In \cite{bouchard15}, the authors consider the case where the target distributio
 where $x_{f}$ is a restriction to a few elements of $x$, $F$ is a set of \emph{factors} and $\gamma_{f}$ is an unnormalised likelihood associated with the factor. In the specific case of a pairwise MRF, the factors are the edges of the graph and the restrictions are the variables corresponding to each nodes. The energy associated to $\pi$ consequently decomposes as $U\equiv \sum_{f\in F}U_{f}$.
 
 %\subsection{Local BPS: algorithm}
-For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $R_{f}$ can be defined in the same way as for the Bouncy Particle Sampler (BPS, see point \ref{point:BPS}) except that $\nabla U_{f}$ is set to have zero components for all variables not associated to the factor. We can then define a collection of intensities with
+For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $R_{f}$ can be defined in the same way as for the Bouncy Particle Sampler (BPS, see section \ref{point:BPS}) except that $\nabla U_{f}$ is set to have zero components for all variables not associated to the factor. We can then define a collection of intensities with
 %
 \eqa{
 	\chi_{f}(t) &=& \lambda_{f}(x^{(i-1)}+v^{(i-1)}t,v^{(i-1)}). 
@@ -75,7 +75,7 @@ Finally, note that the full dimensionality of the model is $n\times d + p\times 
 
 \subsection{Local BPS for the PMF}
 
-The factor graph corresponding to the matrix factorisation problem has a simple structure: each rating $r_{ij}$ for $(i,j)\in\mathcal M$ corresponds to a factor connected to the variables $u_{i}$ and $v_{j}$. This is illustrated at the figure \ref{fig:pmf-graph} below.
+The factor graph corresponding to the matrix factorisation problem has a simple structure: each rating $r_{ij}$ for $(i,j)\in\mathcal M$ corresponds to a factor connected to the variables $u_{i}$ and $v_{j}$. This is illustrated in figure \ref{fig:pmf-graph} below.
 
 \begin{figure}[!h]
 \center
@@ -181,7 +181,7 @@ Following the literature, we use $d=30$; we set $\sigma_{R}=1$ and $\sigma_{U}=\
 	\caption{\label{fig:LBPSvHMC}RMSE on the test set of the MovieLens 1M dataset when using Probabilistic Matrix Factorisation with HMC and the LBPS algorithm compared to the result obtained with the Sparse SVD algorithm. The crosses indicate the range of values obtained and ranges of times for each of the 10 runs recorded for different simulation lengths. The dashed lines connects the means.}
 \end{figure}
 
-The results displayed on the figure \ref{fig:LBPSvHMC} seem to show that the LBPS does a little bit better in this case than the HMC algorithm. The improvement is not very significant but confirms that the BPS and the LBPS can perform as well or better than the HMC algorithm (a similar result had been obtained by \citep{bouchard15} on a much simpler factor graph). 
+The results displayed in figure \ref{fig:LBPSvHMC} seem to show that the LBPS does a little bit better in this case than the HMC algorithm. The improvement is not very significant but confirms that the BPS and the LBPS can perform as well or better than the HMC algorithm (a similar result had been obtained by \citep{bouchard15} on a much simpler factor graph). 
 
 Both methods underperform significantly compared to the test-RMSE obtained with the sparse SVD.  This may be a poor choice of hyper parameters though after trying a range of possible hyper parameters we did not see major differences. In this case it may just be that the SVDS algorithm performs very well and does not overfit the data rendering the regularisation that appears in the PMF model useless. 
 
@@ -198,7 +198,7 @@ Much remains to be explored on how to better tune Piecewise Deterministic sample
 \end{figure}
 
 A key element for the viability of the LBPS for a large scale graphical model is the sparsity of the graph. As we hinted at earlier, if each variable node is connected to many factors then every time a factor is triggered, every factor that shares a variable with it is also triggered. If this is a large portion of the graph, the advantage of exploiting the factorisation structure of the model is severely diminished. 
-In the figure \ref{fig:nratings}, we look at the distribution of the number of ratings per users. It shows that the distribution is heavy tailed with a significant number of users having over 250 ratings (1149 users). This along with the slow convergence we observed for the LBPS in figure \ref{fig:LBPSvHMC} suggests that the LBPS may be struggling due to the graph not being sparse enough.
+In figure \ref{fig:nratings}, we look at the distribution of the number of ratings per users. It shows that the distribution is heavy tailed with a significant number of users having over 250 ratings (1149 users). This along with the slow convergence we observed for the LBPS in figure \ref{fig:LBPSvHMC} suggests that the LBPS may be struggling due to the graph not being sparse enough.
 
 Future work could look at other models which offer a sparse conditional dependence structure and compare the LBPS with the BPS. We suspect that for very sparse models the LBPS will outperform the BPS as observed experimentally for Gaussian Random Fields in \citep{bouchard15}. %but it is unclear at which point the BPS starts outperforming the LBPS. 
 

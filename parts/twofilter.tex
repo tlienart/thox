@@ -303,7 +303,7 @@ Note that in the case where one can sample easily from the backward dynamic of t
 This is in fact a core element of the idea behind our \emph{expected particle belief propagation} (EPBP) algorithm to target the beliefs on an arbitrary MRF which we discuss in the second part of this thesis (see chapter \ref{chap:EPBP}).\check{jul16, jul13}
 
 \subsection{Sub-quadratic FFBS}
-A similar idea than the one applied at the previous point can be applied in the context of the FFBS algorithm (section \ref{bg:particle-smoothing}).
+A similar idea than the one applied at the previous point can be applied in the context of the FFBS algorithm (point \ref{bg:particle-smoothing}).
 In the FFBS algorithm, a particle filter is ran forward and the weights are then updated in a backward step:
 %
 \eqa{		w^{(i)}_{t\st T} &\propto& w^{(i)}_{t}\sum_{j=1}^{N}{w^{(j)}_{t+1\st T}\pac{p(X^{(j)}_{t+1}\st X^{(i)}_{t})\over \sum_{k=1}^{N}w^{(k)}_{t}p(X^{(j)}_{t+1}\st X^{(k)}_{t})}}. \label{ffbs-weight-2}
@@ -428,7 +428,7 @@ This model is drawn from the paper of \citet{arulampalam02} with the dimensional
 %
 We call this model NL-1-1 for further reference. We use $N=50$ particles and for $K=100$ time step (as in the original paper) and run the experiments $50$ times with $M=15$ for the sub-quadratic algorithms.
 
-The figure \ref{comp-nl-1} shows the results of the comparison of the RMSE for each algorithm considered. No smoothing algorithm particularly stands out but it shows that the sub-quadratic smoothing algorithms considered do not significantly underperform compared to the full quadratic complexity ones even when the underlying dynamic is non-linear.
+Figure \ref{comp-nl-1} shows the results of the comparison of the RMSE for each algorithm considered. No smoothing algorithm particularly stands out but it shows that the sub-quadratic smoothing algorithms considered do not significantly underperform compared to the full quadratic complexity ones even when the underlying dynamic is non-linear.
 
 \begin{figure}[!h]
 \center

@@ -68,7 +68,7 @@ with, for a leaf node $\alpha$, $M_{\alpha  s} \equiv \psi_\alpha$. This is the 
 The $B_{s}(x_{s})$ are known as the \emph{beliefs} and are proportional to the true marginals as we showed with the development above. \check{aug17}
 
 \subsection{Belief propagation on a chain}
-A particular case of interest is the chain graph which is associated with Hidden Markov Models introduced at point \ref{intro:exMRF} and studied in more details at chapter \ref{chap:BIS}. On the leaf node, we have a prior $\pi_{0}(x_{1})$ and an observation with likelihood $p(y_{1}\st x_{1})$. Therefore, we have $M_{12}(x_{1})=\pi_{0}(x_{1})p(y_{1}\st x_{1})\propto p(x_{1}\st y_{1})$. Correspondingly, the message $m_{12}$ is given by
+A particular case of interest is the chain graph which is associated with Hidden Markov Models introduced at section \ref{intro:exMRF} and studied in more details at chapter \ref{chap:BIS}. On the leaf node, we have a prior $\pi_{0}(x_{1})$ and an observation with likelihood $p(y_{1}\st x_{1})$. Therefore, we have $M_{12}(x_{1})=\pi_{0}(x_{1})p(y_{1}\st x_{1})\propto p(x_{1}\st y_{1})$. Correspondingly, the message $m_{12}$ is given by
 \eqa{
 	m_{12}(x_{2}) &\propto& \int p(x_{2}\st x_{1}) p(x_{1}\st y_{1}) \dx_{1} \spe p(x_{2}\st y_{1}).\nn
 }

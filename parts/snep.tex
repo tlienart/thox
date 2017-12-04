@@ -18,7 +18,7 @@ where $\pi_0$ is a prior distribution. Each of the likelihood term itself factor
 
 It is important to stress that, in the setup considered here, each compute node has access to independent subsets of the data. In \citet{hasenclever16} we explain that this situation can occur in large scale learning but also in cases when the data cannot be shared directly (e.g.: for privacy reasons). This type of context is sometimes known as divide-and-conquer or consensus inference \citep{kleiner14,battey15,zhao16}. 
 
-Defining $t_i$ to be nonnegative factors with $t_i(x)=p(y_i\st x)$, the factorised form \eqref{eq:distrposterior} reads $\pi_0(x)\prod_{i=1:K}t_i(x)$ which is the form \eqref{eq:targetfactorises} that we had used to motivate the introduction of the ADF and EP algorithms (cf.\ point \ref{s:ADF+EP}).
+Defining $t_i$ to be nonnegative factors with $t_i(x)=p(y_i\st x)$, the factorised form \eqref{eq:distrposterior} reads $\pi_0(x)\prod_{i=1:K}t_i(x)$ which is the form \eqref{eq:targetfactorises} that we had used to motivate the introduction of the ADF and EP algorithms (cf.\ section \ref{s:ADF+EP}).
 In the rest of this chapter, we show how different variants of the EP algorithm can be used to perform parallel variational inference in the presence of distributed data.\check{jul25,jun8, aug18} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -48,7 +48,7 @@ The general parallel computational framework considered iterates on the followin
 	\item the master node integrates the new $\omega_i$ into $\theta$.
 \end{enumerate} 
 
-\noindent This is illustrated at the figure \ref{fig:SNEP-arch} drawn from our paper \citep{hasenclever16}.
+\noindent This is illustrated in figure \ref{fig:SNEP-arch} drawn from our paper \citep{hasenclever16}.
 
 \begin{figure}[!h]
 	\center
