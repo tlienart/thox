@@ -8,7 +8,7 @@ We describe here an algorithm corresponding to the description in \citep{fearnhe
 \eqa{	\syst{
 	\pi_{0}(x_1)		&=& \mathcal N(x_1; \mu_0, Q_0) 	\\
 	p(x_t\st x_{t-1}) 	&=& \mathcal N(x_t; A_t x_{t-1}, Q)
-		}.
+		}
 	\nn}
 We start by discussing the form of the normalising densities following the choice suggested in \citep{briers10} and considered in \citep{fearnhead10} then discuss how the corresponding normalised backward information filter (BIF) can be targeted and finally how the particle filter and the normalised BIF can be coupled to yield estimators of the smoothing densities. %\add{code is available in SMC.jl} \check{jul16}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,7 +49,7 @@ This last expression gives the following recursion for the mean and the covarian
 %
 \eqa{\syst{
 	\Sigma_{t}\inv &=& Q\inv - Q\inv A\Sigma^{\bullet}_{t-1}A\transp Q\inv \\	\mu_{t} &=& \Sigma_{t}\pat{ Q\inv A \Sigma^{\bullet}_{t-1} \Sigma\inv_{t-1}\mu_{t-1} }
-	}.
+	}
 }
 %
 %%%%%%%%%%%%%%%
@@ -59,7 +59,7 @@ Now that we have defined the normalising densities, we can sample backwards to t
 \eqa{\syst{
 	\tilde\Sigma_{T}\inv &=& \Sigma_{T}\inv + B\transp R\inv B\\
 	\tilde\mu_{T} &=& \Sigma_{T}\pat{\Sigma_{T}\inv \mu_{T} + B\transp R\inv y_{T}}
-}.\nn
+}\nn
 }
 The weights are uniform since the sampling is done from the optimal proposal. Subsequently, the optimal proposal for the following steps is derived from \eqref{recursion joint BIF}:
 %
@@ -72,7 +72,7 @@ and the numerator is a Gaussian in $x_{t}$ and, again, it is easy to obtain
 \eqa{\syst{
 	\tilde\Sigma_{t}\inv &=& \Sigma_{t}\inv + B\transp R\inv B + A\transp Q\inv A\\
 	\tilde\mu_{t} &=& \Sigma_{t}\pat{\Sigma_{t}\inv \mu_{t} + B\transp R\inv y_{t}+A\transp Q\inv x_{t+1}}
-	}.\nn}
+	}\nn}
 %
 This time, the weights need to be adapted to reflect the term $\gamma_{t+1}(\tilde X^{(j)}_{t+1})$ which is easily computed as it is the likelihood of a Gaussian with known mean and variance. Therefore, we have for $t=T-1,\dots,1$:
 %
@@ -96,7 +96,7 @@ where $\varphi_{i^{\star},j^{\star}}(x_{t}) = p(\tilde X^{(j^{\star})}_{t+1}\st 
 \eqa{\syst{
 	\overline\Sigma\inv_{t} &=& Q\inv+ A\transp Q\inv A + B\transp R\inv B\\
 	\overline\mu_{t} &=& \overline\Sigma_{t}\pat{A\transp Q\inv \tilde X^{(j^{\star})}_{t+1} + Q\inv A X^{(i^{\star})}_{t-1} + B\transp R\inv y_{t} }
-}.\nn
+}\nn
 }
 %
 

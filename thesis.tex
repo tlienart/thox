@@ -175,11 +175,16 @@
 
 %%%%%%%%%%%
 
-\begin{appendices}
-\chapter{}
+
+\setcounter{chapter}{0}
+\renewcommand{\chaptername}{Paper}
+\renewcommand{\thechapter}{\Alph{chapter}}
+
+%\begin*{appendices}
+\chapter{Appendix}
 \input{parts/appendix}
 \input{parts/appendix2}
-\end{appendices}
+%\end*{appendices}
 
 
 

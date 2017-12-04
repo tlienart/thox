@@ -241,7 +241,7 @@ PBP as presented in \citet{ihler09} is implemented using the same parameters tha
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsubsection{Results of the grid and tree experiments}
 
-The \fig{figCompGrid} compares the performances of both methods. The error is computed as the mean $L^{1}$ error over all nodes between the estimated beliefs and the ground truth. One can observe that not only does PBP perform worse than EPBP but also that the error plateaus with increasing number of samples. This is because the sampling within PBP is done approximately and hence the consistency of the estimators is lost. Note that for EPBP, one observes the expected $1/\sqrt{N}$ convergence of particle methods discussed in \citet{ihler09}.
+Figure \ref{figCompGrid} compares the performances of both methods. The error is computed as the mean $L^{1}$ error over all nodes between the estimated beliefs and the ground truth. One can observe that not only does PBP perform worse than EPBP but also that the error plateaus with increasing number of samples. This is because the sampling within PBP is done approximately and hence the consistency of the estimators is lost. Note that for EPBP, one observes the expected $1/\sqrt{N}$ convergence of particle methods discussed in \citet{ihler09}.
 
 \begin{figure}[!h]
 \center
@@ -309,7 +309,7 @@ Additionally, we looked at how ``pure EP'' with normal distributions performs. W
 \end{figure}
 
 
-The \fig{compTree} compares the estimator of the beliefs obtained by all the methods on the tree example for three representative nodes (node $1$, $3$ and $8$ as illustrated in \fig{fig:grids} (right)). As for the grid example, the figure illustrates how EPBP better recovers the true beliefs. 
+Figure \ref{compTree} compares the estimator of the beliefs obtained by all the methods on the tree example for three representative nodes (node $1$, $3$ and $8$ as illustrated in \fig{fig:grids} (right)). As for the grid example, the figure illustrates how EPBP better recovers the true beliefs. 
 
 
 \begin{figure}[!h]
@@ -326,7 +326,7 @@ The \fig{compTree} compares the estimator of the beliefs obtained by all the met
 \end{figure}
 
 \subsection{Sub-quadratic implementation and denoising application}
-As outlined at point \ref{sec:EPBP-compcompl}, the inherent quadratic complexity of the EPBP algorithm can be reduced to $\mathcal O(MN)$ where $M$ is the number of mixture components effectively considered to represent the messages. We also consider the maximum likelihood-based projection mechanism as discussed in point \ref{point:epbp-proj} for the two experiments.
+As outlined at point \ref{sec:EPBP-compcompl}, the inherent quadratic complexity of the EPBP algorithm can be reduced to $\mathcal O(MN)$ where $M$ is the number of mixture components effectively considered to represent the messages. We also consider the maximum likelihood-based projection mechanism as discussed in section \ref{point:epbp-proj} for the two experiments.
 
 We apply this method to the $3\times 3$ grid example in the case where $M=\mathcal O(\log(N))$: for $N=\{10,20,50,100,200,500\}$, we pick $M=\{5, 6,8,10,11,13\}$. The results are illustrated in \fig{figCompNLOGN} where one can see that the $N\log N$ implementation compares very well to the original quadratic implementation at a much reduced cost. 
 
