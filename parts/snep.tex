@@ -16,7 +16,7 @@ In a Bayesian setting, we are interested in the posterior distribution over a pa
 %
 where $\pi_0$ is a prior distribution. Each of the likelihood term itself factors over the individual data points of $y_i$, i.e.: $p(y_i\st x)=\prod_{j=1}^{N_i}p(y_{ij}\st x)$ with $N_i$ the number of individual data points held by the $i$th compute node.
 
-It is important to stress that, in the setup considered here, each compute node has access to independent subsets of the data. In \citet{hasenclever16} we explain that this situation can occur in large scale learning but also in cases when the data cannot be shared directly (e.g.: for privacy reasons). This type of context is sometimes known as divide-and-conquer or consensus inference \citep{kleiner14,battey15,zhao16}. 
+It is important to stress that, in the setup considered here, each compute node only has access to independent subsets of the data. In \citet{hasenclever16} we explain that this situation can occur in large scale learning but also in cases when the data cannot be shared directly (e.g.: for privacy reasons). This type of context is sometimes known as divide-and-conquer or consensus inference \citep{kleiner14,battey15,zhao16}. 
 
 Defining $t_i$ to be nonnegative factors with $t_i(x)=p(y_i\st x)$, the factorised form \eqref{eq:distrposterior} reads $\pi_0(x)\prod_{i=1:K}t_i(x)$ which is the form \eqref{eq:targetfactorises} that we had used to motivate the introduction of the ADF and EP algorithms (cf.\ section \ref{s:ADF+EP}).
 In the rest of this chapter, we show how different variants of the EP algorithm can be used to perform parallel variational inference in the presence of distributed data.\check{jul25,jun8, aug18} 
@@ -65,7 +65,7 @@ Indeed, in our general setting we do not assume that computing $\E_{q_i}[\phi(X)
 In their paper, \citet{xu14} suggest a method to synchronise Monte Carlo samplers ran on independent compute nodes. They call it \emph{Sequential Moment Sharing} or SMS for short. It was originally proposed to scale up MCMC methods and as such it assumes that MCMC chains can be run for many iterations to convergence in between communications with the master. Effectively, SMS corresponds precisely to the case mentioned at the previous point consisting of running EP across multiple physical nodes while using noisy estimates of $\E_{q_i}[\phi(X)]$, the expected value of the sufficient statistics under the tilted distribution. 
 Below, we introduce the algorithm as a damped fixed-point iteration in the natural parameter space. This will prove useful when comparing different EP-like algorithms.\check{june8,may27, aug18}
 
-We showed that the basic EP algorithm could be interpreted as a kind of fixed point iteration targeting the Local Moment Matching Conditions \eqref{eq:LMMC} (LMMC). At a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter should therefore be updated such as to verify $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let us define denote the moment of the local tilted distribution as $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
+We showed that the basic EP algorithm could be interpreted as a kind of fixed point iteration targeting the Local Moment Matching Conditions \eqref{eq:LMMC} (LMMC). At a given step of the algorithm, when considering the inclusion of the factor $t_i$, the global parameter should therefore be updated such as to verify $\E_{q_\theta}[\phi(X)]= \E_{q_i}[\phi(X)]$. Let us define the moment of the local tilted distribution as $\mu_i:=\E_{q_i}[\phi(X)]$, the update then amounts to finding $\theta$ such that $\nabla A(\theta) = \mu_i$ or
 %
 \eqa{	
 	\theta &\leftarrow & \nabla A^{\star}(\mu_i).	\label{eq:ep-np-update}
@@ -92,7 +92,7 @@ The master node then aggregates all updated local parameters and updates the glo
 %
 \eqa{	\theta &\leftarrow& (1-\kappa')\theta+\kappa'\sum_{i=1}^{K}\omega_{i}	}
 %
-where $\kappa' \in (0,1]$ is a global damping parameter which may also help convergence. 
+where $\kappa' \in (0,1]$ is a global damping parameter which may also help overall convergence. 
 These steps are summarised at the algorithm \ref{alg:ep-sms-synch} below.\check{june8}
 
 \begin{algorithm}[!h]\small
@@ -199,6 +199,7 @@ Therefore the gradient of the complete right hand side of \eqref{eq:decomposeKL}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsubsection*{Looking for a stationary point of the EP energy}
 %\todofr{Think first about how you want to present information and in particular what you want to say. Could just present the min max problem. Say that if torture the problem you can get to a double loop that looks like SNEP. Would be good not to go along the crappy road of the dev a la Teh, just showing that we're actually doing some kind of Newton's method would already be quite nice use for this \url{http://homes.soic.indiana.edu/classes/spring2012/csci/b553-hauserk/newtons_method.pdf} and probably ``Information geometry of mirror descent'' \citep{raskutti15}}
+
 In \citet{heskes05}, the authors show that the energy \eqref{EP-energy} is in fact equivalent to their \emph{Expectation Consistent free energy}. Further, they indicate that several stationary points can exist and that the framework does not provide a criterion to pick an optimal one. Lastly, they remind the reader that since the energy is neither convex nor concave with respect to the parameters $\lambda_i$, it does not tell whether stationary points are minimum, maximum or saddle points.\footnote{So in fact, \emph{energy} is a bit of an unfortunate misnomer here.} %\check{june21}\add{should probably emphasise that ``energy'' is a bit misnomer}
 %However, since the first term is concave in $\theta$ while each of the terms in the sum is convex in $\lambda_i$, \citet{minka01c} suggests writing the EP stationary points as corresponding to the following min-max problem 
 %%
@@ -262,7 +263,7 @@ The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{a
 %\eqa{	\nabla A(\theta) &=& K\inv \sum_{i=1}^{K} \nabla A_i(\lambda).	}
 %(A form of average). 
 %Key point is that the $\mathcal E_{BBA}$ is bounded from below for $\alpha\le N$ (see BBA) therefore convergence or something.
-
+\clearpage
 %%%%%%%%%%%%%%%%%%%%%
 \section{\label{dist-ep-exps}Experiments}
 %# EP exps
@@ -275,7 +276,7 @@ The model considered is a simple Bayesian logistic regression model. Whilst this
 \begin{eqnarray}
     p(y_c=1|z_c, x) &=& \sigma(\langle z_c, x\rangle )
 \end{eqnarray}
-where $\sigma$ denotes the logistic function: $\sigma(s)\equiv (1+\exp(-s))^{-1}$. A Gaussian prior $p_0(x) = \mathcal N(x; 0_d, 10\mathbb I_d)$ is set on $x$ and the aim is to construct an approximation to the posterior $p(x|\mathcal D)$. We generate $N=5000$ data points with $d=10$ using iid draws for the covariates, $z_c\sim\mathcal N(\mu, \Sigma)$ where the $d$ components of $\mu$ are drawn iid from a Uniform $\mathcal U[0,1]$ and $\Sigma=PP^T$ where the components of $P$ are drawn from a Uniform $\mathcal U[-1,1]$. The generating weight vector $x^\star$ is drawn from the prior $p_0$. The labels $y_c$ are then sampled according to the model.
+where $\sigma$ denotes the logistic function: $\sigma(s)= (1+\exp(-s))^{-1}$. A Gaussian prior $p_0(x) = \mathcal N(x; 0_d, 10\mathbb I_d)$ is set on $x$ and the aim is to construct an approximation to the posterior $p(x|\mathcal D)$. We generate $N=5000$ data points with $d=10$ using iid draws for the covariates, $z_c\sim\mathcal N(\mu, \Sigma)$ where the $d$ components of $\mu$ are drawn iid from a Uniform $\mathcal U[0,1]$ and $\Sigma=PP^T$ where the components of $P$ are drawn from a Uniform $\mathcal U[-1,1]$. The generating weight vector $x^\star$ is drawn from the prior $p_0$. The labels $y_c$ are then sampled according to the model.
 
 The data is sharded across five factors (corresponding to 5 compute nodes) each with one fifth of the data. To compute expected values against the tilted distribution, an importance sampling estimator is constructed with a varying number of samples (5, 10, 50) as shown in figure \ref{fig-res-snep}. The proposal used is the last global approximation shared with the compute node. Note that more involved samplers can be used (as is done in \citet{hasenclever16} which uses a stochastic gradient MCMC method) but the purpose here is primarily to explore the robustness of the algorithms to Monte Carlo noise so that a simple sampler is adequate. 
 
@@ -285,7 +286,7 @@ As the base exponential family, we use a full-covariance Gaussian. We compare th
 
 \subsection{Results}
 
-We show in figure \ref{fig-res-snep} the evolution of the predictive RMSE with increasing number of iterations for the three algorithms considered when varying the number of iteration per samples (corresponding to the amount of Monte Carlo noise) and the damping parameter (indicated by $d=$ in the legends). Note that the computational complexity of the iteration for each of the three algorithm is very similar, the main difference residing in the ordering of operations.\footnote{In all the runs, an iteration of MP-EP is around 5\% faster than an iteration of NP-EP and around 20\% faster than an iteration of SNEP but that is negligible compared to the factor of 2 speedup obtained by the much faster convergence of the algorithm.} As a baseline, the predictive RMSE corresponding to $x^{\star}$ (the generating set of weights) is drawn as a black line on each graph.
+We show in figure \ref{fig-res-snep} the evolution of the predictive RMSE with increasing number of iterations for the three algorithms considered when varying the number of iteration per samples (corresponding to the amount of Monte Carlo noise) and the damping parameter (indicated by $d=0.01$ in the legends). Note that the computational complexity of the iteration for each of the three algorithm is very similar, the main difference residing in the ordering of operations.\footnote{In all the runs, an iteration of MP-EP is around 5\% faster than an iteration of NP-EP and around 20\% faster than an iteration of SNEP but that is negligible compared to the factor of 2 speedup obtained by the much faster convergence of the algorithm.} As a baseline, the predictive RMSE corresponding to $x^{\star}$ (the generating set of weights) is drawn as a black line on each graph.
 
 A range of damping parameters is selected to illustrate the behaviour of the algorithm. The range is always taken with the largest damping parameter being on the verge of numerical instability for the algorithm. Indeed, when using a full-covariance Gaussian as base exponential family, going from the mean-parameter space to the natural parameter space or vice versa requires the inversion of a matrix. Doing the update in the mean parameter space helps the numerical stability of this step as does increasing the damping (reducing the step-size).
 
@@ -408,10 +409,10 @@ Further to this, the convergence question may in fact be of little practical use
 \includegraphics[width=.6\textwidth]{figures/general/vi-ep-space}
 \vspace*{.2cm}
 \caption{\label{comp-vi-ep}Toy representation of the approximating distributions obtained through MFVI or EP when targeting a distribution $p$ of interest. The starting points are denoted with a superscript $\circ$. MFVI provably converges to a point $q^{\star}_{\text{MF}}$ (solid green line) but we do not know how this point compares to a distribution $q^{\star\star}_{\text{MF}}$ that truly minimises the corresponding KL divergence.\\ By contrast, EP is not guaranteed to converge to a fixed point $q^{\star}_{\text{EP}}$ (dashed orange line) and we also do not know how it compares to $q^{\star\star}_{\text{EP}}$ that truly minimises the corresponding KL divergence. \\
-In both cases, we do not really know how the minimisers obtained compare to the target distribution $p$ (dashed purple lines). }
+In both cases, we do not really know, in general, how the minimisers obtained compare to the target distribution $p$ (dashed purple lines). This graph is best seen in colours. }
 \end{figure}
 
-Finally, we note that the entirety of the EP variants discussed in this section can be re-expressed in the general framework of ``Power-EP'' \citep{minka04} where the discrepancy is more general than the basic Kullback-Leibler divergence \citep{hernandez15, li16}. This, however, has little impact to the considerations discussed in the chapter in that the only element it changes is the definition of the projection operator $\mathbf P_{\phi}$. We focused on ``classical'' EP for this reason and also because the role of the exponent in Power-EP is poorly understood in general.%\add{maybe add equation + discuss}
+Finally, we note that the entirety of the EP variants discussed in this section can be re-expressed in the general framework of ``Power-EP'' \citep{minka04} where the discrepancy is more general than the basic Kullback-Leibler divergence \citep{hernandez15, li16}. This, however, has little impact to the considerations discussed in the chapter in that the only element it changes is the definition of the projection operator $\mathbf P_{\phi}$. We focused on ``classical'' EP for this reason and also because, to the best of our knowledge, the role of the exponent in Power-EP is poorly understood in general.%\add{maybe add equation + discuss}
 
 
 

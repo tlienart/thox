@@ -15,13 +15,13 @@ In \cite{bouchard15}, the authors consider the case where the target distributio
 where $x_{f}$ is a restriction to a few elements of $x$, $F$ is a set of \emph{factors} and $\gamma_{f}$ is an unnormalised likelihood associated with the factor. In the specific case of a pairwise MRF, the factors are the edges of the graph and the restrictions are the variables corresponding to each nodes. The energy associated to $\pi$ consequently decomposes as $U\equiv \sum_{f\in F}U_{f}$.
 
 %\subsection{Local BPS: algorithm}
-For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $R_{f}$ can be defined in the same way as for the Bouncy Particle Sampler (BPS, see section \ref{point:BPS}) except that $\nabla U_{f}$ is set to have zero components for all variables not associated to the factor. We can then define a collection of intensities with
+For each factor, a local intensity $\lambda_{f}$ and a local bouncing operator $R_{f}$ can be defined in the same way as for the Bouncy Particle Sampler (BPS, see section \ref{point:BPS}) except that $\nabla U_{f}$ is set to have zero components for all variables not associated with the factor. We can then define a collection of intensities with
 %
 \eqa{
 	\chi_{f}(t) &=& \lambda_{f}(x^{(i-1)}+v^{(i-1)}t,v^{(i-1)}). 
 }
 %
-and consider the superposition principle with $\chi\equiv\sum_{f} \chi_{f}$.
+and consider the superposition principle with $\chi\equiv\sum_{f} \chi_{f}$ (see point \ref{point:BPS}).
 
 Instead of modifying all velocity variables at a bounce as in the basic BPS, the method samples a factor $f$ with probability $\chi_{f}(\tau)/\chi(\tau)$ and modifies only the variables connected to the sampled factor. 
 This can significantly reduce the overall computational cost associated with the algorithm and especially so when the underlying MRF has a connection structure that is not too densely connected. Indeed, when an update is triggered at a factor $f$ all factors that share a variable with $f$ are also triggered. If that corresponds to a large portion of the graph, computational gains are lost compared to simply using the full BPS. The skeleton of the algorithm is shown below.
@@ -62,7 +62,7 @@ This can significantly reduce the overall computational cost associated with the
 
 \section{Probabilistic Matrix Factorisation}
 
-Probabilistic Matrix Factorisation (PMF) \citep{mnih08} is a Bayesian approach to the matrix completion problem. In that problem, we consider a matrix $R$ of size $n\times p$ of ratings $r_{ij}$ corresponding to user $i$ and item $j$ (e.g.: a movie) but we only have access to a mask of $R$, a very sparse subset of the ratings which we denote $\hat R$. The aim of matrix completion methods such as PMF is to try to construct a low-rank factorisation  $R\approx U^{t}V$ based on the known entries where $U$ is of size $d\times n$ and $V$ of size $n\times p$ and $d$ is very small compared to $n$ or $p$. 
+Probabilistic Matrix Factorisation (PMF) \citep{mnih08} is a Bayesian approach to the matrix completion problem. In that problem, we consider a matrix $R$ of size $n\times p$ of ratings $r_{ij}$ corresponding to user $i$ and item $j$ (e.g.: a movie) but we only have access to a mask of $R$, a very sparse subset of the ratings which we denote $\hat R$. The aim of matrix completion methods such as PMF is to try to construct a low-rank factorisation  $R\approx U^{t}V$ based on the known entries, where $U$ is of size $d\times n$ and $V$ of size $n\times p$ and $d$ is very small compared to $n$ or $p$. 
 
 \subsection{Description of the  Model}
 
@@ -70,9 +70,9 @@ The model described in \citep{mnih08} assumes that each rating $r_{ij}$ is a rea
 Further, the model assumes spherical Gaussian priors on all $u_{i}$ and $v_{j}$ with standard deviation $\sigma_{u}$ and $\sigma_{v}$ respectively. Formally:
 %
 \begin{eqnarray}
-	r_{ij} &\sim& \mathcal N(\,\cdot\, ; \scal{u_{i}, v_{j}}, \sigma_{r}), \qquad (i,j)\in\mathcal M\nn\\
-	u_{i} &\sim& \mathcal N(\,\cdot\, ; 0_{d}, \sigma_{u}\mathbb I_{d}), \qquad i\in 1,\dots,n \label{eq:pmf-model}\\
-	v_{j} &\sim& \mathcal N(\,\cdot\, ; 0_{d}, \sigma_{v}\mathbb I_{d}), \qquad j\in 1,\dots,p\nn
+	r_{ij} &\sim& \mathcal N(\,\cdot\, ; \scal{u_{i}, v_{j}}, \sigma_{r}^{2}), \qquad (i,j)\in\mathcal M\nn\\
+	u_{i} &\sim& \mathcal N(\,\cdot\, ; 0_{d}, \sigma_{u}^{2}\mathbb I_{d}), \qquad i\in 1,\dots,n \label{eq:pmf-model}\\
+	v_{j} &\sim& \mathcal N(\,\cdot\, ; 0_{d}, \sigma_{v}^{2}\mathbb I_{d}), \qquad j\in 1,\dots,p\nn
 \end{eqnarray}
 %
 where $\mathcal M$ denotes the entries which are available, $0_{d}$ and $\mathbb I_{d}$ denote the zero vector in $\mathbb R^{d}$ and the $d\times d$ identity matrix respectively. 
@@ -84,7 +84,7 @@ The negative log-posterior of interest is therefore:
 {1\over2\sigma_{v}^{2}}\|V\|_{2}^{2}
 }
 %
-In our experiments, we assume $\sigma_{r}, \sigma_{u}$ and $\sigma_{v}$ are fixed,\footnote{In practice, we compute sensible estimates from the data following the authors' original code available at \url{http://www.cs.toronto.edu/~rsalakhu/BPMF.html}.} more involved models exist including hyper-priors which we will not consider here since our aim is primarily to compare the local BPS and HMC on a large scale model rather than produce the best performing PMF method.\footnote{In \citep{mnih08} also suggest doing a few steps of Gibbs sampling for the hyperparameters. We do not do this in order to simplify the computations and the comparisons.}
+In our experiments, we assume $\sigma_{r}, \sigma_{u}$ and $\sigma_{v}$ are fixed,\footnote{In practice, we compute sensible estimates from the data following the authors' original code available at \url{http://www.cs.toronto.edu/~rsalakhu/BPMF.html}.} more involved models exist including hyper-priors which we will not consider here since our aim is primarily to compare the local BPS and HMC on a large scale model rather than produce the best performing PMF method.\footnote{In \citep{mnih08}, the authors also suggest doing a few steps of Gibbs sampling for the hyperparameters. We do not do this in order to simplify the computations and the comparisons.}
 
 Finally, note that the full dimensionality of the model is $n\times d + p\times d$. Below we consider an example where $d=10$, $n=6000$, $p=4000$ and $|\mathcal M|=10^{6}$ meaning that the full dimensionality of the model is $100 000$ with 1 million factors. For that kind of scale, a method such as naive Gibbs sampling (see point \ref{point:classical-sampling}) is impractical. 
 
@@ -132,7 +132,7 @@ The factor graph corresponding to the matrix factorisation problem has a simple 
 
 % Note that while every rating factor has degree 2 in the graph whereas it can vary for each variable nodes.  
 
-The energy associated with one of the rating factor is also easily obtained by taking the negative log-likelihood associated to $r_{ij}$ (see \eqref{eq:pmf-model}), we denote it $\mathcal E_{ij}$ with
+The energy associated with one of the rating factor is also obtained by taking the negative log-likelihood associated to $r_{ij}$ (see \eqref{eq:pmf-model}), we denote it $\mathcal E_{ij}$ with
 %
 \eqa{
 	\mathcal E_{ij}(u_{i}, v_{j}) &:=& 0.5\sigma_{r}^{-2}(r_{ij}-\scal{u_{i}, v_{j}})^{2}.
@@ -191,7 +191,7 @@ We had already shown that the negative log posterior in $U$ and $V$ of the model
 \eqa{
 	-2\log p (U, V | \hat R) &=& \sigma_{r}^{-2}\sum_{(i,j)\in\mathcal M} (r_{ij}-\scal{u_{i},v_{j}})^{2} +\sigma_{u}^{-2}\|U\|_{2}^{2} + \sigma_{v}^{-2}\|V\|_{2}^{2}.\nn
 }
-Therefore, the gradient in $u_{i}$ and $v_{j}$ can easily be computed in closed form and it is straightforward to apply HMC on this model (cf.\ algorithm \ref{alg:hmc-alg}). The main hurdle is that each gradient evaluation requires a full pass over all observed ratings making iterations expensive. 
+Therefore, the gradient in $u_{i}$ and $v_{j}$ can easily be computed in closed form and it is straightforward to apply HMC on this model (cf.\ algorithm \ref{alg:hmc-alg}). The main hurdle is that each gradient evaluation requires a full pass over all observed ratings making iterations computationally expensive. 
 
 \subsection{Experiments}
 
@@ -217,7 +217,7 @@ Further, their code does not show the SVD step but suggests a scaling of the rat
 
 The main purpose of this chapter was to compare the HMC algorithm to the LBPS on a very high-dimensional model with a rather sparse graphical model structure. We showed in the experiments that the LBPS compares favourably with HMC in this case which gives hope for future use of the LBPS on large scale graphical models.
 
-Much remains to be explored on how to better tune Piecewise Deterministic samplers and in particular on graphical models. To the best of our knowledge, this was the first attempt to use the LBPS on a large-scale model in statistics or machine learning. 
+Much remains to be explored on how to better tune Piecewise Deterministic samplers and in particular its local version for MRF. To the best of our knowledge, this was the first attempt to use the LBPS on a large-scale model in statistics or machine learning. 
 
 \begin{figure}[!h]
 \center

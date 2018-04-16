@@ -3,7 +3,7 @@
 In this thesis we define approximate Bayesian inference in broad terms as the class of methods attempting to recover a distribution $q$ in a restricted family of distributions $\mathcal F\subset \mathcal P(\mathcal X)$ such that $q$ is a ``good'' proxy for a posterior distribution $p$ of interest. 
 This definition leaves significant room to describe different methods based on the definition of what a ``good proxy'' means. 
 
-Let $D:\mathcal P(\mathcal X)\times \mathcal P(\mathcal X)\to \mathbb R_{+}$ denote a divergence between two probability distribution functions. Then, the generic variational problem we consider is the minimisation of this divergence in $\mathcal F$:
+Let $D:\mathcal P(\mathcal X)\times \mathcal P(\mathcal X)\to \mathbb R_{+}$ denote a divergence between two probability distribution functions. Then, the generic variational problem we consider is the minimisation of this divergence over $\mathcal F$:
 %
 \eqa{
 q^{\star} &\in& \arg\min_{q\in \mathcal F}\quad D(q,p).\label{eq:generic-abi}
@@ -20,7 +20,7 @@ Many discrepancy measures can be considered such as the total variation distance
 %%%%%%%%%%%%%%%%%
 \subsection{Variational inference}
 The KL divergence has been widely considered in the literature partly because it leads to variational problems that are amenable to gradient descent-based algorithms. 
-In particular, considering the discrepancy $\KL{q,p}$ lead to the development of the popular \emph{variational inference} algorithms \citep{hoffman13,blei16}. 
+In particular, considering the discrepancy $\KL{q,p}$ led to the development of the popular \emph{variational inference} algorithms \citep{hoffman13,blei16}. 
 
 In the basic \emph{mean-field variational inference} (MFVI), the approximating family of distributions $\mathcal F$ is taken to be the class of distributions that fully factorises:
 %
@@ -28,15 +28,15 @@ In the basic \emph{mean-field variational inference} (MFVI), the approximating f
 	\mathcal F_{\text{MFVI}} &=& \pab{q \in \mathcal P(\mathcal X) \st q(x_{1},\dots,x_{d}) = \prod_{i=1}^{d}q_{i}(x_{i}) }.
 }
 % 
-This choice of distribution space, while rather restrictive, leads to the inference problem \eqref{eq:generic-abi} being tractable: indeed, writing $q_{\neg i}(x_{\neg i}) = \prod_{j\neq i} q_{j}(x_{j}) $, we have
+This choice of distribution space, while rather restrictive, leads to the inference problem \eqref{eq:generic-abi} being tractable. Indeed, writing $q_{\neg i}(x_{\neg i}) = \prod_{j\neq i} q_{j}(x_{j}) $, we have
 \eqa{
 	\KL{q,p} &=& \E_{q_{i}}\pac{ \log q_{i} -	\E_{q_{\neg i}}\pac{ \log p}} + \E_{q_{\neg i}}\pac{\sum_{j\neq i}\log q_{j}} 
 }
-suggesting to iterate over the components taking each time $q_{i} \propto \exp(\E_{q\neg i} \log p) $. This scheme can be used to provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}. However, the problem is non-convex and no practical guarantees exist as to what the iterations converge to. 
+suggesting to iterate over the components taking each time $q_{i} \propto \exp(\E_{q\neg i} \log p) $. This scheme can be used to provably decrease the objective function \citep{hoffman13, kucukelbir16, blei16}; however, the problem is non-convex and no practical guarantees exist as to what the iterations converge to. 
 In this thesis, we focus on an alternative approximate Bayesian inference class of algorithms which exploits the factorisation structure of the target distribution $p$ directly instead of imposing a factorisation structure a priori like in MFVI.
 
 \subsection{ADF, EP and LBP}
-The Assumed Density Filtering (ADF) algorithm and the  Expectation Propagation (EP) algorithm are two other popular methods that are also based on the KL divergence. The choice of distribution space is usually the exponential family associated with a sufficient statistic $\phi$. Additionally, these methods assume that the target distribution $p$ factorises in terms that are easier to handle than $p$ itself. We introduce these methods at sections \ref{point:expof-convex} and \ref{s:ADF+EP}.
+The Assumed Density Filtering (ADF) algorithm and the  Expectation Propagation (EP) algorithm are two other popular methods that are also based on the KL divergence. The choice of distribution space is usually the exponential family associated to a sufficient statistic $\phi$. Additionally, these methods assume that the target distribution $p$ factorises in terms that are easier to handle than $p$ itself. We introduce these methods at sections \ref{point:expof-convex} and \ref{s:ADF+EP}.
 
 The Belief Propagation (BP) algorithm and the Loopy Belief Propagation (LBP) algorithm are message-passing algorithms which target distributions that factorise according to a MRF. Those methods can also be shown to be fixed-point algorithms corresponding to a specific form of \eqref{eq:generic-abi} \citep{yedidia01, yedidia02}.
 

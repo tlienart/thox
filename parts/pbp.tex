@@ -14,7 +14,7 @@ where the pre-messages are given by
 \eqa{
 	M_{st}^{n}(x_{s}) &=& \psi_{s}(x_{s}) \prod_{r\in\partial s\backslash t} m^{n-1}_{rs}(x_{s}).
 }
-Ultimately, we are interested in computing the beliefs obtained by multiplying message and pre-message: $B_{s}^{n}(x_{s}) = m^{n}_{ts}(x_{s})M^{n}_{st}(x_{s})$. There are a few main computational problems to tackle when attempting to run this algorithm in a continuous setting. First, the messages need to be represented in a tractable fashion. Second, the message updates need to be computable and the results easily expressible in the chosen representation system. Lastly, we need to be able to easily compute expected values with respect to the resulting estimators for the beliefs. We discuss below two existing methods attempting to tackle those issues.
+Ultimately, we are interested in computing the beliefs obtained by multiplying message and pre-message: $B_{s}^{n}(x_{s}) = m^{n}_{ts}(x_{s})M^{n}_{st}(x_{s})$. There are a few main computational problems to tackle when attempting to run this algorithm in a continuous state space. First, the messages need to be represented in a tractable fashion. Second, the message updates need to be computable and the results easily expressible in the chosen representation system. Lastly, we need to be able to easily compute expected values with respect to the resulting estimators for the beliefs. We discuss below two existing methods attempting to tackle those issues.
 %%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Nonparametric Belief Propagation}
 
@@ -131,7 +131,7 @@ where all $\widehat m_{rs}$ are importance sampling estimators built using the c
 %%%%%%%%%%%%%%%%
 \subsection{The EPBP algorithm}
 As we showed in point \ref{point:PBP}, it is computationally expensive to use the particle approximated node belief as the proposal distribution. 
-Our idea is therefore consider an approximation $q_{s}$ drawn from a tractable exponential family $\mathcal F_{\phi}$ with a structure matching that of the belief:
+Our idea is therefore consider an approximation $q_{s}$ drawn from a tractable exponential family $\mathcal F_{\phi}$ with a structure matching that of the belief ($B_{s}(x_{s}) = \psi_{s}(x_{s})\prod_{r\in\partial s} m_{rs}(x_{s})$):
 %
 \eqa{ 
 	q_s(x_s) &\propto& \eta_{\circ s}(x_s) \prod_{r\in\partial s} \eta_{rs}(x_s).
@@ -187,7 +187,8 @@ Further, the evaluation of the pre-message requires evaluating the message $\wid
 
 This inherent quadratic complexity can be reduced. Indeed, instead of we can follow a method presented in \cite{briers05} to sample from a product of mixtures where one draws, for each mixture $\widehat m_{st}$, a set of $M$ indices $\{i^{\star}_{\ell}\}_{\ell=1}^{M}$ from a multinomial with weights $\{w^{i}_{st}\}_{i=1}^{N}$ and samples from a mixture of the corresponding $M$ terms $\psi^{i^{\star}_{\ell}}_{st}$. 
 This reduces the cost of the evaluation of the belief to $\mathcal O(|\partial {s}|MN)$ where $M$ is taken to be sub-quadratic in $N$. 
-We show in the next section that this version of the algorithm still compares favourably to the quadratic implementation with $M = \mathcal O(\log N)$. 
+We show in the next section that this version of the algorithm still compares favourably to the quadratic implementation with $M = \mathcal O(\log N)$.
+Finally, note that this simplification leads to a biased algorithm but, in our experiments, the bias seems smaller than the ambient noise making this still a practical heuristic to use. 
 
 
 
@@ -197,7 +198,7 @@ We show in the next section that this version of the algorithm still compares fa
 %%%%%%%%%%%
 \section{Experiments}
 
-We investigate the performance of our method on MRFs for two simple graphs. This allows us to compare the performance of EPBP to the performance of PBP in depth. We also illustrate the behaviour of the sub-quadratic version of EPBP. Finally we show that EPBP provides good results in a simple denoising application, an example on which the PBP implementation of \citet{ihler09} would struggle to give results in a reasonable time due to its dimensionality.
+We investigate the performance of our method on two simple graphs. This allows us to compare the performance of EPBP to the performance of PBP in depth. We also illustrate the behaviour of the sub-quadratic version of EPBP. Finally we show that EPBP provides good results in a simple denoising application, an example on which the PBP implementation of \citet{ihler09} would struggle to give results in a reasonable time due to high dimensionality.
 
 \subsection{Grid and tree experiments}
 We start by comparing EPBP to PBP as implemented by \citet{ihler09} on a $3\times 3$ grid (see \fig{fig:grids} (left)) with random variables taking values on $\mathbb R$. The node and edge potentials are selected such that the marginals are multimodal, non-Gaussian and skewed with

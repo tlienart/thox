@@ -35,4 +35,5 @@ Since $q_{\theta}\equiv\exp(\scal{\theta,\phi}-A(\theta))$, this reduces to
 \eqa{		\KL{q',q} &=& A(\theta')-A(\theta)-\scal{\theta'-\theta,A(\theta)}	\nn}
 which is the Bregman divergence associated with the log-partition function $A$. The corresponding mirror-descent algorithm reads:
 \eqa{		\theta_{k+1} &=& \nabla A^{\star}\pac{ \nabla A(\theta) - \alpha_{k}\nabla \mathcal J(\theta_{k})}	,}
-which is known as the \emph{natural gradient descent} algorithm. For a deeper analysis of the reasoning behind using the natural gradient descent in learning, we refer to the seminal paper by Amari \citep{amari98}.
+which is often known as the \emph{natural gradient descent} algorithm in the machine learning community. 
+For a deeper analysis of the reasoning behind using the natural gradient descent in learning, we refer to the seminal paper by \citet{amari98}.

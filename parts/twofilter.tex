@@ -12,7 +12,7 @@ In this chapter, we introduce a class of algorithms that can be obtained from an
 
 \subsection{\label{point:TFS}Two filter formula}
 An alternative to the FFBS approach is to exploit the \emph{two filter formula}. 
-To derive it, note that the smoothing distribution can be written in the following way using Bayes' formula:
+To derive it, note that the smoothing distribution can be written in the following way using the definition of conditional probability:
 %
 \eqa{
 	p(x_t\st y_{1:T})&=& {p(x_t,y_{1:t-1},y_{t:T})\over p(y_{1:T})}.\nn
@@ -29,7 +29,7 @@ Then, exploiting the conditional dependences of the HMM, we get
 %
 This last factorised form is the two filter formula which leads to the \emph{two filter smoothing} (TFS) algorithm \citep{bresler86, kitagawa96}. 
 The first term in \eqref{eq:TFS} is the prediction density (PD), 
-the second term $p(y_{t:T}\st x_{t})$ is called the \emph{backward information filter} (BIF). To simplify developments we introduce the following non-standard notations for the predictive density and the backward information filter:\check{jul16}
+the second term $p(y_{t:T}\st x_{t})$ is called the \emph{backward information filter} (BIF). To simplify developments we introduce the following (non-standard) notations for the predictive density and the backward information filter:\check{jul16}
 %
 \eqa{
 	\pd_{t}(x_{t}) \esp:=\esp p(x_{t}\st y_{1:t-1}), \quad\text{and}  \quad \bif_{t}(x_{t}) \esp:=\esp p(y_{t:T}\st x_{t}).
@@ -53,7 +53,7 @@ In other words, the normalising distribution $\gamma_{t}$ allows to define a \em
 }
 %
 for some normalising constant $Z\inv_{t}$.\check{july5}
-Any $\gamma_{t}\in\mathcal P(\mathcal X)$ can be chosen as long as it verifies the \emph{support condition} i.e.: as long as its support covers that of the backward information filter:
+Any normalisation $\gamma_{t}\in\mathcal P(\mathcal X)$ can be chosen as long as it verifies the \emph{support condition} i.e.: as long as its support covers that of the backward information filter:
 %
 \eqa{	
 	\bif_t(x_t) &>&0 \quad\Longrightarrow\quad \gamma_{t}(x_{t})\esp>\esp 0. \label{eq: tech condition normalisation density}	
@@ -195,17 +195,15 @@ This expression suggests picking $\gamma_{1}$ to be the prior distribution on th
 The last two equations \eqref{normalised BIF and partial joint} and \eqref{full joint and first bif} are crucial for the rest of the analysis. The first one suggests that if we pick $\gamma_{t}$ to be close to the predictive density then, then each term $\tbif_{t}(x_{t:T})$ forms an estimator for the partial joint smoothing densities $p(x_{t:T}\st y_{1:T})$; the second one indicates that upon selecting $\gamma_{1}$ to be the prior for the initial state, we end up targeting exactly the joint distribution of interest, no matter which admissible sequence $\{\gamma_{t}\}_{t=2}^{T}$ we picked earlier. \check{jul16}
 
 This suggests to build a good estimator of the prediction density, based partly or entirely on a particle estimator of the filtering density; use it as normalisation density and target the corresponding normalised BIF recursively. 
-We explored this idea and showed that it significantly outperforms the default choice used in \citep{briers10, fearnhead10} where the authors suggest also taking $\gamma_{1}$ as the prior $\pi_{0}$ and the subsequent $\gamma_{t}$ by propagating this through the dynamic of the HMM i.e.:
+We explored this idea and showed that it significantly outperforms the default choice used in \citep{briers10, fearnhead10} where the authors also suggest taking $\gamma_{1}$ as the prior $\pi_{0}$ and build the subsequent $\gamma_{t}$ by propagation through the transition dynamic of the HMM:
 %
 \eqa{
 	\gamma_{t}(x_{t}) &=& \int p(x_{t}\st x_{t-1})\gamma_{t-1}(x_{t-1}) \mathrm dx_{t-1}\label{eq:choice-norma-bad}
 }
 %
-Note that this choice also suffers from a tractability issue in a system with dynamic that is more complex than the linear and Gaussian one considered in \citep{fearnhead10} where, in any case, the optimal Kalman smoother should be preferred. We show in the appendix (point \ref{app:normalising-density-fearnhead-lg}) how this normalising density can be obtained in the case of a simple linear Gaussian dynamic.\check{jul16}
+Note that this choice also suffers from a tractability issue in a system with transition that is more complex than the linear and Gaussian one considered in \citep{fearnhead10} where, in any case, the optimal Kalman smoother should be preferred. We show in the appendix (point \ref{app:normalising-density-fearnhead-lg}) how this normalising density can be obtained in the case of a simple linear Gaussian dynamic.\check{jul16}
 
-Upon selecting $\gamma_{t}$ to be the approximation of the predictive density \eqref{eq PDhat} based entirely on a a particle estimator of the filtering density, we get what Taghavi calls the \emph{backward informations smoothing} (BIS) algorithm \citet{taghavi12}. This choice verifies the support condition \eqref{eq: tech condition normalisation density} provided the support  of the transition density covers the support of the BIF. Typically, the support of the transition density is the whole space $\mathcal X$ which guarantees this.
-
-The optimal importance function for targeting the corresponding normalised BIF is obtained by considering \eqref{recursion joint BIF} with this specific choice of normalising density:\check{jul16, jul2}
+Upon selecting $\gamma_{t}$ to be the approximation of the predictive density \eqref{eq PDhat} based entirely on a a particle estimator of the filtering density, we get what Taghavi calls the \emph{backward informations smoothing} (BIS) algorithm \citet{taghavi12}. This choice verifies the support condition \eqref{eq: tech condition normalisation density} provided the support  of the transition density covers the support of the BIF. Typically, the support of the transition density is the whole space $\mathcal X$ which guarantees this. The optimal importance function for targeting the corresponding normalised BIF with this specific choice of normalising density ($\gamma_{t}(x_{t})=\hpd_{t}(x_{t})$) is obtained by considering \eqref{recursion joint BIF}:\check{jul16, jul2}
 \eqa{		\tilde q^{\text{opt}}_{t}(x_{t}\st \tilde X^{(j)}_{t+1}) &\propto & {\hpd_{t}(x_{t})\over \hpd_{t+1}(\tilde X^{(j)}_{t+1})} p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t}),\label{eq:opt-prop-bif}}
 where the $\{\tilde X_{t+1}^{(j)}\}_{j=1}^{N}$ are the particles from the previous smoothing step. These steps are illustrated in algorithm \ref{alg:bisquad}.\check{jul5}
 
@@ -219,16 +217,17 @@ where the $\{\tilde X_{t+1}^{(j)}\}_{j=1}^{N}$ are the particles from the previo
 			\State update and normalise the weights $\tilde w^{(j)}_{t}\propto \tilde\alpha^{(j)}_{t}\tilde w^{(j)}_{t+1}$
 			\State resample the particles if necessary
 		\EndFor
-		\State same operations for $t=1$ but with $\tilde q^{\text{opt},i,j}_{1} \propto \pi_{0}(x_{1})p(\tilde X^{(j)}_{2}\st x_{1})p(y_{1}\st x_{1})/\hpd_{2}(\tilde X^{(j)}_{2})$\\
+		\State same operations for $t=1$ but with 
+			$\hpd_{1} \equiv \pi_{0}$\\
 
 		\Return weighted set of particles $\{\tilde X^{(j)}_{1:T}, \tilde w^{(j)}_{1:T}\}$
 	\end{algorithmic}
 \end{algorithm}
 %
 
-At each step $t$ and for each particle $j$, Algorithm \ref{alg:bisquad} ideally requires sampling a particle from $\hpd_{t}(x_{t})p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t})$ which is a mixture of $N$ terms. Additionally, computing the updating factors for the weights requires computing a sum of $N$ terms $\hpd_{t+1}(\tilde X_{t+1}^{(j)})$. Provided we use $N$ particles to target the BIF, the complexity of the BIS algorithm is therefore inherently quadratic in the number of particles. This is the same computational complexity as that of the FFBS algorithm.\check{jul16, jul5}
+At each step $t$ and for each particle $j$, Algorithm \ref{alg:bisquad} ideally requires sampling a particle from $\hpd_{t}(x_{t})p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t})$ which is a mixture of $N$ terms. Additionally, computing the updating factors for the weights requires computing $\hpd_{t+1}(\tilde X_{t+1}^{(j)})$ which is also a sum of $N$ terms. Provided we use $N$ particles to target the BIF, the complexity of the BIS algorithm is therefore inherently quadratic in the number of particles. This is the same computational complexity as that of the FFBS algorithm.\check{jul16, jul5}
 
-As it is not trivial in general to sample from $p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t})$, let alone when it is combined with $\hpd_{t}(x_{t})$, a possibility akin to the bootstrap proposal for the particle filter is to simply sample from $\hpd_{t}(x_{t})$. The disadvantage is that this choice doesn't take into account all the information available (contained in $\tilde X^{(j)}_{t}$ and $y_{t}$). Assuming we can sample easily from the transition distribution, sampling from $\hpd_{t}$ can be done easily in two steps: first sample an index $i^{\star}\sim \mathcal M(w^{(1)}_{t-1}, \dots, w^{(N)}_{t-1})$ where $\mathcal M$ denotes a multinomial distribution and then sample from the corresponding term $p(x_{t}\st X^{(i^{\star})}_{t-1})$. The update factor is then given by
+As it is not trivial in general to sample from $p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t})$, let alone when it is combined with $\hpd_{t}(x_{t})$, a possibility akin to the bootstrap proposal for the particle filter is to simply sample from $\hpd_{t}(x_{t})$. The disadvantage is that this choice does not take into account all the information available (contained in $\tilde X^{(j)}_{t}$ and $y_{t}$). Assuming we can sample easily from the transition distribution, sampling from $\hpd_{t}$ can be done easily in two steps: first sample an index $i^{\star}\sim \mathcal M(w^{(1)}_{t-1}, \dots, w^{(N)}_{t-1})$ where $\mathcal M$ denotes a multinomial distribution and the $w_{t-1}^{(i)}$ are the weights of the particle filter; and then sample from the corresponding term $p(x_{t}\st X^{(i^{\star})}_{t-1})$. The update factor is then given by
 %
 \eqa{
 	\tilde\alpha^{(j)}_{t} &=& { p(\tilde X^{(j)}_{t+1} \st \tilde X^{(j)}_{t})p(y_{t}\st \tilde X^{(j)}_{t}) \over \hpd_{t+1}(\tilde X^{(j)}_{t+1})},
@@ -249,7 +248,7 @@ where $s^{(j)}_{t+1}=\sum_{k=1}^{n}w^{(k)}_{t}p(\tilde X^{(j)}_{t+1}\st X^{(k)}_
 Sampling from such a mixture can be done in two steps: first, sample a pair of labels $(i^{\star},j^{\star})$ from a multinomial distributions with $N^{2}$ weights $\beta^{(i,j)}_{t}$ corresponding to the weight of the component $(i,j)$ relative to the whole mixture $q_{t}^{\text{mix}}$; second, sample from the component $(i^{\star},j^{\star})$. 
 Of course this does not simplify the problem: we still have to sample $N$ pairs of indices from a multinomial with $N^{2}$ pair which is still quadratic in $N$ and, additionally, computing the mixture component weights $\beta^{(i,j)}_{t}$ is intractable in general. \check{jul16,jul10}
 
-An approximation suggested first by \citet{briers05} in the wider context of sampling from products of mixtures and exploited by \citet{fearnhead10, taghavi12} in the context of the TFS algorithm is to approximate $i$ and $j$ independently by representing $\beta^{(i,j)}_{t}\approx \beta^{(i)}_{t}\tilde\beta^{(j)}_{t}$. The simplest form for this approximation, is to use $\beta^{(i)}_{t} = w^{(i)}_{t-1}$ and $\tilde\beta^{(j)}_{t}=\tilde w^{(j)}_{t+1}$. 
+An approximation suggested first by \citet{briers05} in the wider context of sampling from products of mixtures and exploited by \citet{fearnhead10, taghavi12} in the context of the TFS algorithm is to approximate $i$ and $j$ independently by representing $\beta^{(i,j)}_{t}\approx \beta^{(i)}_{t}\tilde\beta^{(j)}_{t}$. The simplest form for this approximation, is therefore to use $\beta^{(i)}_{t} = w^{(i)}_{t-1}$ and $\tilde\beta^{(j)}_{t}=\tilde w^{(j)}_{t+1}$. 
 
 Since sampling from a density proportional to $p(x_{t}\st X^{(i^{\star})}_{t-1})p(y_{t}\st x_{t})p(\tilde X^{(j^{\star})}_{t+1}\st x_{t})$ may still be intractable, we can resort to importance sampling for that term as well and compute the corresponding importance weight $\tilde w_{t}^{(j)}$ as a result.
 With this approach, sampling the indices is now an operation with linear computational complexity in the number of particles and the resulting algorithm consequently also enjoys linear complexity. 
@@ -268,7 +267,7 @@ The steps are illustrated in algorithm \ref{alg:bis-linear}. \check{jul16}
 			\EndFor
 			\State normalise the weights (and resample if necessary)
 		\EndFor
-	\State same operations for $t=1$ but with $\tilde q^{\text{opt},i,j}_{1} \propto \pi_{0}(x_{1})p(\tilde X^{(j)}_{2}\st x_{1})p(y_{1}\st x_{1})$\\
+	\State same operations for $t=1$ but with $\tilde q^{\text{opt}}_{1}(x_{1}\st \tilde X^{(j)}_{2}) \propto \pi_{0}(x_{1})p(\tilde X^{(j)}_{2}\st x_{1})p(y_{1}\st x_{1})$\\
 	\Return weighted set of particles $\{\tilde X^{(j)}_{1:T}, \tilde w^{(j)}_{1:T}\}_{j=1}^{N}$
 	\end{algorithmic}
 \end{algorithm}
@@ -362,13 +361,13 @@ We compare the average RMSE across the time steps computed as:
 where $j$ indicates the experiment run ($j=1,\dots,J$), the superscript $a$ indicates the algorithm, $x_{j}$ denotes the ground truth for the $j$th experiment and $\hat\mu^{a}_{j}$ the recovered mean from the algorithm. 
 This is a crude measure of quality but is enough to show how the different algorithms compare (and, in particular, that the BIS outperforms Fearnhead's algorithm); \citet{arulampalam02} in their highly cited paper mention that the RMSE is widely used in the literature and facilitates quantitative comparison.  
 
-In the figures below, \emph{KF} and \emph{KS} refer to the Kalman filter and smoother, \emph{PF} to a bootstrap particle filter, \emph{FFBS} to the forward filtering backward smoothing algorithm applied after the PF and \emph{FFBS$_{\text{L}}$} to the sub-quadratic implementation (with $M=25$). The \emph{BIS} symbols refer to the (bootstrap) backward information smoothers and the subscript indicates the version: Q for quadratic, L for linear, S for sub-quadratic (with $M=25$). Finally, FH refers to Fearnhead's algorithm (the full description of Fearnhead's algorithm for this model is available in the appendix \ref{app:fearnhead-lg}).\add{link to reproducible code sims, SMC.jl}\check{jul13}
+In the figures below, \emph{KF} and \emph{KS} refer to the Kalman filter and smoother, \emph{PF} to a bootstrap particle filter, \emph{FFBS} to the forward filtering backward smoothing algorithm applied after the PF and \emph{FFBS$_{\text{S}}$} to the sub-quadratic implementation (with $M=25$). The \emph{BIS} symbols refer to the (bootstrap) backward information smoothers and the subscript indicates the version: Q for quadratic, L for linear, S for sub-quadratic (with $M=25$). Finally, FH refers to Fearnhead's algorithm (the full description of Fearnhead's algorithm for this model is available in the appendix \ref{app:fearnhead-lg}).\add{link to reproducible code sims, SMC.jl}\check{jul13}
 
 In figure \ref{comp-smoothing-A} it is already clear that the FH algorithm underperforms. It is also interesting to observe that all three BIS offer comparable performances while the BIS$_{\text{L}}$ is computationally the least expensive.
 The FFBS algorithm performs quite well as well which can be expected as the dynamic is simple and hence the FFBS results does not suffer too much from the lack of resampling in the backward stage.\check{jul13}
 
 In figure \ref{comp-smoothing-B} the FH algorithm significantly underperforms compared to all other algorithms considered. The other algorithms behave in a way that is comparable to our discussion of case A with, again, the BIS$_{\text{L}}$ offering good performances while being the least computationally expensive of the particle methods considered. 
-We can also observe that both sub-quadratic implementations (FFBS$_{\text{L}}$ and BIS$_{\text{L}}$) seem to suffer a bit with performances that are a bit more spread out. 
+We can also observe that both sub-quadratic implementations (FFBS$_{\text{S}}$ and BIS$_{\text{L}}$) seem to suffer a bit with performances that are a bit more spread out. 
 \check{jul16,jul13}
 
 %%%%%%%%%%%%%

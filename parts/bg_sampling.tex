@@ -244,13 +244,14 @@ The authors show that, if the lengths $\{\tau_{i}\}_{i\ge 1}$ are governed by a 
 In the BPS algorithm, the IPP governing the lengths of the trajectory segments has intensity function $\lambda:\R^{d}\times\R^{d}\to\R^{+}$ with
 %
 \eqa{
-	\lambda(x,v) &=& \scal{\nabla U(x),v}^{+},	
+	\lambda(x,v) &=& \scal{\nabla U(x),v}^{+}.	
 }
 %
-where $z^{+}$ is defined to be $\max \{0, z\}$.\\
 At the end of each segment, the trajectory ``bounces'' and the velocity is reflected against the local level set of the energy $U$:
 \eqa{	v' &=& R(x)v \spe v-2{\scal{\nabla U(x),v}\nabla U(x)\over \bnorm{\nabla U(x)}^{2}}.	}
 The authors show that the velocities also need to be ``refreshed'' according to the arrival times of a (homogenous) Poisson process (PP) of intensity $\lambda^{\text{ref}}\ge 0$, a parameter of the BPS. This ensures the algorithm explores the entirety of the space. The basic BPS algorithm is reproduced in \hyperref[alg:BPS1]{algorithm~\ref*{alg:BPS1}} below.
+
+\clearpage
 
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:BPS1}\small \idblue{Basic BPS}}
@@ -277,13 +278,13 @@ The target expectation can then be obtained by integrating the test function alo
 &\approx& T\inv \pat{\sum_{i=1}^{n-1} \int_0^{\tau_i} \varphi(x^{(i-1)}+v^{(i-1)}s)\,\mathrm{d}s + \int_0^{t_n-T}\varphi(x^{(n-1)}+v^{(n-1)}s)\mathrm{d}s}. \nn}
 The integrals in the sum can themselves be approximated if needed using quadrature.
 
-As we saw, the algorithm requires to sample the first arrival time of an IPP of intensity $\chi(t)=\lambda(x+vt,v)$ where $\lambda(x,v)=\max\{0,\scal{\nabla U(x),v}\}$. Sampling from an IPP is a well explored topic in the literature and the authors summarise three possible approaches which we list briefly below:
+As we saw, the algorithm requires to sample the first arrival time of an IPP of intensity $\chi(t)=\lambda(x+vt,v)$ where $\lambda(x,v)=\scal{\nabla U(x),v}^{+}$. Sampling from an IPP is a well explored topic in the literature and the authors summarise three possible approaches which we list briefly below:
 %\begin{itemize}\itsep0
 
-    \emph{Time-scale transformation}: this approach requires computing the inverse quantile of $\Xi(t):=\int_{0}^{t} \chi(s)\mathrm{d}s$ which is usually intractable but it can computed numerically if the target is strictly log-concave and differentiable. Given $V$ drawn from a Uniform on $[0,1]$, the first arrival time of the IPP is given by $\Xi^{\inv}(-\log(V))$.
+    \emph{Time-scale transformation}: this approach requires computing the inverse quantile of $\Xi(t):=\int_{0}^{t} \chi(s)\mathrm{d}s$ which is usually intractable but it can be computed numerically if the target is strictly log-concave and differentiable. Given $V$ drawn from a Uniform on $[0,1]$, the first arrival time of the IPP is given by $\Xi^{\inv}(-\log(V))$.
 %This, the authors show, allows to make a connection with the Metropolis Hastings algorithm.
     
-    \emph{Adaptive thinning}: this approach requires an upper bounds $\overline{\chi}_{s}(t)$ with $\overline\chi_{s}(t)=0$ for $t<s$ and $\overline\chi_{s}(t)\ge\chi(t)$ for $s\le t\le s+\Delta(s)$ where $\Delta$ is a positive function (in the standard case, $\Delta=+\infty$). Additionally, it requires the ability to sample from the IPP corresponding to $\overline\chi_{s}$. Let $\tau$ be such a sample with $\tau\le s+\Delta$, there is then an accept-reject step with rate $\chi(\tau)/\overline\chi(\tau)$. Ideally, $\Delta$ and $\chi/\overline\chi_{s}$ are large (so that we do not have to simulate too many candidates which incurs a computational cost).
+    \emph{Adaptive thinning}: this approach requires an upper bounds $\overline{\chi}_{s}(t)$ with $\overline\chi_{s}(t)=0$ for $t<s$ and $\overline\chi_{s}(t)\ge\chi(t)$ for $s\le t\le s+\Delta(s)$ where $\Delta$ is a positive function (in the standard case, $\Delta=+\infty$). Additionally, it requires the ability to sample from the IPP corresponding to $\overline\chi_{s}$. Let $\tau$ be such a sample with $\tau\le s+\Delta$, there is then an accept-reject step with rate $\chi(\tau)/\overline\chi(\tau)$. Ideally, $\Delta$ and $\chi/\overline\chi_{s}$ are large (so that we do not have to simulate too many candidates which would incur an increased computational cost).
  
     \emph{Superposition}: if the energy $U$ can be decomposed in a sum $U(x)=\sum_{j=1}^{m}U^{[j]}(x)$ and that each term can be targeted (via one of the first two methods), then we can use the thinning method with bound $\sum_{j=1}^{m}\chi^{[j]}(t)$.
 
