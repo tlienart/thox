@@ -2,7 +2,7 @@
 
 ![stability-wip](https://img.shields.io/badge/stability-work_in_progress-lightgrey.svg)
 
-(if you happen to be interested, send me an email at `tlienart £ turing > ac > uk`)
+(if you happen to be interested, send me an email at `tlienart.cpg £ gmail > com`)
 
 ## Todo
 
