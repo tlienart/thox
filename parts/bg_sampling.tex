@@ -69,7 +69,7 @@ This metric is bounded from below by $1$ -- the degenerate case where a single p
 
 In this point we mention briefly a few standard algorithms used to attempt to generate samples from a distribution.
 Later on, we will compare alternative methods to these standard algorithms.
-The list and descriptions are not meant to be exhaustive and we refer to \citep{robert04, green15} for a more complete overview.
+The list and descriptions are not meant to be exhaustive and we refer to \citet{robert04, green15} for a more complete overview.
 
 \subsubsection{Metropolis-Hasting}
 The Metropolis-Hasting algorithm (MH) is one of the most prominent member of the class of Markov Chain Monte Carlo methods (MCMC). In MCMC methods, one considers a sequence (chain) of random variables $X^{(1)}, X^{(2)},\dots$ following a conditional probability density or \emph{transition kernel} $K$ with $X^{(n+1)} \sim K(X^{(n)}, \,\cdot\,)$. 
@@ -141,7 +141,7 @@ It is a very popular method in computational Bayesian inference and tends to be 
 \subsection{Sequential importance sampling}
 %%%%%%%%%%%%%%%%%%%
 %\subsubsection{Hidden Markov models}
-In the context of HMM, we are usually interested in estimating a sequence of target distributions $\{\pi_{t}(x_{1:t})\}_{t=1}^{T}$ which admit the following factorisation structure:
+In the context of HMMs, we are usually interested in estimating a sequence of target distributions $\{\pi_{t}(x_{1:t})\}_{t=1}^{T}$ which admit the following factorisation structure:
 %
 \eqa{
 	\pi_{t}(x_{1:t}) &\propto& \pi_{t}(x_{t}\st x_{1:t-1})\pi_{t-1}(x_{1:t-1}).\nn
@@ -169,11 +169,12 @@ In the filtering problem on a HMM, the target densities are $\pi_{t}(x_{1:t})=p(
 \eqa{ \alpha_t(x_{1:t}) &=& {p(x_{1:t}\st y_{1:t})\over p(x_{1:t-1}\st y_{1:t-1})q_t(x_t\st x_{1:t-1})} 	\nn\\
 	&=& {p(x_t,y_t\st x_{1:t-1},y_{1:t-1})p(x_{1:t-1}\st y_{1:t-1})p(y_{1:t-1})\over p(x_{1:t-1}\st y_{1:t-1})q_t(x_t\st x_{1:t-1})p(y_{1:t})}  \nn\\
 	&\propto& {p(y_t\st x_t)p(x_t\st x_{t-1}) \over q_t(x_t\st x_{1:t-1})},}
-where we exploited the conditional dependence structure of a HMM. Consequently, the optimal proposal is
+where we exploited the conditional dependence structure of the HMM. 
+Consequently, the optimal proposal is
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{t-1}) &\propto& p(y_{t}\st x_{t})p(x_{t}\st x_{t-1})	, \label{particle filter OID}}
-which could also have obtained from applying \eqref{optimal proposal}.\\
+which could also have been obtained from applying \eqref{optimal proposal}.\\
 Beyond simply corresponding to sequential importance sampling for the filtering problem, the particle filter adds an extra step: resampling. 
-This step permits to alleviate the problem of weight degeneracy incurring a growth of the variance of resulting estimators over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. 
+This step alleviates the problem of weight degeneracy whereby the variance of estimators grows over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. 
 The resampling step consists of resampling particles with replacement depending upon their weights.
 This, in practice, is done when the ESS comes under a pre-assigned threshold \citep{delmoral06}.
 Several schemes exist with the simplest one being the \emph{Multinomial Resampling} where $n$ particle indices are drawn from a Multinomial with weights corresponding to the $n$ weights of the initial particles.\\

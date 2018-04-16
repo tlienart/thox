@@ -14,7 +14,7 @@ In line with the rest of this document we concern ourselves with the case where 
 %\subsubsection{Tree graphs}
 
 The problem of computing singleton marginals on a tree is relatively easy since the recursive structure of the problem can be exploited. Let $s$ denote a node of interest so that we are targeting the marginal $p(x_{s})$. 
-The full joint on the tree can then be written relatively to that node:
+The full joint on the tree can then be written relative to that node:
 \eqa{	p(x) &\propto& \psi_s(x_s) \prod_{t\in\partial s} \psi_{ts}(x_t,x_s)\pac{\psi_t(x_t)\phi_{\partial t\backslash s}(x_t,x_{\partial t\backslash s})},	\label{eq:factorisation-tree}}
 where the $\phi_{\partial t\backslash s}$ are given recursively by
 %
@@ -142,7 +142,7 @@ A common workaround is to perform the BP algorithm multiple times on different s
 				}
 %
 The initial messages are usually chosen among a class of simple distributions (e.g., the Normal distribution) potentially incorporating prior knowledge about the steady state messages. 
-Provided the algorithm converges to a fixed point, the beliefs cannot be guaranteed to be proportional to the true marginals unlike the tree case. However, the beliefs can provide good approximations to the marginals which makes the LBP a popular method for approximate Bayesian inference on MRF \citep{sudderth03}. The fixed points of the LBP have been shown to correspond to extrema of the Bethe free energy \citep{yedidia02} and there exist conditions under which the LBP algorithm provably converges \citep{heskes04,ihler05}.
+Provided the algorithm converges to a fixed point, the beliefs cannot be guaranteed to be proportional to the true marginals unlike the tree case. However, the beliefs can provide good approximations to the marginals which makes the LBP a popular method for approximate Bayesian inference on MRFs \citep{sudderth03}. The fixed points of the LBP have been shown to correspond to extrema of the Bethe free energy \citep{yedidia02} and there exist conditions under which the LBP algorithm provably converges \citep{heskes04,ihler05}.
 
 Note that while it is known that the LBP algorithm can lead to good proxy to the marginals, the updates may still be intractable. Indeed, the computation of messages requires an integral which may be hard (or expensive) to compute accurately (e.g., if the dimension of the random variable on a node is high).\check{aug17}
 

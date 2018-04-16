@@ -36,9 +36,9 @@ suggesting to iterate over the components taking each time $q_{i} \propto \exp(\
 In this thesis, we focus on an alternative approximate Bayesian inference class of algorithms which exploits the factorisation structure of the target distribution $p$ directly instead of imposing a factorisation structure a priori like in MFVI.
 
 \subsection{ADF, EP and LBP}
-The Assumed Density Filtering (ADF) algorithm and the  Expectation Propagation (EP) algorithm are two other popular methods that are also based on the KL divergence. The choice of distribution space is usually the exponential family associated to a sufficient statistic $\phi$. Additionally, these methods assume that the target distribution $p$ factorises in terms that are easier to handle than $p$ itself. We introduce these methods at sections \ref{point:expof-convex} and \ref{s:ADF+EP}.
+The Assumed Density Filtering (ADF) algorithm and the  Expectation Propagation (EP) algorithm are two other popular methods that are also based on the KL divergence. The choice of distribution space is usually the exponential family associated to a sufficient statistic $\phi$. Additionally, these methods assume that the target distribution $p$ factorises into terms that are easier to handle than $p$ itself. We introduce these methods in sections \ref{point:expof-convex} and \ref{s:ADF+EP}.
 
-The Belief Propagation (BP) algorithm and the Loopy Belief Propagation (LBP) algorithm are message-passing algorithms which target distributions that factorise according to a MRF. Those methods can also be shown to be fixed-point algorithms corresponding to a specific form of \eqref{eq:generic-abi} \citep{yedidia01, yedidia02}.
+The Belief Propagation (BP) algorithm and the Loopy Belief Propagation (LBP) algorithm are message-passing algorithms which target distributions that factorise according to a MRF. Those methods can also be shown to be fixed-point algorithms corresponding to a specific form of divergence \eqref{eq:generic-abi} \citep{yedidia01, yedidia02}.
 
 In this part of the thesis we focus on the use of EP and (L)BP algorithms for inference on MRF and discuss applications. In point \ref{s:ADF+EP} we cover the ADF and EP algorithms with exponential family distributions and in point \ref{bg:belief-propag} we introduce the BP and LBP algorithms.
 
