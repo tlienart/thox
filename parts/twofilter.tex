@@ -22,7 +22,7 @@ Then, exploiting the conditional dependences of the HMM, we get
 %
 \eqa{
 	p(x_t\st y_{1:T}) 	
-		&\propto& p(y_{t+1:T}\st x_t,x_{t+1},y_t)p(y_t\st x_t,x_{t+1})
+		&\propto& p(y_{t:T}\st x_{t}, y_{1:t-1})p(x_{t}, y_{1:t-1})
 \nn\\
 		&\propto& p(x_t\st y_{1:t-1})p(y_{t:T}\st x_t).	\label{eq:TFS}
 }
@@ -195,15 +195,16 @@ This expression suggests picking $\gamma_{1}$ to be the prior distribution on th
 The last two equations \eqref{normalised BIF and partial joint} and \eqref{full joint and first bif} are crucial for the rest of the analysis. The first one suggests that if we pick $\gamma_{t}$ to be close to the predictive density then, then each term $\tbif_{t}(x_{t:T})$ forms an estimator for the partial joint smoothing densities $p(x_{t:T}\st y_{1:T})$; the second one indicates that upon selecting $\gamma_{1}$ to be the prior for the initial state, we end up targeting exactly the joint distribution of interest, no matter which admissible sequence $\{\gamma_{t}\}_{t=2}^{T}$ we picked earlier. \check{jul16}
 
 This suggests to build a good estimator of the prediction density, based partly or entirely on a particle estimator of the filtering density; use it as normalisation density and target the corresponding normalised BIF recursively. 
-We explored this idea and showed that it significantly outperforms the default choice used in \citep{briers10, fearnhead10} where the authors also suggest taking $\gamma_{1}$ as the prior $\pi_{0}$ and build the subsequent $\gamma_{t}$ by propagation through the transition dynamic of the HMM:
+We explored this idea and showed that it significantly outperforms the default choice used in \citet{briers10, fearnhead10} where the authors also suggest taking $\gamma_{1}$ as the prior $\pi_{0}$ and build the subsequent $\gamma_{t}$ by propagation through the transition dynamic of the HMM:
 %
 \eqa{
 	\gamma_{t}(x_{t}) &=& \int p(x_{t}\st x_{t-1})\gamma_{t-1}(x_{t-1}) \mathrm dx_{t-1}\label{eq:choice-norma-bad}
 }
 %
-Note that this choice also suffers from a tractability issue in a system with transition that is more complex than the linear and Gaussian one considered in \citep{fearnhead10} where, in any case, the optimal Kalman smoother should be preferred. We show in the appendix (point \ref{app:normalising-density-fearnhead-lg}) how this normalising density can be obtained in the case of a simple linear Gaussian dynamic.\check{jul16}
+Note that this choice also suffers from a tractability issue in a system with a transition that is more complex than the linear and Gaussian one considered in \citet{fearnhead10} where, in any case, the optimal Kalman smoother should be preferred. 
+We show in the appendix (point \ref{app:normalising-density-fearnhead-lg}) how this normalising density can be obtained in the case of a simple linear Gaussian dynamic.\check{jul16}
 
-Upon selecting $\gamma_{t}$ to be the approximation of the predictive density \eqref{eq PDhat} based entirely on a a particle estimator of the filtering density, we get what Taghavi calls the \emph{backward informations smoothing} (BIS) algorithm \citet{taghavi12}. This choice verifies the support condition \eqref{eq: tech condition normalisation density} provided the support  of the transition density covers the support of the BIF. Typically, the support of the transition density is the whole space $\mathcal X$ which guarantees this. The optimal importance function for targeting the corresponding normalised BIF with this specific choice of normalising density ($\gamma_{t}(x_{t})=\hpd_{t}(x_{t})$) is obtained by considering \eqref{recursion joint BIF}:\check{jul16, jul2}
+Upon selecting $\gamma_{t}$ to be the approximation of the predictive density \eqref{eq PDhat} based entirely on a a particle estimator of the filtering density, we get what Taghavi calls the \emph{backward informations smoothing} (BIS) algorithm \citep{taghavi12}. This choice verifies the support condition \eqref{eq: tech condition normalisation density} provided the support  of the transition density covers the support of the BIF. Typically, the support of the transition density is the whole space $\mathcal X$ which guarantees this. The optimal importance function for targeting the corresponding normalised BIF with this specific choice of normalising density ($\gamma_{t}(x_{t})=\hpd_{t}(x_{t})$) is obtained by considering \eqref{recursion joint BIF}:\check{jul16, jul2}
 \eqa{		\tilde q^{\text{opt}}_{t}(x_{t}\st \tilde X^{(j)}_{t+1}) &\propto & {\hpd_{t}(x_{t})\over \hpd_{t+1}(\tilde X^{(j)}_{t+1})} p(\tilde X^{(j)}_{t+1}\st x_{t})p(y_{t}\st x_{t}),\label{eq:opt-prop-bif}}
 where the $\{\tilde X_{t+1}^{(j)}\}_{j=1}^{N}$ are the particles from the previous smoothing step. These steps are illustrated in algorithm \ref{alg:bisquad}.\check{jul5}
 
@@ -212,8 +213,9 @@ where the $\{\tilde X_{t+1}^{(j)}\}_{j=1}^{N}$ are the particles from the previo
 	\caption{\label{alg:bisquad}\dblue{\emph{\small Backward information smoother with quadratic complexity}}}
 	\begin{algorithmic}[1]
 		\State run a PF targeting $\{p(x_{t}\st y_{1:t})\}_{t=1}^{T}$ with $N$ particles $\{X^{(i)}_{t}, w^{(i)}_{t}\}_{t,i=1}^{T,N}$
+		\State let $\{\tilde X^{(j)}_{T}, \tilde w^{j}_{T}\}$ be the result of resampling (if required) the final PF particles
 		\For{$t=T-1:2$}
-			\State sample $\tilde X^{(j)}_{t}\simiid \tilde q_{t}(\cdot\st \tilde X^{(j)}_{t+1})$ with $\tilde q_{t}\approx \tilde q_{t}^{\text{opt}}$ for $j=1,\dots,N$
+			\State sample $\tilde X^{(j)}_{t}$ from $\tilde q_{t}(\cdot\st \tilde X^{(j)}_{t+1})$ with $\tilde q_{t}\approx \tilde q_{t}^{\text{opt}}$ for $j=1,\dots,N$
 			\State update and normalise the weights $\tilde w^{(j)}_{t}\propto \tilde\alpha^{(j)}_{t}\tilde w^{(j)}_{t+1}$
 			\State resample the particles if necessary
 		\EndFor
@@ -243,7 +245,7 @@ We have shown that the BIF algorithm is inherently quadratic in the number of pa
 \eqa{
 	\tilde X^{(j)}_{t} &\simiid & \tilde q^{\text{mix}}_{t} \esp\propto\esp \sum_{i,j=1}^{N} {w^{(i)}_{t-1} \tilde w^{(j)}_{t+1} \over s^{(j)}_{t+1}} p(x_{t}\st X^{(i)}_{t-1})p(y_{t}\st x_{t})p(\tilde X^{(j)}_{t+1}\st x_{t}),
 } 
-where $s^{(j)}_{t+1}=\sum_{k=1}^{n}w^{(k)}_{t}p(\tilde X^{(j)}_{t+1}\st X^{(k)}_{t})$. Since this is equivalent to sampling from the optimal proposal, no reweighing step is needed, provided we can sample exactly from the mixture.\check{jul16, jul6}
+where $s^{(j)}_{t+1}=\sum_{k=1}^{n}w^{(k)}_{t}p(\tilde X^{(j)}_{t+1}\st X^{(k)}_{t})$. Since this is equivalent to sampling from the optimal proposal, no reweighting step is needed, provided we can sample exactly from the mixture.\check{jul16, jul6}
  
 Sampling from such a mixture can be done in two steps: first, sample a pair of labels $(i^{\star},j^{\star})$ from a multinomial distributions with $N^{2}$ weights $\beta^{(i,j)}_{t}$ corresponding to the weight of the component $(i,j)$ relative to the whole mixture $q_{t}^{\text{mix}}$; second, sample from the component $(i^{\star},j^{\star})$. 
 Of course this does not simplify the problem: we still have to sample $N$ pairs of indices from a multinomial with $N^{2}$ pair which is still quadratic in $N$ and, additionally, computing the mixture component weights $\beta^{(i,j)}_{t}$ is intractable in general. \check{jul16,jul10}
@@ -304,7 +306,7 @@ This is in fact a core element of the idea behind our \emph{expected particle be
 
 \subsection{Sub-quadratic FFBS}
 A similar idea than the one applied at the previous point can be applied in the context of the FFBS algorithm (point \ref{bg:particle-smoothing}).
-In the FFBS algorithm, a particle filter is ran forward and the weights are then updated in a backward step:
+In the FFBS algorithm, a particle filter is run forwards and the weights are then updated in a backward step:
 %
 \eqa{		w^{(i)}_{t\st T} &\propto& w^{(i)}_{t}\sum_{j=1}^{N}{w^{(j)}_{t+1\st T}\pac{p(X^{(j)}_{t+1}\st X^{(i)}_{t})\over \sum_{k=1}^{N}w^{(k)}_{t}p(X^{(j)}_{t+1}\st X^{(k)}_{t})}}. \label{ffbs-weight-2}
 }
@@ -349,7 +351,8 @@ A = \matd{1 & 1\\0&1},\quad B = \matd{1&0}, \quad Q = {\nu\over 6}\matd{3&1\\1&2
 }
 \renewcommand{\arraystretch}{1.2}
 %
-where $\nu,\tau>0$ define the amplitude of the noise processes. We compare two cases, the first one (case A) has $\nu=10$ and $\tau=1$ and the second one (case B) has the opposite assignment $\nu=1$ and $\tau=10$. Case A corresponds to a case where \citet{fearnhead10} indicate that the state has freedom to follow the observations which helps smoothing algorithms. Case B corresponds to a case where \citet{fearnhead10} indicate that the states are highly dependent through time which can smoothers to struggle. \check{jul13}
+where $\nu,\tau>0$ define the amplitude of the noise processes. We compare two cases, the first one (case A) has $\nu=10$ and $\tau=1$ and the second one (case B) has the opposite assignment $\nu=1$ and $\tau=10$. Case A corresponds to a case where \citet{fearnhead10} indicate that the state has freedom to follow the observations which helps smoothing algorithms. 
+Case B corresponds to a case where \citet{fearnhead10} indicate that the states are highly dependent through time which can cause smoothers to struggle. \check{jul13}
 
 We run the dynamic for $T=50$ steps with $N=200$ particles and run the experiments $J=50$ times for each algorithm.
 We compare the average RMSE across the time steps computed as:
@@ -363,7 +366,7 @@ This is a crude measure of quality but is enough to show how the different algor
 
 In the figures below, \emph{KF} and \emph{KS} refer to the Kalman filter and smoother, \emph{PF} to a bootstrap particle filter, \emph{FFBS} to the forward filtering backward smoothing algorithm applied after the PF and \emph{FFBS$_{\text{S}}$} to the sub-quadratic implementation (with $M=25$). The \emph{BIS} symbols refer to the (bootstrap) backward information smoothers and the subscript indicates the version: Q for quadratic, L for linear, S for sub-quadratic (with $M=25$). Finally, FH refers to Fearnhead's algorithm (the full description of Fearnhead's algorithm for this model is available in the appendix \ref{app:fearnhead-lg}).\add{link to reproducible code sims, SMC.jl}\check{jul13}
 
-In figure \ref{comp-smoothing-A} it is already clear that the FH algorithm underperforms. It is also interesting to observe that all three BIS offer comparable performances while the BIS$_{\text{L}}$ is computationally the least expensive.
+In figure \ref{comp-smoothing-A} it is already clear that the FH algorithm underperforms. It is also interesting to observe that all three BIS methods offer comparable performances while the BIS$_{\text{L}}$ is computationally the least expensive.
 The FFBS algorithm performs quite well as well which can be expected as the dynamic is simple and hence the FFBS results does not suffer too much from the lack of resampling in the backward stage.\check{jul13}
 
 In figure \ref{comp-smoothing-B} the FH algorithm significantly underperforms compared to all other algorithms considered. The other algorithms behave in a way that is comparable to our discussion of case A with, again, the BIS$_{\text{L}}$ offering good performances while being the least computationally expensive of the particle methods considered. 
@@ -394,8 +397,8 @@ We can also observe that both sub-quadratic implementations (FFBS$_{\text{S}}$ a
 \subsubsection{Model 2 (medium dimensionality)}
 In this second example, we consider a model with a 10-dimensional latent space and a 6-dimensional observational space. The matrix $A$ is defined as the identity plus a perturbation matrix $E$ with elements $e_{ij}=\eta_{ij}/5$ with $\eta_{ij}$ drawn from a standard Gaussian. The matrix $B$ has elements $b_{ij}$ drawn from a standard Gaussian. Both matrices $A$ and $B$ are normalised to prevent an explosive behaviour from the HMM. The matrix $Q$ and $R$ have random elements drawn in a similar fashion and both matrices are made positive definite. Both $Q$ and $R$ are normalised and scaled such that $\| Q\| = 1/5$ and $\| R\| = 1/20$. We denote this model LG-10-6 for further reference.
 
-The point of this example is to show that when the particle filter struggles (with a lot of particles with very low weight or, correspondingly, a low ESS) then naturally both version of the FFBS struggle. 
-However, the algorithms which apply a resampling of the representation of the particle filter (BIS$_{\text{L}}$ and BIS$_{\text{S}}$) perform very well. Indeed, this resampling allows guiding the smoothing densities to regions of higher expected density (through more concentrated normalising densities $\gamma_{t}$) resulting in better performances overall. The performances are illustrated at figure \ref{comp-model2}.
+The point of this example is to show that when the particle filter struggles (with a lot of particles with very low weight or, correspondingly, a low ESS) then naturally both versions of the FFBS struggle. 
+However, the algorithms which apply a resampling of the representation of the particle filter (BIS$_{\text{L}}$ and BIS$_{\text{S}}$) perform very well. Indeed, this resampling guides the smoothing densities to regions of higher expected density (through more concentrated normalising densities $\gamma_{t}$) resulting in better performance overall. The performances are illustrated at figure \ref{comp-model2}.
 
 \begin{figure}[!h]
 \center
@@ -426,7 +429,7 @@ This model is drawn from the paper of \citet{arulampalam02} with the dimensional
 }\,\,\text{and}\,\, Q=10,\,\, R=1.
 }
 %
-We call this model NL-1-1 for further reference. We use $N=50$ particles and for $K=100$ time step (as in the original paper) and run the experiments $50$ times with $M=15$ for the sub-quadratic algorithms.
+We call this model NL-1-1 for further reference. We use $N=50$ particles and for $K=100$ time steps (as in the original paper) and run the experiments $50$ times with $M=15$ for the sub-quadratic algorithms.
 
 Figure \ref{comp-nl-1} shows the results of the comparison of the RMSE for each algorithm considered. No smoothing algorithm particularly stands out but it shows that the sub-quadratic smoothing algorithms considered do not significantly underperform compared to the full quadratic complexity ones even when the underlying dynamic is non-linear.
 
