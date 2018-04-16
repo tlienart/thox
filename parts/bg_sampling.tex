@@ -21,7 +21,7 @@ In such cases, a broadly studied approach is the Monte Carlo integration with
 	X^{(i)}\esp \simiid\esp \pi,\quad\text{and}\quad w(X^{(i)})\spe N\inv. 	
 \label{eq:mcsampling}}
 %
-The strong law of large numbers then indicates that $\widehat I_N\to I$ almost surely with approximation error scaling like $\mathcal O(N^{-1/2})$ independently of the dimensionality of the problem. This is to be compared with deterministic rules which typically have approximation error scaling like $\mathcal O(N^{-\alpha/d})$ for a fixed $\alpha>0$ depending on the quadrature rule \citep{caflisch98}. The problem then becomes one of drawing iid samples from $\pi$ which is often also an intractable problem. Note that \eqref{eq:mcsampling} in fact defines an \emph{empirical measure} $\hat \pi$ with
+The strong law of large numbers then indicates that $\widehat I_N\to I$ almost surely with approximation error scaling like $\mathcal O(N^{-1/2})$ independently of the dimensionality of the problem (see e.g. \cite{robert04}). This is to be compared with deterministic rules which typically have approximation error scaling like $\mathcal O(N^{-\alpha/d})$ for a fixed $\alpha>0$ depending on the quadrature rule \citep{caflisch98}. The problem then becomes one of drawing iid samples from $\pi$ which is often also an intractable problem. Note that \eqref{eq:mcsampling} in fact defines an \emph{empirical measure} $\hat \pi$ with
 %
 \eqa{
 	\hat \pi(x) &:=& N\inv\sum_{i=1}^{N} \delta_{X^{(i)}}(x),
@@ -124,7 +124,8 @@ Since finding the exact trajectory of a Hamiltonian system is usually intractabl
 		\State draw a momentum variable $P^{(n)}\sim\mathcal N(0, M) $
 		\State compute $L$ steps of the leapfrog integrator from $(X^{(n)},P^{(n)})\rightarrow (X^{\star},P^{\star})$ 
 		\State compute the acceptance ratio
-			$$ \rho \leftarrow \min\left\{\exp\left(-H(X^{\star},P^{\star})-H(X^{(n)}, P^{(n)})\right),1\right\} $$
+			$$ \rho \leftarrow \min\left\{\exp\left(-\Delta H \right),1\right\} $$
+			where $\Delta H \leftarrow H(X^{\star},P^{\star})-H(X^{(n)}, P^{(n)})$.
 		\State generate $\beta \sim\mathcal B(\rho)$
 		\State compute the new state: $X^{(n+1)} \leftarrow \beta X^{\star}+(1-\beta)X^{(n)}$
 	\end{algorithmic}
@@ -146,7 +147,7 @@ In the context of HMM, we are usually interested in estimating a sequence of tar
 	\pi_{t}(x_{1:t}) &\propto& \pi_{t}(x_{t}\st x_{1:t-1})\pi_{t-1}(x_{1:t-1}).\nn
 }
 %
-This lead to the development of \emph{sequential Monte Carlo} (SMC) methods \citep[chapter 14.3]{robert04}. The underlying principle of sequential importance sampling is the same as that of importance sampling except that a different proposal is considered at every step $t$ taking into account the previous draw of particles and the evolution of the system:
+This led to the development of \emph{sequential Monte Carlo} (SMC) methods \citep[chapter 14.3]{robert04}. The underlying principle of sequential importance sampling is the same as that of importance sampling except that a different proposal is considered at every step $t$ taking into account the previous draw of particles and the evolution of the system:
 %
 \eqa{
 	q_{t}(x_{1:t}) &\propto& q_{t}(x_{t}\st x_{1:t-1})q_{t-1}(x_{1:t-1}).	\nn
@@ -160,7 +161,7 @@ Following this form, new samples or \emph{particles} $X^{(i)}_t$ can be drawn fr
 %
 The variance of an IS estimator is directly related to the variance of the associated importance weights. In order to counter the increase of variance induced by the sequential IS procedure, the proposal at step $t$ should be such that the variance of the update factors $\alpha_t$ is as small as possible. In particular, the \emph{optimal proposal} \citep{doucet11} keeps it at zero with
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{1:t-1}) &:=& \pi_{t}(x_{t}\st x_{1:t-1}).	\label{optimal proposal}}
-Additionally, since we can't typically sample easily from the optimal proposal, we have to resort to approximating distributions.\check{jul16, jun24}
+Additionally, since we cannot typically sample easily from the optimal proposal, we have to resort to approximating distributions.\check{jul16, jun24}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Particle filtering}
@@ -172,10 +173,10 @@ where we exploited the conditional dependence structure of a HMM. Consequently, 
 \eqa{		q^{\text{opt}}_{t}(x_{t}\st x_{t-1}) &\propto& p(y_{t}\st x_{t})p(x_{t}\st x_{t-1})	, \label{particle filter OID}}
 which could also have obtained from applying \eqref{optimal proposal}.\\
 Beyond simply corresponding to sequential importance sampling for the filtering problem, the particle filter adds an extra step: resampling. 
-This step permits to alleviate the problem of weight degeneracy incurring growth of variance over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. 
+This step permits to alleviate the problem of weight degeneracy incurring a growth of the variance of resulting estimators over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. 
 The resampling step consists of resampling particles with replacement depending upon their weights.
 This, in practice, is done when the ESS comes under a pre-assigned threshold \citep{delmoral06}.
-Several schemes exist with the simplest one being the \emph{Multinomial Resampling} where $n$ particle indices are drawn from a Multinomial with weights corresponding to the $n$ weights of the initial particles.
+Several schemes exist with the simplest one being the \emph{Multinomial Resampling} where $n$ particle indices are drawn from a Multinomial with weights corresponding to the $n$ weights of the initial particles.\\
 Resampling is a crucial step needed to make SMC methods viable \citep{hol06, doucet11}. However, the methods discussed in this thesis do not depend upon the resampling scheme and therefore we will assume in the sequel that a resampling scheme is applied without discussing it further. In the experiments we use the standard multinomial resampling.
 
 %We have omitted the \emph{resampling step} in algorithm \ref{alg:particle-filter}. That step resamples particles with replacement based on their weights if the ESS comes under a pre-assigned threshold \citep{delmoral06}. In practice, this alleviates the problem of weight degeneracy incurring growth of variance over time when one considers a suboptimal proposal distribution such as the bootstrap proposal. Although this step is a key aspect of particle filters, it is not an aspect that plays an important role in the issues we consider in this document; in the sequel we will therefore assume that a standard multinomial resampling is applied \citep{hol06,doucet11}. 
@@ -202,7 +203,8 @@ The computational complexity of algorithm \ref{alg:particle-filter} is $\mathcal
 
 Sampling directly from the optimal proposal is often an intractable problem by itself. In the context of filtering, an alternative choice is the \emph{bootstrap proposal} \citep{doucet11} with
 \eqa{q^{\text{bs}}(x_{t}\st x_{t-1})&:=&p(x_{t}\st x_{t-1}),}
-which is often easier to sample from. In that case, the update factor simply reduces to $\alpha^{(i)}_t \propto p(y_t\st X^{(i)}_t)$. However, since the likelihood and the transition density may not be well aligned, those update factors can vary a lot incurring an increase in the variance of the resulting estimator.\check{jul16,jun29}
+which is often easier to sample from. In that case, the update factor simply reduces to $\alpha^{(i)}_t \propto p(y_t\st X^{(i)}_t)$. However, since the likelihood and the transition density may not be well aligned, those update factors can vary a lot incurring an increase in the variance of the resulting estimator.
+This problem is particularly prevalent in high dimensions when the distributions considered tend to be more concentrated.
 
 %\check{jul16}
 
@@ -235,7 +237,7 @@ The objective is again the computation of expected values of the form $\E_\pi[\v
 
 Defining the \emph{energy} function $U$ as $U(x) = -\log \gamma(x)	$
  and assuming it is continuously differentiable, the algorithm generates a piecewise linear path based on $\nabla U$. 
- Each segment is specified by an initial position $x^{(i)}\in \R^{d}$, a length $\tau_{i+1}\in \R^{+}$ and a velocity $v^{(i)}$ with the recurrence $x^{(i+1)}=x^{(i)}+v^{(i)}\tau_{i+1}$. The times where the velocity changes are given by the cumulative sum, $t_i=\sum_{j=1}^{i}\tau_j$ with $t_0=0$. The continuous positions along the path are therefore given by
+ Each segment is specified by an initial position $x^{(i)}\in \R^{d}$, a length $\tau_{i+1}\in \R^{+}$ and a velocity $v^{(i)}$ with the recurrence $x^{(i+1)}=x^{(i)}+v^{(i)}\tau_{i+1}$. The times where the velocity changes are given by the cumulative sums, $t_i=\sum_{j=1}^{i}\tau_j$ with $t_0=0$. The continuous positions along the path are therefore given by
 \eqa{	x(t) &=& x^{(i)} + v^{(i)}(t-t_i), \quad\text{for}\quad t\in[t_i,t_{i+1}).	\label{eq:path-BPS}}
 The authors show that, if the lengths $\{\tau_{i}\}_{i\ge 1}$ are governed by a specific Inhomogenous Poisson Process (IPP) and if the speeds are modified for each segment according to a simple reflection mechanism, then the target expected values can be approximated consistently via an integral of the test function along the path given by \eqref{eq:path-BPS}.
 
@@ -248,7 +250,7 @@ In the BPS algorithm, the IPP governing the lengths of the trajectory segments h
 where $z^{+}$ is defined to be $\max \{0, z\}$.\\
 At the end of each segment, the trajectory ``bounces'' and the velocity is reflected against the local level set of the energy $U$:
 \eqa{	v' &=& R(x)v \spe v-2{\scal{\nabla U(x),v}\nabla U(x)\over \bnorm{\nabla U(x)}^{2}}.	}
-The authors show that the velocities also need to be ``refreshed'' according to the arrival times of a homogenous Poisson process (PP) of intensity $\lambda^{\text{ref}}\ge 0$, a parameter of the BPS. This ensures the algorithm explores the entirety of the space. The basic BPS algorithm is reproduced in \hyperref[alg:BPS1]{algorithm~\ref*{alg:BPS1}} below.
+The authors show that the velocities also need to be ``refreshed'' according to the arrival times of a (homogenous) Poisson process (PP) of intensity $\lambda^{\text{ref}}\ge 0$, a parameter of the BPS. This ensures the algorithm explores the entirety of the space. The basic BPS algorithm is reproduced in \hyperref[alg:BPS1]{algorithm~\ref*{alg:BPS1}} below.
 
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:BPS1}\small \idblue{Basic BPS}}
