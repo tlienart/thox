@@ -14,13 +14,13 @@ The thesis concentrates on computational methods to tackle the problem in a numb
 
 The thesis is divided in two parts. In the first part -- \emph{Sampling Methods} -- we consider ``exact'' methods that attempt to produce samples from the true marginals and lead to estimators of expectations of interest that are exact in the limit of infinite computational power and infinite precision in the representation of numbers. These methods can work well when the dimensionality of the state-space associated with the marginals of interest is not too high. 
 
-In the second part -- \emph{Approximate Bayesian Inference} -- we consider approximate methods that attempt to find proxies for the marginals in restricted probability distribution spaces. These methods can offer a viable alternative to sampling methods when the latter become too expensive to consider. 
+In the second part -- \emph{Approximate Bayesian Inference} -- we consider approximate methods that attempt to find proxies for the marginals in restricted probability distribution spaces. These methods can offer a viable alternative to sampling methods when the latter become too expensive to consider.\footnote{The separation between ``exact'' and ``approximate'' methods is a bit arbitrary. Another perspective can be to distinguish between ``sampling'' versus ``distributional'' approaches.}
 
 In this introductory chapter we introduce the concept of Markov Random Fields and present a few classical examples.
 
 %%%%%%%%%%%
 \section{\label{subsection: mrf}Markov Random Fields}
-A \margnote{MRF}\emph{Markov random field} (MRF) is a graph structure that allows to represent joint distributions functions that factorise in a specific way or, in other words, to represent a set of conditional dependences between a set of random variables. In this document, we consider graphs determined by a finite index set $\mathcal V$, a set of edges $\mathcal E\subseteq \mathcal V\times \mathcal V$ connecting those nodes and \emph{potential functions} on its cliques (fully connected components of the graph). Each node $i\in\mathcal V$ corresponds to one random variable taking values in a sample space $\mathcal X_i \subseteq\mathbb R^{d_i}$ for some dimension $d_i\in\mathbb N$. 
+A \margnote{MRF}\emph{Markov random field} (MRF) is a graph structure that represents joint distributions functions that factorise in a specific way or, in other words, to represent a set of conditional dependences between a set of random variables. In this document, we consider graphs determined by a finite index set $\mathcal V$, a set of edges $\mathcal E\subseteq \mathcal V\times \mathcal V$ connecting those nodes and \emph{potential functions} on its cliques (fully connected components of the graph). Each node $i\in\mathcal V$ corresponds to one random variable taking values in a sample space $\mathcal X_i \subseteq\mathbb R^{d_i}$ for some dimension $d_i\in\mathbb N$. 
 
 We restrict ourselves to graphs with pairwise interactions i.e., uniquely determined by potential functions on their nodes and edges.\footnote{Considering only pairwise MRF is not too constraining since any MRF can be expressed as a pairwise MRF by the introduction of auxiliary variables although this may lead to a very complex graph \citep{yedidia00, wainwright08}.}
 We write\check{sep14,jun22}
@@ -153,7 +153,9 @@ In this document, we define \emph{star graphs}\margnote{star graph} as correspon
 
 In this case, the singleton marginal can simply be written as:
 \eqa{	p(x\st y) &\propto& \pi_0(x) \prod_{i=1}^{K} p(y_k\st x)	\nn}
-where the $y_k$ are subsets of the entire observed data and $\pi_0$ is a prior on the hidden state. This can be a useful representation for distributed inference where each of the observation node can correspond to a distinct physical machine with a portion of the relevant data. We exploit this structure to suggest a novel way to approach distributed Bayesian inference in chapter \ref{chap:EPforDBI}.\check{sep14, jul24, jun21}
+where the $y_k$ are subsets of the entire observed data and $\pi_0$ is a prior on the hidden state. 
+This can be a useful representation for distributed inference where each of the observation nodes can correspond to a distinct physical machine with a portion of the relevant data. 
+We exploit this structure to suggest a novel way to approach distributed Bayesian inference in chapter \ref{chap:EPforDBI}.\check{sep14, jul24, jun21}
 
 \subsection{Grid and loopy graphs}
 The examples listed above do not exhibit cycles. An example of a common MRF structure with cycles which is encountered, for instance, in image processing, is the \emph{grid graph}\margnote{grid graph} illustrated in \fig{fig:grid1}.

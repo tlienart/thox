@@ -62,11 +62,11 @@ This can significantly reduce the overall computational cost associated with the
 
 \section{Probabilistic Matrix Factorisation}
 
-Probabilistic Matrix Factorisation (PMF) \citep{mnih08} is a Bayesian approach to the matrix completion problem. In that problem, we consider a matrix $R$ of size $n\times p$ of ratings $r_{ij}$ corresponding to user $i$ and item $j$ (e.g.: a movie) but we only have access to a mask of $R$, a very sparse subset of the ratings which we denote $\hat R$. The aim of matrix completion methods such as PMF is to try to construct a low-rank factorisation  $R\approx U^{t}V$ based on the known entries, where $U$ is of size $d\times n$ and $V$ of size $n\times p$ and $d$ is very small compared to $n$ or $p$. 
+Probabilistic Matrix Factorisation (PMF) \citep{mnih08} is a Bayesian approach to the matrix completion problem. In that problem, we consider a matrix $R$ of size $n\times p$ of ratings $r_{ij}$ corresponding to user $i$ and item $j$ (e.g.: a movie) but we only have access to a mask of $R$, a very sparse subset of the ratings which we denote $\hat R$. The aim of matrix completion methods such as PMF is to try to construct a low-rank factorisation  $R\approx U^{t}V$ based on the known entries, where $U$ is of size $d\times n$ and $V$ of size $d\times p$ and $d$ is very small compared to $n$ or $p$. 
 
 \subsection{Description of the  Model}
 
-The model described in \citep{mnih08} assumes that each rating $r_{ij}$ is a realisation from a Normal random variable with mean $\scal{u_{i}, v_{j}}$ and standard deviation $\sigma_{r}$. 
+The model described in \citet{mnih08} assumes that each rating $r_{ij}$ is a realisation from a Normal random variable with mean $\scal{u_{i}, v_{j}}$ and standard deviation $\sigma_{r}$. 
 Further, the model assumes spherical Gaussian priors on all $u_{i}$ and $v_{j}$ with standard deviation $\sigma_{u}$ and $\sigma_{v}$ respectively. Formally:
 %
 \begin{eqnarray}
@@ -143,7 +143,7 @@ The IPP associated with the rating factors can also be easily sampled from using
 
 \subsubsection{Sampling the IPP associated with a rating factor}
 
-To simplify notations, we consider a single rating $r$ associated with two $d$-dimensional vectors $u$ and $v$. We introduce the notation $x:=(u; v)$ and write $x_{u}=u$ and $x_{v}=v$. We also write $e(x):=(\scal{x_{u},x_{v}}-r)$. With these notations, we can write the energy as $\mathcal E(x) = 0.5\sigma_{r}^{-2}e^{2}(x)$. 
+To simplify notation, we consider a single rating $r$ associated with two $d$-dimensional vectors $u$ and $v$. We introduce the notation $x:=(u; v)$ and write $x_{u}=u$ and $x_{v}=v$. We also write $e(x):=(\scal{x_{u},x_{v}}-r)$. With these notations, we can write the energy as $\mathcal E(x) = 0.5\sigma_{r}^{-2}e^{2}(x)$. 
 As for the BPS, the intensity associated with this factor is $\chi(t) = \scal{\nabla \mathcal E(x+tw), w}^{+}$ where $w$ is a velocity-vector of the same dimension as $x$. The gradient with respect to the $u$ and $v$ component can be written as
 \eqa{
 	\syst{\nabla_{x_{u}} \mathcal E(x) &=& \gamma(x)x_{v}\\
@@ -169,7 +169,7 @@ The situation is illustrated in a case where $t_{-}>0$ in figure \ref{fig-lbps-p
 \begin{figure}[!h]
 \centering
 	\includegraphics[width=.7\textwidth]{figures/lbp/pmf_plot}
-	\caption{\label{fig-lbps-plot} The intensity $\chi$ (blue) is the positive part of a third-order polynomial, its integral $\Xi$ (red) is represented and is a piecewise fourth-order polynomial. For $\lambda$ drawn from an $\mathrm{Exp}(1)$, we can find $t(\lambda)$ corresponding to the first arrival time of interest. (Best seen in colours.)}
+	\caption{\label{fig-lbps-plot} The intensity $\chi$ (blue) is the positive part of a third-order polynomial, its integral $\Xi$ (red) is represented and is a piecewise fourth-order polynomial. For $\lambda$ drawn from an $\mathrm{Exp}(1)$, we can find $t(\lambda)$ corresponding to the first arrival time of interest. (Best viewed in colours.)}
 \end{figure}
 %
 

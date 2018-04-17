@@ -33,7 +33,7 @@ The computation of the message updates \eqref{eq:mess-update-2} is thereby alway
 \subsubsection*{Main issues}
 
 A key weakness of the NBP algorithm is that the conditions \eqref{conditions NBP} do not hold in a number of important cases (the authors aknowledge this in a footnote of their paper). 
-First, the node potentials $\psi_{u}$ are usually proportional to likelihoods of the form $p(y_{u}\st x_{u})$ which need not be integrable in $x_{u}$. In fact, for most non-Gaussian potential, this is the case. Then, there exist applications for which the first integrability condition on edge potentials does not hold. In imaging applications for example, the edge potential can encode a measure of similarity between pixels which need not verify the first integrability condition as in \citet{nikolova00}. Finally, by definition of NBP as an approximated representation with a fixed number of Gaussians, it does lead to consistent estimators of the LBP messages.\check{jul24, jul21, jul19}
+First, the node potentials $\psi_{u}$ are usually proportional to likelihoods of the form $p(y_{u}\st x_{u})$ which need not be integrable in $x_{u}$. In fact, for most non-Gaussian potentials, this is the case. Then, there exist applications for which the first integrability condition on edge potentials does not hold. In imaging applications for example, the edge potential can encode a measure of similarity between pixels which need not verify the first integrability condition as in \citet{nikolova00}. Finally, by definition of NBP as an approximated representation with a fixed number of Gaussians, it does not lead to consistent estimators of the LBP messages.\check{jul24, jul21, jul19}
 
 
 
@@ -67,7 +67,7 @@ The first suggestion by the authors to sample from the local potential is only v
 %
 which is a product of mixtures of $N$ components. As in nonparametric BP, naive sampling of the proposal has complexity $\mathcal O {(N^{|\partial {s}|})}$ and is thus, in general, too expensive to consider.
 
-Alternatively the author suggest running a short MCMC simulation targeting it which reduces the complexity to order $\mathcal O {(|\partial {s}|N^{2})}$. Indeed, each MCMC iteration requires evaluating $\widehat B_{s}^{\text{PBP}}$ point-wise which has complexity $\mathcal O {(|\partial{s}|N)}$, and we need at least $\mathcal{O}(N)$ iterations of the MCMC simulation to produce the samples. Note that it is unclear how many more iterations are necessary to get $N$ \emph{good} samples. Running a short MCMC chain (to reduce computational cost) will therefore almost certainly lead to biased samples. In the code the authors shared with us, they run $N$ parallel random walk Metropolis-Hastings chains \citep[chapter 6]{robert04} for a fixed number of steps. This choice may have been motivated by a desire to control the complexity of the algorithm more accurately but it is at the expense of the quality of the samples obtained.
+Alternatively the authors suggest running a short MCMC simulation targeting it which reduces the complexity to order $\mathcal O {(|\partial {s}|N^{2})}$. Indeed, each MCMC iteration requires evaluating $\widehat B_{s}^{\text{PBP}}$ point-wise which has complexity $\mathcal O {(|\partial{s}|N)}$, and we need at least $\mathcal{O}(N)$ iterations of the MCMC simulation to produce the samples. Note that it is unclear how many more iterations are necessary to get $N$ \emph{good} samples. Running a short MCMC chain (to reduce computational cost) will therefore almost certainly lead to biased samples. In the code the authors shared with us, they run $N$ parallel random walk Metropolis-Hastings chains \citep[chapter 6]{robert04} for a fixed number of steps. This choice may have been motivated by a desire to control the complexity of the algorithm more accurately but it is at the expense of the quality of the samples obtained.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \section{\label{sec:EPBP}Expectation Particle Belief Propagation}
@@ -121,7 +121,7 @@ Marginalising this approximation over $x_{t}$ leads to
 	\widehat{B}_{st}(x_{s}) &\propto& \sum_{i=1}^{N} {\widehat M_{st}(X_{s}^{(i)}) \widehat { m}_{ts}(X_{s}^{(i)}) \over q_{s}(X_{s}^{(i)})} \delta_{X_{s}^{(i)}}(x_{s}), \label{eq:pbb-particle-joint-belief-marg}
 }
 %
-where $\widehat{m}_{ts}$ is the importance sampling estimator for $ m_{ts}$ using $q_{t}$ as proposal. Of course, marginalising \eqref{eq:pbp-particle-joint-belief} over $x_{s}$ leads to an expression analogous to \eqref{eq:pbb-particle-joint-belief-marg}. Focusing on node $s$, the expression \eqref{eq:pbb-particle-joint-belief-marg} indicate that the proposals should be given by
+where $\widehat{m}_{ts}$ is the importance sampling estimator for $ m_{ts}$ using $q_{t}$ as proposal. Of course, marginalising \eqref{eq:pbp-particle-joint-belief} over $x_{s}$ leads to an expression analogous to \eqref{eq:pbb-particle-joint-belief-marg}. Focusing on node $s$, the expression \eqref{eq:pbb-particle-joint-belief-marg} indicates that the proposals should be given by
 %
 \eqa{
 	q_{s}(x_{s}) &\propto& \widehat{M}_{st}(x_{s}) \widehat{m}_{ts}(x_{s}) \esp = \esp \psi_{s}(x_{s}) \prod_{r\in\partial s} \widehat{m}_{rs}(x_{s})
@@ -142,7 +142,7 @@ Using the framework of expectation propagation (EP) that we discussed in point \
 
 For each $r\in\partial s$, we update the $\eta_{rs}$ following the EP framework. We start by forming the \emph{cavity} $q^{\backslash r}_{s}=q_{s}/\eta_{rs}$ and the corresponding \emph{tilted distribution} proportional to $\widehat m_{rs} q_{s}^{\backslash r}$.  The updated distribution is then the projection of the tilted distribution onto the exponential family manifold:
 \eqa{ q_{s} &\leftarrow& \mathbf P_{\phi}[\widehat m_{rs}q_{s}^{\backslash r}],}	
-where $\mathbf P_{\phi}$ is the projection operator defined in section \ref{eq:def-proj-operator-ep}. Consequently, the factor $\eta_{rs}$ is updated: $\eta_{rs} \leftarrow  q_{s}/ q_{s}^{\backslash r}$. Note that other projection mechanisms than projecting with respect to the Kullback-Leibler divergence can be considered as well. 
+where $\mathbf P_{\phi}$ is the projection operator defined in section \ref{eq:def-proj-operator-ep}. Consequently, the factor $\eta_{rs}$ is updated: $\eta_{rs} \leftarrow  q_{s}/ q_{s}^{\backslash r}$. Note that projection mechanisms that project with respect to divergences other than the Kullback-Leibler divergence can be considered as well. 
 
 In the algorithm as we have described it so far, the EP steps for each incoming message into $s$ and for the node potential are performed first in order to fit the proposal to the current estimated belief at $s$. Then, this estimated belief is used to draw $N$ particles which can be used to form the particle approximated messages from $s$ to each of its neighbours. 
 Alternatively, once each particle approximated message $\widehat{m}_{st}(x_t)$ is formed, we can update their exponential family projections $\eta_{st}(x_t)$ immediately. This is the scheme described in algorithm \ref{alg:epbp-node-update}.
@@ -181,7 +181,7 @@ In our experiments for example, we tried considering the $q_{s}\in\mathcal F_{\p
 
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{\label{sec:EPBP-compcompl}Computational complexity}
-The steps that dominate in terms of computational complexity is the evaluation of the approximate representation of the pre-message.
+The steps that dominate in terms of computational complexity are the evaluation of the approximate representation of the pre-message.
 Since the estimator for the belief is a product of $|\partial s|$ mixtures of $N$ components, evaluating at $N$ sampling points is $\mathcal O(|\partial s|N^{2})$. 
 Further, the evaluation of the pre-message requires evaluating the message $\widehat m_{ts}$ at $N$ sampling points. Since $\widehat m_{ts}$ is a mixture of $N$ components, this also has quadratic complexity. The dominating complexity of the EPBP algorithm is therefore $\mathcal O(KEN^{2})$ where $K$ is the number of passes done over the graph, and $E$ is the number of edges in the graph.
 
