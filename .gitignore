@@ -1,3 +1,5 @@
+*.tui
+*.tmp
 *.DS_Store
 zexp/
 zexp2/

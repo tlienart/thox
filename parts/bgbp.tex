@@ -125,8 +125,7 @@ which is the two filter formula for the smoothing distribution $p(x_{t}\st y_{1:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\label{point:LBP}Loopy Belief Propagation}
 
-In the presence of cycles in the graph (\emph{loopy graph}), there is not a unique way to go through all nodes. 
-Propagating messages through different orderings of the nodes can therefore lead to inconsistent messages (see \ref{fig:lbp-inconsistent} for an illustration).
+In the presence of cycles in the graph (\emph{loopy graph}), BP does not necessarily converge and there may be more than one fixed point because propagating messages through different orderings of the nodes can lead to inconsistent messages (see \ref{fig:lbp-inconsistent} for an illustration).
  
 \begin{figure}[!h]
 \center

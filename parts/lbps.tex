@@ -84,9 +84,9 @@ The negative log-posterior of interest is therefore:
 {1\over2\sigma_{v}^{2}}\|V\|_{2}^{2}
 }
 %
-In our experiments, we assume $\sigma_{r}, \sigma_{u}$ and $\sigma_{v}$ are fixed,\footnote{In practice, we compute sensible estimates from the data following the authors' original code available at \url{http://www.cs.toronto.edu/~rsalakhu/BPMF.html}.} more involved models exist including hyper-priors which we will not consider here since our aim is primarily to compare the local BPS and HMC on a large scale model rather than produce the best performing PMF method.\footnote{In \citep{mnih08}, the authors also suggest doing a few steps of Gibbs sampling for the hyperparameters. We do not do this in order to simplify the computations and the comparisons.}
+In our experiments, we assume $\sigma_{r}, \sigma_{u}$ and $\sigma_{v}$ are fixed,\footnote{In practice, we compute sensible estimates from the data following the authors' original code available at \url{http://www.cs.toronto.edu/~rsalakhu/BPMF.html}.} more involved models exist including hyper-priors which we will not consider here since our aim is primarily to compare the local BPS and HMC on a large scale model rather than produce the best performing PMF method.\footnote{In \citet{mnih08}, the authors also suggest performing a few steps of Gibbs sampling for the hyperparameters. We do not do this in order to simplify the computations and the comparisons.}
 
-Finally, note that the full dimensionality of the model is $n\times d + p\times d$. Below we consider an example where $d=10$, $n=6000$, $p=4000$ and $|\mathcal M|=10^{6}$ meaning that the full dimensionality of the model is $100 000$ with 1 million factors. For that kind of scale, a method such as naive Gibbs sampling (see point \ref{point:classical-sampling}) is impractical. 
+Finally, note that the full dimensionality of the model is $n\times d + p\times d$. Below we consider an example where $d=10$, $n=6000$, $p=4000$ and $|\mathcal M|=10^{6}$ meaning that the full dimensionality of the model is $100 000$ with 1 million factors. For that kind of scale, a method such as naive Gibbs sampling (see point \ref{point:classical-sampling}) is impractical though methods such as block Gibbs could be deployed (see e.g. \citet[section 2.5]{geyer05}). 
 
 
 \subsection{Local BPS for the PMF}
@@ -180,7 +180,7 @@ The situation is illustrated in a case where $t_{-}>0$ in figure \ref{fig-lbps-p
 
 \subsubsection{Singular Value Decomposition}
 
-As a baseline, we consider the Singular Value Decomposition (SVD) algorithm. Indeed, Eckart and Young's theorem shows that for a matrix $M$, the truncated SVD is the best low-rank approximation in the sense of the Frobenius norm. In the matrix completion case, no guarantees are offered by the SVD since we only have access to a sparse mask of the real matrix \citep{srebro04}. Let $R$ denote the true matrix we are trying to reconstruct and $\hat R$ the sparse matrix containing only the observed ratings (centred). The SVD decomposition of $\hat R$ gives $\hat R = U\Sigma V^{t}$ where $U$ is an orthonormal matrix of size $n\times p$, $\Sigma$ is a diagonal matrix of size $p\times p$ and $V$ is an orthogonal matrix of size $p\times p$. Truncating $\Sigma$ to its first $d\ll p$ components leads to a rank-$d$ approximation $\tilde R$ to $\hat R$. 
+As a baseline, we consider the Singular Value Decomposition (SVD) algorithm. Indeed, Eckart and Young's theorem shows that for a matrix $M$, the truncated SVD is the best low-rank approximation in the sense of the Frobenius norm. In the matrix completion case, no guarantees are offered by the SVD since we only have access to a sparse mask of the real matrix \citep{srebro04}. Let $R$ denote the true matrix we are trying to reconstruct and $\hat R$ the sparse matrix containing only the observed ratings (centred around zero). The SVD decomposition of $\hat R$ gives $\hat R = U\Sigma V^{t}$ where $U$ is an orthonormal matrix of size $n\times p$, $\Sigma$ is a diagonal matrix of size $p\times p$ and $V$ is an orthogonal matrix of size $p\times p$. Truncating $\Sigma$ to its first $d\ll p$ components leads to a rank-$d$ approximation $\tilde R$ to $\hat R$ which will be much less sparse than $\hat R$. 
 Letting $U_{\text{SVD}}:=\Sigma^{1/2}U^{t}$ and $V_{\text{SVD}}:=\Sigma^{1/2}V^{t}$ we have a first baseline factorisation $\tilde R=U_{\text{SVD}}^{t}V_{\text{SVD}}\approx R$.
 
 Note that the problem of computing a truncated SVD decomposition of a large sparse system is a well known problem in numerical linear algebra and very efficient methods exist \citep{sorensen96}.\footnote{In the experiments, we use the \texttt{svds} function from Julia 0.6 uses the implicitly restarted Lanczos iterations.} 
@@ -195,27 +195,41 @@ Therefore, the gradient in $u_{i}$ and $v_{j}$ can easily be computed in closed 
 
 \subsection{Experiments}
 
-In our experiments, we consider the MovieLens 1M dataset.\footnote{\url{https://grouplens.org/datasets/movielens/}} corresponding to 1 million ratings of 4000 movies by 6000 users. We take a random subset of 95\% of the ratings as training set using the remaining 5\% as test set. 
-Following the literature, we use $d=30$; we set $\sigma_{R}=1$ and $\sigma_{U}=\sigma_{V}=10$. The starting point is drawn from a standard multivariate Normal centred at the solution of the SVD algorithm. The Local BPS experiments use the \texttt{PDSampler.jl} package, the HMC simulations use 2 leapfrog steps, the stepsize is set to $0.01$. The reported value is the RMSE over the test set. We run each experiments ten times to account for the stochasticity of the algorithms. All results were obtained using Julia 0.6 with a 2.3GHz Intel Core i5 computer. 
+In our experiments, we consider the MovieLens 1M dataset.\footnote{\url{https://grouplens.org/datasets/movielens/}} corresponding to 1 million ratings of 4000 movies by 6000 users. 
+We preprocess the ratings to centre them around zero and scaled on $[-1, 1]$ and take a random subset of 95\% of the ratings as training set using the remaining 5\% as test set. 
+Following the literature, we use $d=30$; we set $\sigma_{R}=1$ and $\sigma_{U}=\sigma_{V}=10$. The starting point is drawn from a standard multivariate Normal centred at the solution of the SVD algorithm. The Local BPS experiments use the \texttt{PDSampler.jl} package, the HMC simulations use 2 leapfrog steps, the stepsize is set to $0.01$.\footnote{Note that 2 leapfrog steps should not be expected to give excellent results though here we picked this in order to get reasonable computational times for the experiments.}
+The reported value is the RMSE over the test set. We run each experiments ten times to account for the stochasticity of the algorithms. All results were obtained using Julia 0.6 with a 2.3GHz Intel Core i5 computer. 
 
 %\newpage
-\begin{figure}
+
+The results displayed in figure \ref{fig:LBPSvHMC} seem to show that the LBPS does a little bit better in this case than the HMC algorithm. The improvement is not very significant but confirms that the BPS and the LBPS can perform as well or better than the HMC algorithm (a similar result had been obtained by \citep{bouchard15} on a much simpler factor graph). 
+
+Both methods underperform compared to the test-RMSE obtained with the sparse SVD. The test-RMSE is computed as
+%
+\eqa{\text{RMSE} &=& \sqrt{\sum_{(i, j)\in\mathcal T} (r_{ij} - \scal{u_{i}, v_{j}})^{2} / (n p)}}  
+%
+where $\mathcal T$ denotes the indices corresponding to the test set and $\scal{u_{i}, v_{j}}$ is clipped if it is outside the range of possible values for the ratings. 
+
+\clearpage
+
+\begin{figure}[!h]
 	\center
 	\includegraphics[width=.8\textwidth]{figures/lbp/curves}
 	\caption{\label{fig:LBPSvHMC}RMSE on the test set of the MovieLens 1M dataset when using Probabilistic Matrix Factorisation with HMC and the LBPS algorithm compared to the result obtained with the Sparse SVD algorithm. The crosses indicate the range of values obtained and ranges of times for each of the 10 runs recorded for different simulation lengths. The dashed lines connects the means.}
 \end{figure}
 
-The results displayed in figure \ref{fig:LBPSvHMC} seem to show that the LBPS does a little bit better in this case than the HMC algorithm. The improvement is not very significant but confirms that the BPS and the LBPS can perform as well or better than the HMC algorithm (a similar result had been obtained by \citep{bouchard15} on a much simpler factor graph). 
 
-Both methods underperform compared to the test-RMSE obtained with the sparse SVD.  
-This may be a poor choice of hyper parameters though after trying a range of possible hyper parameters we did not see major differences. In this case it may just be that the SVDS algorithm performs very well and does not overfit the data rendering the regularisation that appears in the PMF model useless. \\
+The choice of hyper parameters may be suboptimal though after trying a range of possible hyper parameters we did not see major differences. In this case it may just be that the SVDS algorithm performs very well and does not overfit the data rendering the regularisation that appears in the PMF model useless. \\
 In \citep{mnih08}, the authors obtain results with the Bayesian PMF that outperform the SVD significantly but it is unclear what SVD algorithm they use and whether they use it on appropriately re-scaled data. 
 Further they do not discuss the time taken by the algorithms, in our experiments, the SVDS runs several orders of magnitude faster than the LBPS or HMC algorithm though, of course, the SVD does not provide uncertainty estimates. 
 Further, their code does not show the SVD step but suggests a scaling of the ratings on the $[0, 1]$ range for the Bayesian PMF. If the SVD algorithm is also applied on such ratings, it should be expected to perform worse as it will not be able to exploit the sparsity of the data well.
 
 \section{Discussion}
 
-The main purpose of this chapter was to compare the HMC algorithm to the LBPS on a very high-dimensional model with a rather sparse graphical model structure. We showed in the experiments that the LBPS compares favourably with HMC in this case which gives hope for future use of the LBPS on large scale graphical models.
+The main purpose of this chapter was to compare the HMC algorithm to the LBPS on a very high-dimensional model with a rather sparse graphical model structure. We showed in the experiments that the LBPS compares favourably with a simple version of HMC in this case which gives hope for future use of the LBPS on large scale graphical models.
+It should however be noted that the HMC algorithm we used here is not particularly involved and better tuning could be applied (more leapfrog steps, better sample size) though we wanted to keep the sampler simple to be fair to the local BPS which is still quite unexplored.
+
+A possible interesting avenue of work would be to incorporate the local BPS within a block-Gibbs sampler in order to avoid the triggering of wide-reaching node refreshments when the matrix of ratings is not ``sufficiently sparse''. 
 
 Much remains to be explored on how to better tune Piecewise Deterministic samplers and in particular its local version for MRF. To the best of our knowledge, this was the first attempt to use the LBPS on a large-scale model in statistics or machine learning. 
 

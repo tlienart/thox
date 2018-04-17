@@ -41,10 +41,16 @@ The quadrature weights are then adjusted to reflect that the samples are not dra
 %
 where the weights $w(X^{(i)})$ are normalised to sum up to one.
 
-Provided the support of $q$ includes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$, the resulting \emph{importance sampling estimator} is consistent. Further, the estimator of the expected value of a specific test function $\varphi$ is finite provided $\E_{\pi}[\varphi(X)^{2}w(x)]<\infty$ \citep[chapter 3.3]{robert04}. Note that \eqref{eq:impsampling} also defines an empirical measure $\hat\pi$ with
+Provided the support of $q$ includes that of $\pi$ i.e., $\pi(x)>0\Rightarrow q(x)>0$, the resulting \emph{importance sampling estimator} can be shown to be consistent using the strong law of large numbers; i.e., the estimator converges almost surely to the true expected value:
+%
+\eqa{ 
+\sum_{i=1}^{N} w(X^{(i)}) \varphi (X^{(i)}) &\xrightarrow[N\to \infty]{\text{a.s.}}& \E_{\pi}[\varphi(X)],
+}
+%
+for a test function $\varphi$ and the estimator is finite provided $\E_{\pi}[\varphi(X)^{2}w(x)]<\infty$ \citep[chapter 3.3]{robert04}. Note that \eqref{eq:impsampling} also defines an empirical measure $\hat\pi$ with
 %
 \eqa{
-	\hat\pi(x) &\propto& \sum_{i=1}^{N} W(X^{(i)})\delta_{X^{(i)}}(x).
+	\hat\pi(x) &=& \sum_{i=1}^{N} w(X^{(i)})\delta_{X^{(i)}}(x).
 }
 %
  
@@ -134,7 +140,7 @@ Since finding the exact trajectory of a Hamiltonian system is usually intractabl
 This method generates a Markov chain with stationary distribution corresponding to the target distribution $\pi$. 
 It is a very popular method in computational Bayesian inference and tends to be preferred over approaches such as the MH algorithm \citep{neal11}. We will show later in chapter \ref{chapBPSMRF} than in some cases a method that exploits the factorisation structure of the target distribution explicitly may lead to better results. 
 
-\newpage
+%\newpage
 %%%%%%%%%%%%%%%%%%%%%%
 \section{Sequential Monte Carlo Methods}
 %%%%%%%%%%%%%%%%%%%%%%
@@ -225,7 +231,13 @@ In essence, the FFBS algorithm simply recycles a particle filter updating its we
 
 The computation of the updated smoothing weights has complexity $\mathcal O(TN^{2})$ since, at each step, we need to consider the matrix of all pairwise interactions between the particles at two subsequent steps: $[p(X^{(j)}_{t+1}\st X^{(i)}_{t})]_{i,j=1}^{N}$. Since the FFBS algorithm recycles the particles from a particle filter, the performances of the resulting estimators can suffer if the support of the filtering distribution at step $t$ is significantly distinct from that of the smoothing distribution at step $t$.\check{jul16, jun29,jun24}
 
+\subsection{Convergence of particle filters and smoothers}
 
+The resampling mechanism considered in SMC methods means that the particles are no longer statistically independent which makes convergence results harder to get than for vanilla sequential importance sampling (where convergence results can be extended from those of importance sampling).
+However, there is a Central Limit Theorem (CLT) for the estimator of $\E_{\pi_{t}}[\varphi]$ using SMC in the broad sense showing convergence in distribution to the true expected value \citep{chopin04}.
+
+For the specific case of the particle filter, stronger results exist: under mild conditions the empirical measure $\hat p(x_{t}\st y_{1:t})=\sum_{i=1}^{N}w^{(i)}_{t}\delta_{X^{(i)}_{t}}(x_{t})$ converges almost surely to the true filtering distribution $p(x_{t}\st y_{1:t})$ and estimators of expected values taken with respect to it converge in the mean-squared sense as $N\to \infty$ \citep{crisan02}. 
+These results can be extended particle smoothing methods as was done for example in \citet{godsill04}.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -240,7 +252,10 @@ Defining the \emph{energy} function $U$ as $U(x) = -\log \gamma(x)	$
  and assuming it is continuously differentiable, the algorithm generates a piecewise linear path based on $\nabla U$. 
  Each segment is specified by an initial position $x^{(i)}\in \R^{d}$, a length $\tau_{i+1}\in \R^{+}$ and a velocity $v^{(i)}$ with the recurrence $x^{(i+1)}=x^{(i)}+v^{(i)}\tau_{i+1}$. The times where the velocity changes are given by the cumulative sums, $t_i=\sum_{j=1}^{i}\tau_j$ with $t_0=0$. The continuous positions along the path are therefore given by
 \eqa{	x(t) &=& x^{(i)} + v^{(i)}(t-t_i), \quad\text{for}\quad t\in[t_i,t_{i+1}).	\label{eq:path-BPS}}
-The authors show that, if the lengths $\{\tau_{i}\}_{i\ge 1}$ are governed by a specific Inhomogenous Poisson Process (IPP) and if the speeds are modified for each segment according to a simple reflection mechanism, then the target expected values can be approximated consistently via an integral of the test function along the path given by \eqref{eq:path-BPS}.
+The authors show that, if the lengths $\{\tau_{i}\}_{i\ge 1}$ are governed by a specific Inhomogenous Poisson Process (IPP) and if the speeds are modified for each segment according to a simple reflection mechanism, then the target expected values can be approximated via an integral of the test function along the path given by \eqref{eq:path-BPS}:
+\eqa{	\E_\pi[\varphi] &\approx& T\inv \int_0^{T} \varphi(x(t))\mathrm{d}t	\nn\\
+&\approx& T\inv \pat{\sum_{i=1}^{n-1} \int_0^{\tau_i} \varphi(x^{(i-1)}+v^{(i-1)}s)\,\mathrm{d}s + \int_0^{t_n-T}\varphi(x^{(n-1)}+v^{(n-1)}s)\mathrm{d}s}, \nn}
+and this estimator converges almost surely to the true expected value with $T\to \infty$ \citep[theorem 1]{bouchard15}.
 
 In the BPS algorithm, the IPP governing the lengths of the trajectory segments has intensity function $\lambda:\R^{d}\times\R^{d}\to\R^{+}$ with
 %
@@ -250,9 +265,21 @@ In the BPS algorithm, the IPP governing the lengths of the trajectory segments h
 %
 At the end of each segment, the trajectory ``bounces'' and the velocity is reflected against the local level set of the energy $U$:
 \eqa{	v' &=& R(x)v \spe v-2{\scal{\nabla U(x),v}\nabla U(x)\over \bnorm{\nabla U(x)}^{2}}.	}
+This is illustrated at the figure \ref{fig:bounce-bps} below where $\hat n := \nabla U(x)/\|\nabla U(x)\|$.
+%
+%\clearpage
+%
+\begin{figure}[!h]
+	\center
+	\includegraphics[width=.8\textwidth]{./figures/extra/bounce-bps}
+	\caption{\label{fig:bounce-bps}Illustration of the specular reflection. The new velocity vector $v'$ is obtained by doing a specular reflection of the old vector $v$ against the level set of $U$ passing by $x$ (green line). This is obtained by subtracting twice the projection (green arrow) of the velocity on the normal vector to $U$ at $x$ (orange arrow). Figure best seen in colours.}
+\end{figure}
+%
+%\clearpage
+
 The authors show that the velocities also need to be ``refreshed'' according to the arrival times of a (homogenous) Poisson process (PP) of intensity $\lambda^{\text{ref}}\ge 0$, a parameter of the BPS. This ensures the algorithm explores the entirety of the space. The basic BPS algorithm is reproduced in \hyperref[alg:BPS1]{algorithm~\ref*{alg:BPS1}} below.
 
-\clearpage
+%\clearpage
 
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:BPS1}\small \idblue{Basic BPS}}
@@ -274,20 +301,22 @@ The authors show that the velocities also need to be ``refreshed'' according to 
 	\end{algorithmic}
 \end{algorithm}
 
-The target expectation can then be obtained by integrating the test function along the path thus generated:
-\eqa{	\E_\pi[\varphi] &=& T\inv \int_0^{T} \varphi(x(t))\mathrm{d}t	\nn\\
-&\approx& T\inv \pat{\sum_{i=1}^{n-1} \int_0^{\tau_i} \varphi(x^{(i-1)}+v^{(i-1)}s)\,\mathrm{d}s + \int_0^{t_n-T}\varphi(x^{(n-1)}+v^{(n-1)}s)\mathrm{d}s}. \nn}
-The integrals in the sum can themselves be approximated if needed using quadrature.
+The process for two subsequent time steps is illustrated at the figure \ref{fig:bps-trajec} below.
+\begin{figure}[!h]
+\center
+	\includegraphics[width=.8\textwidth]{./figures/extra/trajec-bps}
+	\caption{\label{fig:bps-trajec} Illustration of the process to go from $x^{(i-1)}$ to $x^{(i)}$ in the BPS: a bouncing time $\tau_{\text{bounce}}$ is drawn from the IPP with intensity $\chi(t)$ along the trajectory $x^{(i-1)}+v^{(i-1)}t$ (green line); a reference time $\tau_{\text{ref}}$ is drawn from an exponential, the minimum of the two (here $\tau_{\text{bounce}}$) leads to the position of the next point $x^{(i)}$ where either a bounce or a refreshment of the velocity will happen (here a bounce). Figure best seen in colours.}
+\end{figure}
+%\clearpage
 
 As we saw, the algorithm requires to sample the first arrival time of an IPP of intensity $\chi(t)=\lambda(x+vt,v)$ where $\lambda(x,v)=\scal{\nabla U(x),v}^{+}$. Sampling from an IPP is a well explored topic in the literature and the authors summarise three possible approaches which we list briefly below:
-%\begin{itemize}\itsep0
-
-    \emph{Time-scale transformation}: this approach requires computing the inverse quantile of $\Xi(t):=\int_{0}^{t} \chi(s)\mathrm{d}s$ which is usually intractable but it can be computed numerically if the target is strictly log-concave and differentiable. Given $V$ drawn from a Uniform on $[0,1]$, the first arrival time of the IPP is given by $\Xi^{\inv}(-\log(V))$.
+\begin{itemize}\itsep0
+	\item   \emph{Time-scale transformation}: this approach requires computing the inverse quantile of $\Xi(t):=\int_{0}^{t} \chi(s)\mathrm{d}s$ which is usually intractable but it can be computed numerically if the target is strictly log-concave and differentiable. Given $V$ drawn from a Uniform on $[0,1]$, the first arrival time of the IPP is given by $\Xi^{\inv}(-\log(V))$.
 %This, the authors show, allows to make a connection with the Metropolis Hastings algorithm.
-    
-    \emph{Adaptive thinning}: this approach requires an upper bounds $\overline{\chi}_{s}(t)$ with $\overline\chi_{s}(t)=0$ for $t<s$ and $\overline\chi_{s}(t)\ge\chi(t)$ for $s\le t\le s+\Delta(s)$ where $\Delta$ is a positive function (in the standard case, $\Delta=+\infty$). Additionally, it requires the ability to sample from the IPP corresponding to $\overline\chi_{s}$. Let $\tau$ be such a sample with $\tau\le s+\Delta$, there is then an accept-reject step with rate $\chi(\tau)/\overline\chi(\tau)$. Ideally, $\Delta$ and $\chi/\overline\chi_{s}$ are large (so that we do not have to simulate too many candidates which would incur an increased computational cost).
- 
-    \emph{Superposition}: if the energy $U$ can be decomposed in a sum $U(x)=\sum_{j=1}^{m}U^{[j]}(x)$ and that each term can be targeted (via one of the first two methods), then we can use the thinning method with bound $\sum_{j=1}^{m}\chi^{[j]}(t)$.
+ \item   \emph{Adaptive thinning}: this approach requires an upper bounds $\overline{\chi}_{s}(t)$ with $\overline\chi_{s}(t)=0$ for $t<s$ and $\overline\chi_{s}(t)\ge\chi(t)$ for $s\le t\le s+\Delta(s)$ where $\Delta$ is a positive function (in the standard case, $\Delta=+\infty$). Additionally, it requires the ability to sample from the IPP corresponding to $\overline\chi_{s}$. Let $\tau$ be such a sample with $\tau\le s+\Delta$, there is then an accept-reject step with rate $\chi(\tau)/\overline\chi(\tau)$. Ideally, $\Delta$ and $\chi/\overline\chi_{s}$ are large (so that we do not have to simulate too many candidates which would incur an increased computational cost).
+ \item   \emph{Superposition}: if the energy $U$ can be decomposed in a sum $U(x)=\sum_{j=1}^{m}U^{[j]}(x)$ and that each term can be targeted (via one of the first two methods), then we can use the thinning method with bound $\sum_{j=1}^{m}\chi^{[j]}(t)$.
+ \end{itemize}
+The key elements when trying to deploy the Bouncy Particle Sampler in practice are to select an appropriate $\lambda_{\text{ref}}$ (too low and the processus is essentially a random walk, too high and some regions of space may be left unexplored for a long time) and to implement an appropriate way to sample the first arrival time of the IPP which will depend on the target distribution.
 
 
 %\section{Discussion}

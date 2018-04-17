@@ -168,8 +168,8 @@ In particular, if we take $M=N$, at each step we have to consider a mixture with
 In this section, we explore the choice of normalisation densities and suggest using an approximation to the predictive density. It came to our knowledge that this choice had in fact also been studied independently and earlier than this work by \citet{taghavi12}. 
 We show how the complexity of the resulting algorithm is quadratic in the number of particles. 
 We also discuss two modified versions with sub-quadratic complexity. 
-The first one, inspired by \citet{fearnhead10} and also discussed by \citet{taghavi12}, has linear complexity but the resulting estimators are not consistent. 
-The second one, inspired by our paper \citep{lienart15}, has complexity $\mathcal O(NM)$ where $M$ is sub-linear in $N$ and leads to consistent estimators. \check{jul16}
+The first one, inspired by \citet{fearnhead10} and also discussed by \citet{taghavi12}, has linear complexity but the resulting estimators cannot be shown to converge. 
+The second one, inspired by our paper \citep{lienart15}, has complexity $\mathcal O(NM)$ where $M$ is sub-linear in $N$ and leads to convergent estimators (in the sense of \citet{chopin04}). \check{jul16}
 
 %%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Choice of normalisation densities}
@@ -275,10 +275,10 @@ The steps are illustrated in algorithm \ref{alg:bis-linear}. \check{jul16}
 \end{algorithm}
 
 Note that, in algorithm \ref{alg:bis-linear}, a resampling step can also be introduced if the ESS drops below a fixed admissible threshold as with the particle filtering algorithm. 
-Note also that the approximation inspired by \citet{briers05} used in this algorithm is what leads to an algorithm with linear complexity but also results in estimators that do not enjoy the consistency property of standard importance sampling estimators.\check{jul13}
+Note also that the approximation inspired by \citet{briers05} used in this algorithm is what leads to an algorithm with linear complexity but is biased and results in estimators that do not enjoy the CLT property of standard SMC estimators.\check{jul13}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Consistent BIS with sub-quadratic complexity}
+\subsection{Convergent BIS with sub-quadratic complexity}
 %
 We discussed earlier the bootstrap BIS with quadratic complexity where one samples from the approximation to the predictive density $\hpd_{t}$.
 This can in fact be simplified by compressing the representation of the particle filter from $N$ particles to $M$ particles by resampling. Taking $M$ to be sub-linear in $N$ (e.g.: $M=\mathcal O(\log N)$), the overall algorithm is $\mathcal O(TMN)$ and sub-quadratic in $N$.
@@ -328,6 +328,11 @@ In particular, we show that the default choice of normalisation density \eqref{e
 
 We also show that the linear-complexity implementation of the bootstrap BIS compares very favourably with the sub-quadratic and the quadratic implementation at a much reduced computational cost.  We then go on to compare the performances of the sub-quadratic smoothing algorithms when the underlying dynamic is non-linear.\check{jul16}
 
+The key aim for this section is to present the simplest possible models in which a clear difference in performance among the algorithms is shown.
+The metric for accuracy that is used is the RMSE, as in the main literature in the field (see e.g.: \citet{arulampalam02}).
+This metric is known to be flawed since Bayesian inference does not try to optimise the RMSE but since, in this chapter, we are comparing Bayesian methods, it already provides a good indicator of performance and it is easy to compute. 
+
+
 %%%%%%%%%%%%
 %\newpage
 %%%%%%%%%%%%
@@ -354,7 +359,7 @@ A = \matd{1 & 1\\0&1},\quad B = \matd{1&0}, \quad Q = {\nu\over 6}\matd{3&1\\1&2
 where $\nu,\tau>0$ define the amplitude of the noise processes. We compare two cases, the first one (case A) has $\nu=10$ and $\tau=1$ and the second one (case B) has the opposite assignment $\nu=1$ and $\tau=10$. Case A corresponds to a case where \citet{fearnhead10} indicate that the state has freedom to follow the observations which helps smoothing algorithms. 
 Case B corresponds to a case where \citet{fearnhead10} indicate that the states are highly dependent through time which can cause smoothers to struggle. \check{jul13}
 
-We run the dynamic for $T=50$ steps with $N=200$ particles and run the experiments $J=50$ times for each algorithm.
+We run the dynamic for $T=50$ steps with $N=200$ particles and run the experiments $J=50$ times for each algorithm (the data is randomised each time).
 We compare the average RMSE across the time steps computed as:
 %
 \eqa{
@@ -364,7 +369,12 @@ We compare the average RMSE across the time steps computed as:
 where $j$ indicates the experiment run ($j=1,\dots,J$), the superscript $a$ indicates the algorithm, $x_{j}$ denotes the ground truth for the $j$th experiment and $\hat\mu^{a}_{j}$ the recovered mean from the algorithm. 
 This is a crude measure of quality but is enough to show how the different algorithms compare (and, in particular, that the BIS outperforms Fearnhead's algorithm); \citet{arulampalam02} in their highly cited paper mention that the RMSE is widely used in the literature and facilitates quantitative comparison.  
 
-In the figures below, \emph{KF} and \emph{KS} refer to the Kalman filter and smoother, \emph{PF} to a bootstrap particle filter, \emph{FFBS} to the forward filtering backward smoothing algorithm applied after the PF and \emph{FFBS$_{\text{S}}$} to the sub-quadratic implementation (with $M=25$). The \emph{BIS} symbols refer to the (bootstrap) backward information smoothers and the subscript indicates the version: Q for quadratic, L for linear, S for sub-quadratic (with $M=25$). Finally, FH refers to Fearnhead's algorithm (the full description of Fearnhead's algorithm for this model is available in the appendix \ref{app:fearnhead-lg}).\add{link to reproducible code sims, SMC.jl}\check{jul13}
+In the figures below, \emph{KF} and \emph{KS} refer to the Kalman filter and smoother, \emph{PF} to a bootstrap particle filter, \emph{FFBS} to the forward filtering backward smoothing algorithm applied after the PF and \emph{FFBS$_{\text{S}}$} to the sub-quadratic implementation (with $M=25$). The \emph{BIS} symbols refer to the (bootstrap) backward information smoothers and the subscript indicates the version: Q for quadratic, L for linear, S for sub-quadratic (with $M=25$). Finally, FH refers to Fearnhead's algorithm (the full description of Fearnhead's algorithm for this model is available in the appendix \ref{app:fearnhead-lg}). 
+The main takeaways of the results presented here is to show that:
+\begin{enumerate}
+	\item the choice of normalisation density taken in Fearnhead's algorithm can lead to results that significantly underperform compared to other methods,
+	\item sub-quadratic methods do not significantly underperform as compared to the quadratic methods.
+\end{enumerate}
 
 In figure \ref{comp-smoothing-A} it is already clear that the FH algorithm underperforms. It is also interesting to observe that all three BIS methods offer comparable performances while the BIS$_{\text{L}}$ is computationally the least expensive.
 The FFBS algorithm performs quite well as well which can be expected as the dynamic is simple and hence the FFBS results does not suffer too much from the lack of resampling in the backward stage.\check{jul13}
@@ -380,7 +390,7 @@ We can also observe that both sub-quadratic implementations (FFBS$_{\text{S}}$ a
 \begin{figure}[!h]
 \center
 \includegraphics[width=.65\textwidth]{figures/tfs/comparison_caseA}
-\caption{\label{comp-smoothing-A}Violin plots comparing the RMSE of the algorithms in \emph{case A} over 50 runs. As expected the optimal Kalman smoother tends to perform best, the FFBS and all BIS have comparable performances while the FH underperforms.}
+\caption{\label{comp-smoothing-A}Violin plots comparing the RMSE of the algorithms in \emph{case A} over 50 runs with the optimal Kalman smoother as reference. The FFBS and all BIS have comparable performances while the FH underperforms with generally higher RMSE.}
 \end{figure}
 
 \begin{figure}[!h]
@@ -403,11 +413,11 @@ However, the algorithms which apply a resampling of the representation of the pa
 \begin{figure}[!h]
 \center
 \includegraphics[width=.65\textwidth]{figures/tfs/comparison_mod2}
-\caption{\label{comp-model2}Violin plots comparing the RMSE of the algorithms for model LG-10-6 over 50 runs. In this case, the sub-quadratic implementations of the BIS perform outstandingly well compared to the other algorithms which offer little performance gain over simply considering the particle filter.}
+\caption{\label{comp-model2}Violin plots comparing the RMSE of the algorithms for model LG-10-6 over 50 runs. In this case, the sub-quadratic implementations of the BIS perform outstandingly well compared to the other algorithms which offer little performance gain over simply considering the particle filter. Note that the flat base for some of the violin plots is an artefact of the plotting toolbox used.}
 \end{figure}
 
 %%%%%%%%
-\newpage
+%\newpage
 %%%%%%%%
 
 \subsection{Nonlinear Gaussian models}
@@ -455,9 +465,13 @@ However, the optimal backward sampling step is intractable in general and one ma
 
 We showed in our experiments that the BIS$_{\text{L}}$ and the BIS$_{\text{S}}$ typically perform on par with the naive implementation. There may be cases in which those algorithms do not perform well but based on the results of the experiments, we would encourage a user to consider the BIS$_{\text{L}}$ as a first smoothing algorithm (provided the dynamic is not linear).
 
-We indicated that the estimators obtained through the BIS$_{\text{L}}$ are not consistent due to the approximation in the sampling of the mixture indices. This, however, seemed to have little impact on the results of the experiments. A possible explanation for this is that, at the regime considered with relatively few particles, all estimators are biased and there is too much variance to significantly distinguish between them. Note however that exploiting these algorithms with significantly more particles (a few orders of magnitude more) requires having to deal with numerical instabilities arising from the representation of the range of weights associated with a large number of particles, and this, even with resampling. This is a known issue, particularly when the dimensionality of the problem is higher and some techniques exist to combat the issue \citep{miguez13}. 
+We indicated that the estimators obtained through the BIS$_{\text{L}}$ do not enjoy a CLT due to the biased approximation in the sampling of the mixture indices. 
+This, however, seemed to have little impact on the results of the experiments. 
+A possible explanation for this is that, at the regime considered with relatively few particles, all estimators are biased and there is too much variance to significantly distinguish between them. 
+Note however that exploiting these algorithms with significantly more particles (a few orders of magnitude more) requires having to deal with numerical instabilities arising from the representation of the range of weights associated with a large number of particles, and this, even with resampling. 
+This is a known issue, particularly when the dimensionality of the problem is higher and some techniques exist to combat the issue \citep{miguez13}. 
 
-Finally, we have only considered standard multinomial resampling in our algorithms. It may be that alternative resampling procedures such as the ones mentioned in \citet{hol06} lead to improved performances. This could be an avenue for further work.
+Finally, we have only considered standard multinomial resampling in our algorithms. It may be that alternative resampling procedures such as the ones mentioned in \citet{hol06} lead to improved performances. This could be an avenue for further work as well as a more in depth quantification of the computational performance considering more adequate error metrics such as the log-likelihood on a held out set.
 
 
 %Another comment that can be made is that we showed in the previous section that although it was desirable to have $\gamma_{t}\approx \pd_{t}$, it was not necessary as long as $\gamma_{1}=p_{1}$. As shown in \citet{taghavi12}, one could approximate the prediction densities with a mixture of $K$ Gaussians with $K\ll N$ and then consider the full mixture on $KN$ terms instead of a mixture on $N^{2}$ terms. In \citet{taghavi12}, it is shown that mixtures of one or two Gaussians can already provide a good enough approximation to the prediction density in HMM with a simple dynamic. For high-dimensional systems with highly non-Gaussian dynamics however, adjusting a good mixture of a few Gaussians might be expensive and the resulting approximation might be poor.

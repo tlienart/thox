@@ -49,13 +49,13 @@ where, at the first step, $q_{\theta_{0}}$ is replaced by the prior $\pi_{0}$. I
 Given that this approximate posterior is not necessarily in the exponential family, it needs to be projected as per \eqref{adfonline}.\check{april27} 
 At time $t+1$, the distribution $q_{\theta_{t+1}}$ can now be interpreted as an approximation of the posterior distribution given all the data up to that time or 
 %
-\eqa{	q_{\theta_{t+1}}(x) \esp\approx\esp p(x) &\propto& \pi_{0}(x)\prod_{s=1}^{t+1}p(y_{s}\st x).
+\eqa{	q_{\theta_{t+1}}(x) \esp\approx\esp p(x\st y_{1:t}) &\propto& \pi_{0}(x)\prod_{s=1}^{t+1}p(y_{s}\st x).
 }
 %
 We can therefore reinterpret the algorithm more generally as targeting a distribution $p$ that factorises in a fixed number (say $K$) of factors: 
 %
 \eqa{
-	p(x) & \propto&  \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x) \label{eq:targetfactorises}
+	p(x\st y_{1:t}) & \propto&  \pi_{0}(x)\prod_{i=1}^{K}t_{i}(x) \label{eq:targetfactorises}
 }
 %
 where the factors $t_i$ are nonnegative. This is the \emph{Assumed Density Filtering} (ADF) algorithm. Note that in this case there is no ``natural ordering'' as in the original online learning case and the algorithm can be applied after any permutation of the factors.\check{april27, aug17}
