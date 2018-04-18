@@ -3,6 +3,10 @@
 In this chapter we discuss how the Expectation Propagation (EP) algorithm can be exploited when attempting to perform (approximate) Bayesian inference with distributed data. 
 We focus on how different variants of the EP algorithm perform, how amenable they are to scaling and how robust they are to noisy estimations of the EP updates. 
 
+While very related to our paper \citep{hasenclever16}, this chapter differs in that a class of algorithms is defined and several algorithms are compared as opposed to one (the SNEP algorithm).  
+Further, the fixed-point perspective and relation to mirror-descent is novel and the discussion of the limitation of the convergence claimed in the paper is also novel. 
+Finally, we show in this chapter that a simpler method can lead to better performances than SNEP on simple models though more work would be needed on larger experiments to make this result definitive.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Distributed Bayesian Inference}
 
@@ -100,7 +104,7 @@ These steps are summarised at the algorithm \ref{alg:ep-sms-synch} below.\check{
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:ep-sms-synch}\dblue{\emph{\small Sequential Moment Sharing (synchronous)}}}
 	\begin{algorithmic}[1]
-	\State Initialise $\theta,\omega_{1},\dots,\omega_{K}$ such that $\theta=\sum_{i=1}^{K}\omega_{i} \in \Omega$ and send to each compute node
+	\State Initialise $\theta,\omega_{1},\dots,\omega_{K}$ such that $\theta=\sum_{i=1}^{K}\omega_{i} \in \Omega$ 
 	\For{$k=1:N_{\text{EP}}$}
 		\State Send current global parameter $\theta$ to each node
 		\For{node $i=1:K$}
@@ -209,11 +213,17 @@ In \citet{heskes05}, the authors show that the energy \eqref{EP-energy} is in fa
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{\label{point:MD-for-EP}Mirror Descent for the EP energy}
-Let us define $\mathcal E_i(\lambda_i)$ as the energy \eqref{EP-energy} with all parameters other than $\lambda_i$ kept fixed. On the corresponding compute node, the aim is then to determine a stationary point $\lambda_i^{\text{new}}$ for $\mathcal E_i(\lambda_i)$. This is in fact equivalent to finding a stationary point for $\mathcal G_i(\lambda_i)$ with
+Let us define $\mathcal E_i(\lambda_i)$ as the energy \eqref{EP-energy} with all $\lambda_{j}$ fixed for $j\neq i$  i.e.: 
+%
+\eqa{ \mathcal E_{i}(\lambda_{i}) &=& (1-K) A\pat{(K-1)\inv (\lambda_{i} + \sum_{j\neq i}\lambda _{j})} + A_{i}(\lambda_{i}) + C_{1}	}
+%
+where $C_{1}=\sum_{j\neq i}A_{j}(\lambda_{j})$ does not depend on $\lambda_{i}$. 
+Letting $\eta:=(K-1)\inv$ and $\theta_{-i}:=\eta\sum_{j\neq i}\lambda_{j}$, we have $-\eta\mathcal E_{i}=A(\eta\lambda_{i}+\theta_{-i}) - \eta A_{i}(\lambda_{i})+C_{2}$ with $C_{2}=-\eta C_{1}$. 
+On the corresponding compute node, the aim is then to determine a stationary point $\lambda_i^{\text{new}}$ for $\mathcal E_i(\lambda_i)$ which is then equivalent to finding a stationary point for $\mathcal G_i(\lambda_i)$ with
 \eqa{
-	\mathcal G_i(\lambda_i) &:=& A(\theta_{-i} + \eta\lambda_i) - \eta A_i(\lambda_i)	
+	\mathcal G_i(\lambda_i) &:=& A(\theta_{-i} + \eta\lambda_i) - \eta A_i(\lambda_i).	
 }
-where $\theta_{-i}:=\eta\sum_{j\neq i}\lambda_j$ and $\eta=(K-1)\inv$. A common approach to finding stationary points of a function is to consider Newton's method which revolves around a local quadratic approximation of that function. Let us denote $\lambda_i$ the current parameter and $\lambda_i^{\text{new}}$ the new one. We can consider the following development around $\lambda_i$:
+A common approach to finding stationary points of a function is to consider Newton's method which revolves around a local quadratic approximation of that function. Let us denote $\lambda_i$ the current parameter and $\lambda_i^{\text{new}}$ the new one. We can consider the following development around $\lambda_i$:
 %
 \eqa{
 \mathcal G_i(\lambda_i^{\text{new}}) 
@@ -242,7 +252,7 @@ where $\kappa'=\eta/\kappa$ can be interpreted as a step-size and $\hat\mu_i$ is
 	\omega_i^{\text{new}} &\leftarrow& \nabla A^{\star}\pac{\nabla A(\omega_i)+\kappa''(\hat\mu_i-\nabla A(\theta))}\label{eq:snep-updates}
 }
 %
-which resembles the damped updates in the mean-parameter space \eqref{eq:damped-update-mp} we had obtained earlier (we will show in the experiments section \ref{dist-ep-exps} that it also underperforms compared to the updates \eqref{eq:damped-update-mp}). 
+which resembles the damped updates in the mean-parameter space \eqref{eq:damped-update-mp} we had obtained earlier (we will show in the experiments section \ref{dist-ep-exps} that it underperforms compared to the updates \eqref{eq:damped-update-mp}). 
 More importantly, the updates \eqref{eq:snep-updates} form the core of the \emph{Stochastic Natural gradient Expectation Propagation} (SNEP) algorithm we suggested in \citet{hasenclever16}.
 %\add{Here add small discussion where you pre-announce results from experimental section}\check{june21}
 The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{alg:ep-sms-synch} to obtain the ``SNEP'' variant we use in the experiments.
@@ -271,7 +281,7 @@ The update \eqref{eq:snep-updates} can be injected into the SMS algorithm \ref{a
 \section{\label{dist-ep-exps}Experiments}
 %# EP exps
 
-In this section, we compare the three main versions of EP algorithms discussed in the chapter: NP-EP where the updates are done in the natural parameter space,\footnote{This corresponds to the SMS algorithm described earlier.} MP-EP and SNEP where updates are done in the mean parameter space. For the purpose of the experiments, all algorithms are ran in a synchronous fashion. 
+In this section, we compare the three main versions of EP algorithms discussed in the chapter: NP-EP where the updates are done in the natural parameter space (the SMS algorithm with update \eqref{eq:damped-update-np-w}), MP-EP \eqref{eq:damped-update-mp} and SNEP \eqref{eq:snep-updates} where updates are done in the mean parameter space. For the purpose of the experiments, all algorithms are ran in a synchronous fashion. 
 
 \subsection{Description of the experiments}
 
@@ -289,7 +299,7 @@ As the base exponential family, we use a full-covariance Gaussian. We compare th
 
 \subsection{Results}
 
-We show in figure \ref{fig-res-snep} the evolution of the predictive RMSE with increasing number of iterations for the three algorithms considered when varying the number of iteration per samples (corresponding to the amount of Monte Carlo noise) and the damping parameter (indicated by $d=0.01$ in the legends). Note that the computational complexity of the iteration for each of the three algorithm is very similar, the main difference residing in the ordering of operations.\footnote{In all the runs, an iteration of MP-EP is around 5\% faster than an iteration of NP-EP and around 20\% faster than an iteration of SNEP but that is negligible compared to the factor of 2 speedup obtained by the much faster convergence of the algorithm.} As a baseline, the predictive RMSE corresponding to $x^{\star}$ (the generating set of weights) is drawn as a black line on each graph.
+We show in figure \ref{fig-res-snep} the evolution of the predictive RMSE with increasing number of iterations for the three algorithms considered when varying the number of iteration per samples (corresponding to the amount of Monte Carlo noise) and the damping parameter (indicated by $d$ in the legends). Note that the computational complexity of the iteration for each of the three algorithm is very similar, the main difference residing in the ordering of operations.\footnote{In all the runs, an iteration of MP-EP is around 5\% faster than an iteration of NP-EP and around 20\% faster than an iteration of SNEP but that is negligible compared to the factor of 2 speedup obtained by the much faster convergence of the algorithm.} As a baseline, the predictive RMSE corresponding to $x^{\star}$ (the generating set of weights) is drawn as a black line on each graph.
 
 A range of damping parameters is selected to illustrate the behaviour of the algorithm. The range is always taken with the largest damping parameter being on the verge of numerical instability for the algorithm. Indeed, when using a full-covariance Gaussian as base exponential family, going from the mean-parameter space to the natural parameter space or vice versa requires the inversion of a matrix. Doing the update in the mean parameter space helps the numerical stability of this step as does increasing the damping (reducing the step-size).
 
@@ -301,7 +311,7 @@ It is clear from the results that the best performing algorithm is the MP-EP alg
 \begin{figure}[ht]
 \vspace{-\marginparsep}
 \vspace{-\marginparwidth}
-\vspace*{1.7cm}
+\vspace*{.7cm}
 \center
 %\hspace*{-2.5cm}
 	\begin{subfigure}[b]{0.45\textwidth}
@@ -360,7 +370,7 @@ It is clear from the results that the best performing algorithm is the MP-EP alg
 		\label{res-snep-50}
 	\end{subfigure}		
 %
-\caption{\label{fig-res-snep}Results of the EP experiments (best seen in colours).}
+\caption{\label{fig-res-snep}Results of the EP experiments. Each curve corresponds to a different damping parameter indicated by $d$, taken in the range as close to numerical instability as possible. (Figures best seen in colour).}
 \end{figure}
 \end{landscape}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

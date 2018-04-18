@@ -318,6 +318,8 @@ As we saw, the algorithm requires to sample the first arrival time of an IPP of 
  \end{itemize}
 The key elements when trying to deploy the Bouncy Particle Sampler in practice are to select an appropriate $\lambda_{\text{ref}}$ (too low and the processus is essentially a random walk, too high and some regions of space may be left unexplored for a long time) and to implement an appropriate way to sample the first arrival time of the IPP which will depend on the target distribution.
 
+An advantage of the BPS over methods such as HMC is that it can work seamlessly on constrained domains as is shown in \citet{bierkens17}.
+
 
 %\section{Discussion}
 %
