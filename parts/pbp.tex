@@ -27,13 +27,16 @@ As indicated in the paper, the representation \eqref{eq:nbp-representation} make
 \eqa{	
 	\sup_{x_{t}} \int \psi_{st}(x_{s},x_{t})\dx_{t} &<&\infty, \quad \text{and}\quad \int \psi_{s}(x_{s})\dx_{s} \esp<\esp \infty,\label{conditions NBP}
 }
-where the integrals are taken over the range of admissible values for the relevant variable. Provided these assumptions hold, the message updates are well defined and can be explicitly (and efficiently) computed. Computing the beliefs however, requires considering the product of mixtures of $M$ terms leading to a complex representation and an explosion in computational cost. In order to alleviate this, the authors suggest an importance sampling approach targeting the beliefs and fitting mixtures of Gaussians to the resulting weighted particles. 
+where the integrals are taken over the range of admissible values for the relevant variable. 
+Provided these assumptions hold, the message updates are well defined and can be explicitly (and efficiently) computed.
+If these conditions are not met however the message approximations are not well defined and the iterations may explode.
+Computing the beliefs however, requires considering the product of mixtures of $M$ terms leading to a complex representation and an explosion in computational cost. In order to alleviate this, the authors suggest an importance sampling approach targeting the beliefs and fitting mixtures of Gaussians to the resulting weighted particles. 
 The computation of the message updates \eqref{eq:mess-update-2} is thereby always done over a constant number of terms.\check{jul19}
 
 \subsubsection*{Main issues}
 
 A key weakness of the NBP algorithm is that the conditions \eqref{conditions NBP} do not hold in a number of important cases (the authors aknowledge this in a footnote of their paper). 
-First, the node potentials $\psi_{u}$ are usually proportional to likelihoods of the form $p(y_{u}\st x_{u})$ which need not be integrable in $x_{u}$. In fact, for most non-Gaussian potentials, this is the case. Then, there exist applications for which the first integrability condition on edge potentials does not hold. In imaging applications for example, the edge potential can encode a measure of similarity between pixels which need not verify the first integrability condition as in \citet{nikolova00}. Finally, by definition of NBP as an approximated representation with a fixed number of Gaussians, it does not lead to consistent estimators of the LBP messages.\check{jul24, jul21, jul19}
+First, the node potentials $\psi_{u}$ are usually proportional to likelihoods of the form $p(y_{u}\st x_{u})$ which need not be integrable in $x_{u}$. In fact, for most non-Gaussian potentials, this is the case. Then, there exist applications for which the first integrability condition on edge potentials does not hold. In imaging applications for example, the edge potential can encode a measure of similarity between pixels which need not verify the first integrability condition as in \citet{nikolova00}. Finally, by definition of NBP as an approximated representation with a fixed number of Gaussians, it will typically lead to biased estimators of the LBP messages.\check{jul24, jul21, jul19}
 
 
 
@@ -73,7 +76,7 @@ Alternatively the authors suggest running a short MCMC simulation targeting it w
 \section{\label{sec:EPBP}Expectation Particle Belief Propagation}
 As for the PBP algorithm, we consider importance sampling to build particle representations of the messages. In our method, however, we consider a \emph{sequence} of proposal distributions at each node from which one can cheaply sample particles at a given iteration of the LBP algorithm \citep{lienart15}.
 
-The novelty of the approach is to propose a principled and automated way of designing a sequence of proposals in a tractable exponential family using the expectation propagation (EP) algorithm. The resulting method, which we call \emph{Expectation Particle Belief Propagation} (EPBP), does not suffer from the restrictive integrability conditions of the NBP algorithm and sampling is done exactly unlike the PBP algorithm which implies that we obtain consistent estimators of the LBP messages.
+The novelty of the approach is to propose a principled and automated way of designing a sequence of proposals in a tractable exponential family using the expectation propagation (EP) algorithm. The resulting method, which we call \emph{Expectation Particle Belief Propagation} (EPBP), does not suffer from the restrictive integrability conditions of the NBP algorithm and sampling is done exactly unlike the PBP algorithm which implies that we obtain proper importance sampling estimators of the LBP messages with almost sure convergence guarantees. 
 
 Further, the development of our method also formally shows that considering proposals close to the beliefs, as suggested by \cite{ihler09}, is a good idea.  Our core observation is that since sampling from a proposal of the form \eqref{eq:PBP proposal} using MCMC simulation is very expensive, we should consider using a more tractable proposal distribution instead. However it is important that the proposal distribution is constructed adaptively, taking into account evidence collected through the message passing itself. We propose to achieve this by using proposal distributions lying in a tractable exponential family, and adapted using EP.
 
@@ -94,7 +97,8 @@ This is illustrated in figure \ref{representation-edge-pbp}.
 \caption{\label{representation-edge-pbp}Illustration of the situation for an edge $(s,t)$: all messages coming into $s$ and $t$ have been approximated apart from the messages between $s$ and $t$. Therefore approximated pre-messages (denoted $\widehat M$) are available on both nodes. We are considering the problem of determining the best proposals on $s$ and $t$ in order to approximate the messages between $s$ and $t$ given the situation.}
 \end{figure}
 
-We would like to define $q_{s}$ and $q_{t}$ in a joint manner in such a way that all objects remain consistent with the LBP iterations. For that reason, we consider the joint belief $ B_{st}$ on $s$ and $t$ given the approximation to the pre-messages:
+We would like to define $q_{s}$ and $q_{t}$ in a joint manner in such a way that all objects remain coherent with the LBP iterations. 
+For that reason, we consider the joint belief $ B_{st}$ on $s$ and $t$ given the approximation to the pre-messages:
 %
 \eqa{	
 	 B_{st}(x_{s},x_{t}) &\propto& \widehat M_{st}(x_{s}) \psi_{st}(x_{s},x_{t})\widehat M_{ts}(x_{t}).
@@ -134,7 +138,7 @@ As we showed in point \ref{point:PBP}, it is computationally expensive to use th
 Our idea is therefore consider an approximation $q_{s}$ drawn from a tractable exponential family $\mathcal F_{\phi}$ with a structure matching that of the belief ($B_{s}(x_{s}) = \psi_{s}(x_{s})\prod_{r\in\partial s} m_{rs}(x_{s})$):
 %
 \eqa{ 
-	q_s(x_s) &\propto& \eta_{\circ s}(x_s) \prod_{r\in\partial s} \eta_{rs}(x_s).
+	q_s(x_s) &\propto& \eta_{\circ s}(x_s) \prod_{r\in\partial s} \eta_{rs}(x_s).\label{eq:crux-epbp}
 }
 %
 In the experiments we used a Gaussian family but the algorithm is -- in theory  -- not limited to this choice.
@@ -151,9 +155,9 @@ Alternatively, once each particle approximated message $\widehat{m}_{st}(x_t)$ i
 	\caption{\label{alg:epbp-node-update}\idblue{\small Node update in the EPBP algorithm}}
 	\begin{spacing}{1.2}
 	\begin{algorithmic}[1]
-		\State sample $\{X^{(i)}_{s}\}_{i=1}^{N}\simiid q_{s}$	
-		\State evaluate the approximate representation of the belief: $$\widehat B_{s}(X_{s}^{(i)}) = \psi_{s}(X_{s}^{(i)})\prod_{r\in\partial {s}}\widehat m_{rs}(X_{s}^{(i)})$$% $q_{u}(x_{u}^{(i)})$
-		\For{$v\in \partial {u}$}
+		\State sample $X^{(i)}_{s}$ from $q_{s}$ for $i=1,\dots,N$
+		\State evaluate the approximate representation of the belief: $$\widehat B_{s}(X_{s}^{(i)}) = \psi_{s}(X_{s}^{(i)})\prod_{t\in\partial {s}}\widehat m_{ts}(X_{s}^{(i)})$$% $q_{u}(x_{u}^{(i)})$
+		\For{$t\in \partial {s}$}
 			\State evaluate the approximate representation of the pre-message: $$\widehat M_{st}(X_{s}^{(i)}) :=\widehat B_{s}(X_{s}^{(i)})/\widehat m_{ts}(X_{s}^{(i)})$$
 			\State compute the corresponding normalised weights: $$ w_{st}^{(i)}\propto \widehat M_{st}(X_{s}^{(i)})/q_{s}(X_{s}^{(i)})$$
 			\State update the estimator of the outgoing message: $$\widehat m_{st}(x_{t})=\sum_{i=1}^{N}w^{(i)}_{st}\psi_{st}(X_{s}^{(i)},x_{v})$$
@@ -163,6 +167,35 @@ Alternatively, once each particle approximated message $\widehat{m}_{st}(x_t)$ i
 	\end{algorithmic}
 	\end{spacing}
 \end{algorithm}
+
+To clarify the steps of the previous algorithm, we distinguish two phases.
+\subsubsection{Phase 1 of algorithm \ref{alg:epbp-node-update}}
+In the first phase, new samples $X^{(i)}$ on node $s$ are drawn from the current proposal $q_{s}$. 
+Consequently, their importance weights must be obtained which requires computing the $\widehat B_{s}(X^{(i)}_{s})$ and $\widehat B_{s}$ is obtained by evaluating the product of the message estimators coming into $s$ at those samples as illustrated on figure \ref{fig:epbp-ill-1} below.
+%%%%%%%%%%
+\clearpage
+%
+\begin{figure}[!h]
+\center
+\includegraphics[width=.4\textwidth]{./figures/extra/epbp-ill-1}
+\caption{\label{fig:epbp-ill-1} Illustration of the first phase of the node update. All incoming message estimators are evaluated at the new samples $X^{(i)}_{s}$ and multiplied along with the value at $\psi_{s}$ to form the $\widehat B_{s}(X^{(i)}_{s}$.}
+\end{figure}
+%
+
+The message estimators are mixtures corresponding to the current weighted population of samples along the edge $\{(X^{(j)}_{t}, w^{(j)}_{ts})\}_{j=1}^{N}$ i.e.: $\widehat m_{ts}(x_{s}) = \sum_{j=1}^{N} w^{(j)}_{ts} \psi_{ts}(X^{(j)}_{t}, x_{s})$.
+
+\subsubsection{Phase 2 of algorithm \ref{alg:epbp-node-update}}
+In the second phase, the approximations for the outgoing messages $\widehat m_{st}(x_{t})$ for $t\in\partial s$ (resp. the prior) are formed as well as their EP representation $\eta_{st}$ (resp $\eta_{\circ t}$). 
+For this, the importance weights along each edge corresponding to the new population of samples need to be computed as per \eqref{eq:rep-PBP}
+%
+\begin{figure}[!h]
+\center
+\includegraphics[width=.4\textwidth]{./figures/extra/epbp-ill-2}
+\caption{\label{fig:epbp-ill-1} Illustration of the first part of the second phase of the node update. All outgoing pre-message estimators are evaluated at the new samples $X^{(i)}_{s}$ and divided by the proposal $q_{s}$ to get the importance weights.}
+\end{figure}
+%
+Once the weights for the outgoing message have been computed, a new approximation for the outgoing message is defined.
+This mixture can then be projected onto the exponential family $\mathcal F_{\phi}$ in order to get its new EP representation $\eta_{st}$ which will be used to update the proposal on the neighbouring node $t$ as per \eqref{eq:crux-epbp} (same for the prior).
 
 Note that, in the EP step, if the projection leads to an invalid distribution (e.g., in the Gaussian case, if it leads to an element with negative variance), we simply revert the approximation to its previous value as in \citet{minka01}. %\add{this should be discussed in EP intro}
 
@@ -211,8 +244,13 @@ We start by comparing EPBP to PBP as implemented by \citet{ihler09} on a $3\time
 	\right.
 }
 %-2, 1, 2, 1.3, 0, 2
-where $y_{u}$ denotes the observation at node $u$, $\mathcal N(x;\mu,\sigma)\propto \exp(-x^{2}/2\sigma^{2})$ (density of a Normal distribution), $\mathcal G(x;\mu,\beta)\propto \exp(-[(x-\mu)/\beta+\exp(-(x-\mu)/\beta)])$ (density of a Gumbel distribution) and $\mathcal L(x;\mu,\beta)\propto \exp(-|x-\mu|/\beta)$ (density of a Laplace distribution). The parameters were set in an arbitrary fashion to:
+where $y_{u}$ denotes the observation at node $u$, $\mathcal N(x;\mu,\sigma)\propto \exp(-x^{2}/2\sigma^{2})$ (density of a Normal distribution), $\mathcal G(x;\mu,\beta)\propto \exp(-[(x-\mu)/\beta+\exp(-(x-\mu)/\beta)])$ (density of a Gumbel distribution) and $\mathcal L(x;\mu,\beta)\propto \exp(-|x-\mu|/\beta)$ (density of a Laplace distribution). The parameters were set (arbitrarily) to:
 $$ \alpha_{1}=0.6,\,\, \alpha_{2}=0.4,\,\, \mu_{1}=-2,\,\,\mu_{2}=2,\,\,\mu_{3}=0, \,\,\sigma_{1}=1, \,\,\sigma_{2}=2, \,\,\beta=1.3. $$
+
+The choice of model was mainly driven by showing the performance on a controllable yet mildly multimodal and non-Gaussian setting.
+The model for the edge potential corresponds to a distribution around an $\ell_{1}$ discrepancy between neighbouring nodes.
+While simple, the model already allows to clearly show that PBP underperforms as compared to EPBP.
+
 We compare the two methods after 20 LBP iterations.\footnote{The scheduling used alternates between the classical orderings: top-down-left-right, left-right-top-down, down-up-right-left and right-left-down-up. One ``LBP iteration'' implies that all nodes have been updated once.} 
 We then repeated the experiments on a tree with 8 nodes (\fig{fig:grids} (right)) where we know that, at convergence, the beliefs computed using BP are proportional to the true marginals. Again, the node and edge potentials are picked such that the marginals are multimodal with this time
 \eqa{	
@@ -238,11 +276,22 @@ On this second example, we also considered ``pure EP'' with Gaussians to compare
 	\caption{\label{fig:grids}Illustration of the grid (left) and tree (right) graphs used in the experiments.}
 \end{figure}
 
-PBP as presented in \citet{ihler09} is implemented using the same parameters than those in an implementation code provided by the authors: the proposal on each node is the last estimated belief and sampled with a 20-step MCMC chain, the Metropolis Hastings proposal is a normal distribution. For EPBP, the approximation of the messages are Gaussians. The ground truth is approximated by running LBP on a deterministic equally spaced mesh with 200 points. All simulations were run with Julia on a Mac with 2.5 GHz Intel Core i5 processor, our code is available online.\footnote{\url{https://github.com/tlienart/EPBP}.} All the experiments were run multiple times as shown on the figures to account for the inherent stochasticity of the methods. The mean trends are also drawn.
+PBP as presented in \citet{ihler09} is implemented using the same parameters than those in an implementation code provided by the authors: the proposal on each node is the last estimated belief and sampled with a 20-step MCMC chain, the Metropolis Hastings proposal is a normal distribution. For EPBP, the approximation of the messages are Gaussians. 
+The ground truth is approximated by running LBP on a deterministic equally spaced mesh with 200 points. 
+All simulations were run with Julia on a Mac with 2.5 GHz Intel Core i5 processor, our code is available online.\footnote{\url{https://github.com/tlienart/EPBP}.} 
+All the experiments were run multiple times as shown on the figures to account for the inherent stochasticity of the methods. The mean trends are also drawn.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsubsection{Results of the grid and tree experiments}
 
-Figure \ref{figCompGrid} compares the performances of both methods. The error is computed as the mean $L^{1}$ error over all nodes between the estimated beliefs and the ground truth. One can observe that not only does PBP perform worse than EPBP but also that the error plateaus with increasing number of samples. This is because the sampling within PBP is done approximately and hence the consistency of the estimators is lost. Note that for EPBP, one observes the expected $1/\sqrt{N}$ convergence of particle methods discussed in \citet{ihler09}.
+Figure \ref{figCompGrid} compares the performances of both methods. The error is computed as the mean absolute error (MAE) over all nodes between the estimated beliefs and the ground truth using the same equally spaced mesh used for the ground truth i.e.:
+%
+\eqa{ \text{MAE} &=&	|\mathcal V|\inv\sum_{i\in\mathcal V} \sum_{j=1}^{200} \abs{\widehat B_{i}(x_{j}) - B_{i}^{\text{GT}}(x_{j})}	}
+% 
+where the $x_{j}$ are the grid points. 
+
+One can observe that not only does PBP perform worse than EPBP but also that the error plateaus with increasing number of samples. 
+This is because the sampling within PBP is done approximately and hence it does not correspond to a proper importance sampling estimator which means any convergence guarantee is lost. 
+Note that for EPBP, one observes the expected $1/\sqrt{N}$ convergence of particle methods discussed in \citet{ihler09}.
 
 \begin{figure}[!h]
 \center
@@ -306,7 +355,7 @@ Additionally, we looked at how ``pure EP'' with normal distributions performs. W
 \begin{figure}[!h]
 \center
 \includegraphics[width=.6\textwidth]{figures/epbp/errComparisonEP}
-\caption{\label{compPBPaEP}Comparison of the mean $L^{1}$ error for EPBP and ``PBP after EP'' for the tree example. EPBP is more accurate and converges faster.}
+\caption{\label{compPBPaEP}Comparison of the mean $L^{1}$ error for EPBP and ``PBP after EP'' for the tree example. EPBP is more accurate and converges faster. }
 \end{figure}
 
 
@@ -345,7 +394,8 @@ We apply this method to the $3\times 3$ grid example in the case where $M=\mathc
 \end{figure}
 
 
-We apply the same sub-quadratic method on a simple probabilistic model for an image denoising problem. The aim of this example is to show that the method can be applied to larger graphs and still provide good results. The model underlined is chosen to showcase the flexibility and applicability of our method in particular when the edge-potential is non-integrable. It is not claimed to be an optimal approach to image denoising.\footnote{In this case in particular, an optimisation-based method such as that of \citet{rudin92} is very likely to yield better results and much faster.}
+We apply the same sub-quadratic method on a simple probabilistic model for an image denoising problem. The aim of this example is to show that the method can be applied to larger graphs and still provide good results. The model underlined is chosen to showcase the flexibility and applicability of our method in particular when the edge-potential is non-integrable (i.e. it would not meet the necessary condition \eqref{conditions NBP} for NBP). 
+It is not claimed to be an optimal approach to image denoising.\footnote{In this case in particular, an optimisation-based method such as that of \citet{rudin92} is very likely to yield better results and much faster.}
 
 The node and edge potentials are defined as follows:
 \eqa{	
@@ -356,7 +406,8 @@ The node and edge potentials are defined as follows:
 		\end{array}
 	\right.,\label{modelIMG}
 }
-where $\mathcal L^{\lambda}(x;\mu,\beta)=\mathcal L(x;\mu,\beta)$ if $|x|\le \lambda$ and $\mathcal L(\lambda;\mu,\beta)$ otherwise. In this example we set $\lambda=0.2$. The value assigned to each pixel of the reconstruction is the estimated mean of the belief obtained over the corresponding node (figure \ref{figIMG}). The image has size $50\times 50$ (therefore corresponding to a grid graph of 2500 nodes) and the simulation was run with $N=30$ particles per nodes, $M=5$ and $10$ BP iterations taking under 2 minutes to complete with the setup described earlier. 
+where $\mathcal L^{\lambda}(x;\mu,\beta)=\mathcal L(x;\mu,\beta)$ if $|x|\le \lambda$ and $\mathcal L(\lambda;\mu,\beta)$ otherwise. 
+The node potential represents a simple Gaussian noise while the edge potential represents a clipped $\ell_{1}$ similarity. In this example we set $\lambda=0.2$. The value assigned to each pixel of the reconstruction is the estimated mean of the belief obtained over the corresponding node (figure \ref{figIMG}). The image has size $50\times 50$ (therefore corresponding to a grid graph of 2500 nodes) and the simulation was run with $N=30$ particles per nodes, $M=5$ and $10$ BP iterations taking under 2 minutes to complete with the setup described earlier. 
 We compare it with the result obtained with EP on the same model. 
 Running PBP or any other quadratic method on this example is prohibitively expensive due to the size of the underlying graph.
 
@@ -388,7 +439,7 @@ Running PBP or any other quadratic method on this example is prohibitively expen
 In this chapter, we presented an original way to design adaptively efficient and easy-to-sample-from proposals for a particle implementation of the LBP algorithm. The construction of proposals is done in the Expectation Propagation framework.
 
 We have demonstrated empirically that the resulting algorithm is significantly faster and more accurate than an implementation of the PBP algorithm using the estimated beliefs as proposals and sampling from them using MCMC as proposed in \cite{ihler09}. 
-It is also more accurate than using plain EP due to the nonparametric nature of the messages and offers consistent estimators of the LBP messages. 
+It is also more accurate than using plain EP due to the nonparametric nature of the messages and offers estimators of the LBP messages with almost sure convergence guarantee. 
 
 A sub-quadratic version of the method was also outlined and shown to perform almost as well as the original method on mildly multi-modal models, it was also applied successfully in a simple image denoising example illustrating that the method can be applied on graphical models with thousands of nodes at a reasonable computational cost.
 
