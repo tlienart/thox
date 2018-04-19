@@ -67,13 +67,13 @@ We also illustrate one specific type of loopy graph: the \emph{grid graph}.
 %\dred{COULD ADD hierarchical model as tree graph}
 
 %%%%%%%%%%%
-\section{\label{intro:exMRF}Examples of MRF}
+\section{\label{intro:exMRF}Examples of MRFs}
 In this section, we present a brief overview of three examples of graph structures on which we will focus most of our effort throughout this document. 
 We also present the type of applications they are connected with. 
 
 %%%%%%%%%%%%%%
 \subsection{Hidden Markov Models}
-Chain graphs, where the random variables on every node take value in the same state-space $\mathcal X$, form the underlying structure of \emph{Hidden Markov Models} (HMM)\margnote{HMM} an important class of models. These can be illustrated as follows:
+Chain graphs, where the random variables on every node take value in the same state-space $\mathcal X$, form the underlying structure of \emph{Hidden Markov Models} (HMM)\margnote{HMMs} an important class of models. These can be illustrated as follows:
 \begin{figure}[!h]
 \center
 \begin{tikzpicture}[-,minimum size=1.1cm,scale=.1,node distance=2cm, thick]
@@ -197,7 +197,7 @@ The problem of finding or approximating the singleton marginals then corresponds
 
 \section{Exact vs Inexact Methods and Structure of the Thesis}
 
-While the unifying theme of this thesis is the inference problem on Markov Random Fields, we consider two rather different approaches forming the two main parts of the thesis. In the first approach -- \emph{sampling methods} -- we consider methods to produce samples from the target densities (marginals of an MRF) from which Monte Carlo estimators can be computed. These methods take the form of stochastic processes which, asymptotically, are guaranteed to generate samples from the target distribution. These methods are considered ``exact'' because, asymptotically, they yield samples from the correct distribution. The difficulty of course is to assess whether the generating process has converged in the context of finite compute time and finite precision arithmetics. 
+While the unifying theme of this thesis is the inference problem on Markov Random Fields, we consider two rather different approaches forming the two main parts of the thesis. In the first approach -- \emph{sampling methods} -- we consider methods to produce samples from the target densities (marginals of a MRF) from which Monte Carlo estimators can be computed. These methods take the form of stochastic processes which, asymptotically, are guaranteed to generate samples from the target distribution. These methods are considered ``exact'' because, asymptotically, they yield samples from the correct distribution. The difficulty of course is to assess whether the generating process has converged in the context of finite compute time and finite precision arithmetics. 
 
 In the second approach -- \emph{approximated Bayesian inference} -- we consider methods to produce proxies to the target densities and compute expected values with respect to these proxies. These methods are considered ``inexact'' because even in the limit of infinite computational power or infinite precision arithmetic they do not lead to the correct expected values. 
 

@@ -291,7 +291,7 @@ This can in fact be simplified by compressing the representation of the particle
 		\State sample $r^{(T-1)}_{1:M}$ from $\mathcal M(\{w^{(i)}_{T-1}\}_{i=1}^{N})$ 
 		\For{$t=T-1:2$}	
 			\State sample $r^{(t-1)}_{1:M}$ from $\mathcal M(\{w^{(i)}_{t-1}\}_{i=1}^{N})$ 
-			\State sample $\tilde X^{(j)}_{t}\simiid p(\cdot\st X^{(r^{(t-1)}_{j})}_{t-1})$  for $j=1,\dots,M$
+			\State sample $\tilde X^{(j)}_{t}$ from $ p(\cdot\st X^{(r^{(t-1)}_{j})}_{t-1})$  for $j=1,\dots,M$
 			\State compute the update factors $$\tilde \alpha^{(j)}_{t} = {p(\tilde X^{(j)}_{t+1}\st \tilde X^{(j)}_{t})p(y_{t}\st \tilde X^{(j)}_{t})\over \sum_{\ell=1}^{M} w^{(r^{t}_{\ell})}_{t} p(\tilde X^{(j)}_{t+1} \st X^{(r^{t}_{\ell})}_{t})  }$$
 			\State update and normalise the weights (and resample if required)
 		\EndFor

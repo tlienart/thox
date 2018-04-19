@@ -86,7 +86,7 @@ The MH algorithm corresponds to the transition kernel below where $q$ is a propo
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:mh-kernel}\dblue{\emph{\small Metropolis-Hasting transition}}}
 	\begin{algorithmic}[1]
-		\State generate $Y^{(n)}\sim q(\cdot | X^{(n)})$
+		\State sample $Y^{(n)}$ from  $q(\cdot | X^{(n)})$
 		\State compute the acceptance rate
 			$$ \rho \leftarrow \min\left\{ {p_{u}(Y^{(n)})\over p_{u}(X^{(n)})}{q(X^{(n)}|Y^{(n)})\over q(Y^{(n)}|X^{(n)})}, 1\right\} $$
 		\State generate $\beta\sim \mathcal B(\rho)$ (Bernoulli)
@@ -105,7 +105,7 @@ Gibbs sampling can be applied when targeting a multivariate distribution $p\in \
 	\begin{algorithmic}[1]
 		\State given $x^{(n)}=(x_{1}^{(n)},\dots,x_{d}^{(n)})$
 		\For{$k=1:d$}
-			\State generate $X^{(n+1)}_{k} \sim p_{k}(x_{k}\st x^{(n)}_{-k})$ \,\,with $x_{-k}^{(n)}:=(x_{1}^{(n+1)},\dots,x_{k-1}^{(n+1)},x_{k+1}^{(n)},\dots,x_{d}^{(n)})$
+			\State sample $X^{(n+1)}_{k} $ from $ p_{k}(x_{k}\st x^{(n)}_{-k})$ \,\,with $x_{-k}^{(n)}:=(x_{1}^{(n+1)},\dots,x_{k-1}^{(n+1)},x_{k+1}^{(n)},\dots,x_{d}^{(n)})$
 		\EndFor
 	\end{algorithmic}
 \end{algorithm}
@@ -193,11 +193,11 @@ A skeleton of a particle filter algorithm is given below.\check{jun24}
 \begin{algorithm}[!h]\small
 	\caption{\label{alg:particle-filter}\dblue{\emph{\small Particle filter}}}
 	\begin{algorithmic}[1]
-		\State sample $X_{1}^{(i)}\simiid q_{1}$ for $i=1,\dots,N$	%\Comment{\emph{Initialization}}
+		\State sample $X_{1}^{(i)}$ from $ q_{1}$ for $i=1,\dots,N$	%\Comment{\emph{Initialization}}
 		\State compute and normalise the weights $w_{1}(X^{(i)}_{1})\propto {\pi_{0}( X^{(i)}_{1})p(y_{1}\st X^{(i)}_{1})/ q_{1}(X^{(i)}_{1})}$
 %		\State resample: $\{\X^{(i)}_{1},W^{(i)}_{1}\}\rightarrow\{\overline \X^{(i)}_{1},N\inv\}$\Comment{\emph{Using some resampling scheme}}\vspace*{.2cm}
 		\For{$t=2:T$}
-			\State sample $X^{(i)}_{t}\simiid q_{t}( \cdot \st X^{(i)}_{t-1}, y_{t})$ with $q_{t}\approx q_{t}^{\text{opt}}$ for $i=1,\dots,N$
+			\State sample $X^{(i)}_{t}$ from $ q_{t}( \cdot \st X^{(i)}_{t-1}, y_{t})$ with $q_{t}\approx q_{t}^{\text{opt}}$ for $i=1,\dots,N$
 			\State update and normalise the weights $w^{(i)}_{t}\propto\alpha^{(i)}_{t}w^{(i)}_{t-1}$
 			\State resample the particles if necessary
 		\EndFor\\
@@ -272,7 +272,7 @@ This is illustrated at the figure \ref{fig:bounce-bps} below where $\hat n := \n
 \begin{figure}[!h]
 	\center
 	\includegraphics[width=.8\textwidth]{./figures/extra/bounce-bps}
-	\caption{\label{fig:bounce-bps}Illustration of the specular reflection. The new velocity vector $v'$ is obtained by doing a specular reflection of the old vector $v$ against the level set of $U$ passing by $x$ (green line). This is obtained by subtracting twice the projection (green arrow) of the velocity on the normal vector to $U$ at $x$ (orange arrow). Figure best seen in colours.}
+	\caption{\label{fig:bounce-bps}Illustration of the specular reflection. The new velocity vector $v'$ is obtained by doing a specular reflection of the old vector $v$ against the level set of $U$ passing by $x$ (green line). This is obtained by subtracting twice the projection (green arrow) of the velocity on the normal vector to $U$ at $x$ (orange arrow). Figure best seen in colour.}
 \end{figure}
 %
 %\clearpage
@@ -305,7 +305,7 @@ The process for two subsequent time steps is illustrated at the figure \ref{fig:
 \begin{figure}[!h]
 \center
 	\includegraphics[width=.8\textwidth]{./figures/extra/trajec-bps}
-	\caption{\label{fig:bps-trajec} Illustration of the process to go from $x^{(i-1)}$ to $x^{(i)}$ in the BPS: a bouncing time $\tau_{\text{bounce}}$ is drawn from the IPP with intensity $\chi(t)$ along the trajectory $x^{(i-1)}+v^{(i-1)}t$ (green line); a reference time $\tau_{\text{ref}}$ is drawn from an exponential, the minimum of the two (here $\tau_{\text{bounce}}$) leads to the position of the next point $x^{(i)}$ where either a bounce or a refreshment of the velocity will happen (here a bounce). Figure best seen in colours.}
+	\caption{\label{fig:bps-trajec} Illustration of the process to go from $x^{(i-1)}$ to $x^{(i)}$ in the BPS: a bouncing time $\tau_{\text{bounce}}$ is drawn from the IPP with intensity $\chi(t)$ along the trajectory $x^{(i-1)}+v^{(i-1)}t$ (green line); a reference time $\tau_{\text{ref}}$ is drawn from an exponential, the minimum of the two (here $\tau_{\text{bounce}}$) leads to the position of the next point $x^{(i)}$ where either a bounce or a refreshment of the velocity will happen (here a bounce). Figure best seen in colour.}
 \end{figure}
 %\clearpage
 

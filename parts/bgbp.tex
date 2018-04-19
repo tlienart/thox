@@ -1,6 +1,6 @@
 % !TEX root = ../thesis.tex
 
-In this section we introduce the Belief Propagation (BP) algorithm for tree-structured MRF which, we show, is an iterative algorithm that can recover functions -- the beliefs -- proportional to the exact node marginals by passing ``messages'' through the graph \citep{pearl88,wainwright08}. We also show how this algorithm can be related to the two-filter formula for smoothing on a HMM discussed in chapter \ref{chap:BIS}.
+In this section we introduce the Belief Propagation (BP) algorithm for tree-structured MRFs which, we show, is an iterative algorithm that can recover functions -- the beliefs -- proportional to the exact node marginals by passing ``messages'' through the graph \citep{pearl88,wainwright08}. We also show how this algorithm can be related to the two-filter formula for smoothing on a HMM discussed in chapter \ref{chap:BIS}.
 
 We then introduce the Loopy Belief Propagation (LBP), an extension of the BP algorithm on graphs with cycles. This algorithm does not lead to functions proportional to the exact node marginals but recovers proxies for it which work well in practice \citep{yedidia02,sudderth03}.
 
@@ -130,7 +130,7 @@ In the presence of cycles in the graph (\emph{loopy graph}), BP does not necessa
 \begin{figure}[!h]
 \center
 \includegraphics[width=.7\textwidth]{figures/lbp/loopy1}
-\caption{\label{fig:lbp-inconsistent}A simple graph with a loop. Starting from the leaf node (blue arrow), the message can be propagated in the loop following a clock-wise ordering (green arrow) or a anti-clockwise ordering (orange arrow). The two backward messages coming back to the leaf node do not necessarily match. (This graph is best seen in colours.)}
+\caption{\label{fig:lbp-inconsistent}A simple graph with a loop. Starting from the leaf node (blue arrow), the message can be propagated in the loop following a clock-wise ordering (green arrow) or a anti-clockwise ordering (orange arrow). The two backward messages coming back to the leaf node do not necessarily match. (This graph is best seen in colour.)}
 \end{figure}
 
 A common workaround is to perform the BP algorithm multiple times on different spanning trees of the graphs corresponding to different ordering of the nodes and hope that the iterations converge to a fixed point. This is know as the \emph{loopy belief propagation} (LBP) algorithm \citep{pearl88, yedidia02}:

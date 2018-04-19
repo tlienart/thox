@@ -79,7 +79,7 @@ Let $\omega_{i}=(\theta_{i}-\theta_{i-1})$ denote the difference between subsequ
 	q_{\theta_{K}}(x) &\propto& \pi_{0}(x)\prod_{i=1}^{K}\tilde t_{i}(x).\label{eq:approxadf}
 }
 % 
-The main issue with using ADF on an MRF is that the order in which the graph is read, or equivalently the order in which the factors $t_{i}$ are considered, will affect the final approximation $q_{\theta_{K}}$. A natural extension of the ADF algorithm to take this into account is to perform multiple passes of ADF while considering random orderings of the factors and correct for the fact that each factor is considered multiple times. This is the core idea behind the \emph{Expectation Propagation} algorithm.\check{jul21,may14,aug17}
+The main issue with using ADF on a MRF is that the order in which the graph is read, or equivalently the order in which the factors $t_{i}$ are considered, will affect the final approximation $q_{\theta_{K}}$. A natural extension of the ADF algorithm to take this into account is to perform multiple passes of ADF while considering random orderings of the factors and correct for the fact that each factor is considered multiple times. This is the core idea behind the \emph{Expectation Propagation} algorithm.\check{jul21,may14,aug17}
 %
 % --------------------------------------
 \subsection{\label{point:EP}Expectation Propagation}
